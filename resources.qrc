@@ -1,5 +1,6 @@
 <RCC>
-    <qresource prefix="/plugins/uldk_gugik" >
-        <file>icon.png</file>
-    </qresource>
+  <qresource prefix="/plugins/uldk_gugik">
+    <file>images/icon_uldk2.png</file>
+    <file>images/icon.png</file>
+  </qresource>
 </RCC>

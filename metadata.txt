@@ -10,7 +10,7 @@
 name=Usługa Lokalizacji Działek Katastralnych
 qgisMinimumVersion=3.0
 description=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw.
-version=1.0
+version=0.1
 author=Michał Włoga, Envirosolutions Sp. z o.o.
 email=office@envirosolutions.pl
 

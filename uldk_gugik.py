@@ -21,19 +21,25 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QAction
-
+from qgis.gui import QgsMessageBar
+from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .uldk_gugik_dialog import UldkGugikDialog
 import os.path
+from . import utils, uldk_api
 
+"""Wersja wtyczki"""
+plugin_version = '0.1'
+plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
     """QGIS Plugin Implementation."""
+    nazwy_warstw = {1:"dzialki_ew_uldk", 2:"obreby_ew_uldk", 3:"gminy_uldk", 4:"powiaty_uldk", 5:"wojewodztwa_uldk"}
 
     def __init__(self, iface):
         """Constructor.
@@ -68,6 +74,8 @@ class UldkGugik:
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
+
+
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -162,7 +170,7 @@ class UldkGugik:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/uldk_gugik/icon.png'
+        icon_path = ':/plugins/uldk_gugik/images/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'ULDK'),
@@ -171,7 +179,22 @@ class UldkGugik:
 
         # will be set False in run()
         self.first_start = True
+        self.dlg = UldkGugikDialog()
 
+        # Inicjacja grafik
+        self.dlg.img_main.setPixmap(QPixmap(':/plugins/uldk_gugik/images/icon_uldk2.png'))
+
+        # rozmiar okna
+        self.dlg.setFixedSize(self.dlg.size())
+
+        # informacje o wersji
+        self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
+        self.dlg.lbl_pluginVersion.setText('%s %s' % (plugin_name, plugin_version))
+
+        #eventy
+        self.dlg.btn_download_tab1.clicked.connect(self.btn_download_tab1_clicked)
+        self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
+        self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -181,22 +204,100 @@ class UldkGugik:
                 action)
             self.iface.removeToolBarIcon(action)
 
-
     def run(self):
         """Run method that performs all the real work"""
 
-        # Create the dialog with elements (after translation) and keep reference
-        # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-        if self.first_start == True:
-            self.first_start = False
-            self.dlg = UldkGugikDialog()
-
         # show the dialog
         self.dlg.show()
-        # Run the dialog event loop
-        result = self.dlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+
+    def btn_download_tab1_clicked(self):
+        self.objectType = self.checkedFeatureType()
+
+        objid = self.dlg.edit_id.text().strip()
+
+        if not objid:
+            self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                'musisz wpisać identyfikator',
+                                                level=Qgis.Warning, duration=10)
+        elif utils.isInternetConnected():
+            self.performRequest(pid=objid)
+            self.dlg.hide()
+
+        else:
+            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                'brak połączenia z internetem',
+                                                level=Qgis.Critical, duration=10)
+
+    def btn_download_tab2_clicked(self):
+        pass
+
+    def btn_download_tab3_clicked(self):
+        pass
+
+    def performRequest(self, pid):
+        # warstwa
+        nazwa = self.nazwy_warstw[self.objectType]
+
+        if self.objectType == 1:
+            wkt = uldk_api.getParcelById(pid)
+        elif self.objectType == 2:
+            wkt = uldk_api.getRegionById(pid)
+        elif self.objectType == 3:
+            wkt = uldk_api.getCommuneById(pid)
+        elif self.objectType == 4:
+            wkt = uldk_api.getCountyById(pid)
+        elif self.objectType == 5:
+            wkt = uldk_api.getVoivodeshipById(pid)
+
+        if wkt is None:
+            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                'API nie zwróciło obiektu dla id %s' % pid,
+                                                level=Qgis.Critical, duration=10)
+        else:
+            layers = QgsProject.instance().mapLayersByName(nazwa)
+            if layers:
+                # jezeli istnieje to dodaj obiekt do warstwy
+                layer = layers[0]
+            else:
+                # jezeli nie istnieje to stworz warstwe
+                layer = QgsVectorLayer("Polygon?crs=EPSG:2180", nazwa, "memory")
+                QgsProject.instance().addMapLayer(layer)
+
+            provider = layer.dataProvider()
+            geom = QgsGeometry().fromWkt(wkt)
+            feat = QgsFeature()
+            feat.setGeometry(geom)
+
+            provider.addFeature(feat)
+            layer.updateExtents()
+
+            canvas = self.iface.mapCanvas()
+            canvas.setExtent(layer.extent())
+            canvas.refresh()
+
+            # add attributes
+            identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
+            provider.addAttributes([identyfikatorField])
+            layer.updateFields()
+            idx = layer.fields().indexFromName('identyfikator')
+            attrMap = {1: {idx: pid}}
+            provider.changeAttributeValues(attrMap)
+
+            self.iface.messageBar().pushMessage("Sukces:",
+                                                'pobrano obrys obiektu %s' % (pid),
+                                                level=Qgis.Success, duration=10)
+
+    def checkedFeatureType(self):
+        dlg = self.dlg
+        if dlg.rdb_dz.isChecked():
+            return 1
+        elif dlg.rdb_ob.isChecked():
+            return 2
+        elif dlg.rdb_gm.isChecked():
+            return 3
+        elif dlg.rdb_pw.isChecked():
+            return 4
+        elif dlg.rdb_wo.isChecked():
+            return 5
+        else:
+            return 0
