@@ -276,12 +276,19 @@ class UldkGugik:
             canvas.refresh()
 
             # add attributes
-            identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
-            provider.addAttributes([identyfikatorField])
-            layer.updateFields()
-            idx = layer.fields().indexFromName('identyfikator')
-            attrMap = {1: {idx: pid}}
-            provider.changeAttributeValues(attrMap)
+            if layers:
+                counter = layer.featureCount()
+                idx = layer.fields().indexFromName('identyfikator')
+                attrMap = {counter: {idx: pid}}
+                provider.changeAttributeValues(attrMap)
+
+            else:
+                identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
+                provider.addAttributes([identyfikatorField])
+                layer.updateFields()
+                idx = layer.fields().indexFromName('identyfikator')
+                attrMap = {1: {idx: pid}}
+                provider.changeAttributeValues(attrMap)
 
             self.iface.messageBar().pushMessage("Sukces:",
                                                 'pobrano obrys obiektu %s' % (pid),
