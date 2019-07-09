@@ -19,7 +19,7 @@ about=PL: Wtyczka pozwala na pobieranie geometrii granic działek katastralnych,
 ENG: The plugin allows user to download geometry of parcells, communies, regions. Plugin uses ULDK API of The Central Office of Geodesy and Cartography of Poland
 
 website=https://www.envirosolutions.pl/news/105/129/Usluga-Lokalizacji-Dzialek-Katastralnych.html
-tracker=https://github.com/envirosolutionspl/uldk
+tracker=https://github.com/envirosolutionspl/uldk/issues
 repository=https://github.com/envirosolutionspl/uldk
 # End of mandatory metadata
 
