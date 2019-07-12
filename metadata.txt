@@ -11,8 +11,8 @@ name=Usługa Lokalizacji Działek Katastralnych
 qgisMinimumVersion=3.0
 description=PL: Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw.
 ENG: The plugin made for dowloading parcells geometry from The Central Office of Geodesy and Cartography of Poland "ULDK API"
-version=0.1
-author=Michał Włoga, Envirosolutions Sp. z o.o.
+version=0.2
+author=Michał Włoga & Alicja Konkol, Envirosolutions Sp. z o.o.
 email=office@envirosolutions.pl
 
 about=PL: Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii.

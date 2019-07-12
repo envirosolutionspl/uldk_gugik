@@ -21,17 +21,18 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QAction
-from qgis.gui import QgsMessageBar
-from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField
+from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint
+from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField, \
+    QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .uldk_gugik_dialog import UldkGugikDialog
 import os.path
-from . import utils, uldk_api
+from . import utils, uldk_api, uldk_xy, uldk_teryt
 
 """Wersja wtyczki"""
 plugin_version = '0.1'
@@ -49,6 +50,8 @@ class UldkGugik:
             application at run time.
         :type iface: QgsInterface
         """
+        #DialogOnTop
+
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
@@ -75,7 +78,10 @@ class UldkGugik:
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
 
-
+        self.canvas = self.iface.mapCanvas()
+        # out click tool will emit a QgsPoint on every click
+        self.clickTool = QgsMapToolEmitPoint(self.canvas)
+        self.clickTool.canvasClicked.connect(self.clicked)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -91,7 +97,6 @@ class UldkGugik:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('UldkGugik', message)
-
 
     def add_action(
         self,
@@ -183,6 +188,7 @@ class UldkGugik:
 
         # Inicjacja grafik
         self.dlg.img_main.setPixmap(QPixmap(':/plugins/uldk_gugik/images/icon_uldk2.png'))
+        self.dlg.img_tab2.setPixmap(QPixmap(':/plugins/uldk_gugik/images/coords.png'))
 
         # rozmiar okna
         self.dlg.setFixedSize(self.dlg.size())
@@ -195,6 +201,7 @@ class UldkGugik:
         self.dlg.btn_download_tab1.clicked.connect(self.btn_download_tab1_clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
         self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
+        self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -209,6 +216,7 @@ class UldkGugik:
 
         # show the dialog
         self.dlg.show()
+        self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(2180, QgsCoordinateReferenceSystem.EpsgCrsId))
 
     def btn_download_tab1_clicked(self):
         self.objectType = self.checkedFeatureType()
@@ -229,13 +237,54 @@ class UldkGugik:
                                                 level=Qgis.Critical, duration=10)
 
     def btn_download_tab2_clicked(self):
-        pass
+
+        self.canvas.unsetMapTool(self.clickTool)
+        self.objectType = self.checkedFeatureType()
+
+        objX = self.dlg.doubleSpinBoxX.text().strip()
+        objY = self.dlg.doubleSpinBoxY.text().strip()
+        crs = self.dlg.projectionWidget.crs().authid().split(":")[1]
+
+        if not objX:
+            self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                'musisz wpisać współrzędną X',
+                                                level=Qgis.Warning, duration=10)
+
+        if not objY:
+            self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                'musisz wpisać współrzędną Y',
+                                                level=Qgis.Warning, duration=10)
+
+        elif utils.isInternetConnected():
+            self.performRequestXY(x=objX, y=objY, coord=crs)
+            self.dlg.hide()
+
+        else:
+            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                'brak połączenia z internetem',
+                                                level=Qgis.Critical, duration=10)
+
+    def btn_frommap_clicked(self):
+
+        self.canvas.setMapTool(self.clickTool)
+        self.dlg.hide()
+
+    def clicked(self, point):
+
+        coords = "{}, {}".format(point.x(), point.y())
+
+        self.dlg.doubleSpinBoxX.setValue(point.x())
+        self.dlg.doubleSpinBoxY.setValue(point.y())
+
+        QgsMessageLog.logMessage(str(coords), 'ULDK')
+        self.dlg.show()
 
     def btn_download_tab3_clicked(self):
         pass
 
     def performRequest(self, pid):
-        # warstwa
+
+        # layer
         nazwa = self.nazwy_warstw[self.objectType]
 
         if self.objectType == 1:
@@ -268,11 +317,95 @@ class UldkGugik:
             feat = QgsFeature()
             feat.setGeometry(geom)
 
+            box = feat.geometry().boundingBox()
             provider.addFeature(feat)
             layer.updateExtents()
 
             canvas = self.iface.mapCanvas()
-            canvas.setExtent(layer.extent())
+            canvas.setExtent(box)
+            canvas.refresh()
+
+            # add attributes
+            if layers:
+                counter = layer.featureCount()
+                idx = layer.fields().indexFromName('identyfikator')
+                attrMap = {counter: {idx: pid}}
+                provider.changeAttributeValues(attrMap)
+
+            else:
+                identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
+                provider.addAttributes([identyfikatorField])
+                layer.updateFields()
+                idx = layer.fields().indexFromName('identyfikator')
+                attrMap = {1: {idx: pid}}
+                provider.changeAttributeValues(attrMap)
+
+            self.iface.messageBar().pushMessage("Sukces:",
+                                                'pobrano obrys obiektu %s' % (pid),
+                                                level=Qgis.Success, duration=10)
+
+    def performRequestXY(self, x, y, coord):
+
+        x = x.replace(",", ".")
+        y = y.replace(",", ".")
+        geom = QgsPoint(float(x), float(y))
+        QgsMessageLog.logMessage(str(coord), 'ULDK')
+        sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(coord))
+        destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+        tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+        QgsMessageLog.logMessage(str(tr.destinationCrs), 'ULDK')
+        QgsMessageLog.logMessage(str(tr.sourceCrs), 'ULDK')
+        geom.transform(tr)
+
+        QgsMessageLog.logMessage(str(geom.x()), 'ULDK')
+        QgsMessageLog.logMessage(str(geom.y()), 'ULDK')
+
+        xNew = geom.x()
+        yNew = geom.y()
+
+        pid = str(xNew) + "," + str(yNew)
+
+        # layer
+        nazwa = self.nazwy_warstw[self.objectType]
+
+        if self.objectType == 1:
+            wkt = uldk_xy.getParcelByXY(pid)
+        elif self.objectType == 2:
+            wkt = uldk_xy.getRegionByXY(pid)
+        elif self.objectType == 3:
+            wkt = uldk_xy.getCommuneByXY(pid)
+        elif self.objectType == 4:
+            wkt = uldk_xy.getCountyByXY(pid)
+        elif self.objectType == 5:
+            wkt = uldk_xy.getVoivodeshipByXY(pid)
+
+        if wkt is None:
+            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                'API nie zwróciło obiektu dla współrzędnych %s' % pid,
+                                                level=Qgis.Critical, duration=10)
+        else:
+            pid = wkt[1]
+            wkt = wkt[0]
+            layers = QgsProject.instance().mapLayersByName(nazwa)
+            if layers:
+                # jezeli istnieje to dodaj obiekt do warstwy
+                layer = layers[0]
+            else:
+                # jezeli nie istnieje to stworz warstwe
+                layer = QgsVectorLayer("Polygon?crs=EPSG:2180", nazwa, "memory")
+                QgsProject.instance().addMapLayer(layer)
+
+            provider = layer.dataProvider()
+            geom = QgsGeometry().fromWkt(wkt)
+            feat = QgsFeature()
+            feat.setGeometry(geom)
+            box = feat.geometry().boundingBox()
+
+            provider.addFeature(feat)
+            layer.updateExtents()
+
+            canvas = self.iface.mapCanvas()
+            canvas.setExtent(box)
             canvas.refresh()
 
             # add attributes
