@@ -8,7 +8,7 @@
                               -------------------
         begin                : 2019-05-31
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by Michał Włoga - Envirosolutions Sp. z o.o.
+        copyright            : (C) 2019 by Michał Włoga & Alicja Konkol - Envirosolutions Sp. z o.o.
         email                : office@envirosolutions.pl
  ***************************************************************************/
 
@@ -32,10 +32,10 @@ from .resources import *
 # Import the code for the dialog
 from .uldk_gugik_dialog import UldkGugikDialog
 import os.path
-from . import utils, uldk_api, uldk_xy, uldk_teryt
+from . import utils, uldk_api, uldk_xy
 
 """Wersja wtyczki"""
-plugin_version = '0.1'
+plugin_version = '0.2'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:

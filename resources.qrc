@@ -2,5 +2,6 @@
   <qresource prefix="/plugins/uldk_gugik">
     <file>images/icon_uldk2.png</file>
     <file>images/icon.png</file>
+    <file>images/coords.png</file>
   </qresource>
 </RCC>
