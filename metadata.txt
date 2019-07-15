@@ -9,17 +9,14 @@
 [general]
 name=Usługa Lokalizacji Działek Katastralnych
 qgisMinimumVersion=3.0
-description=PL: Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw.
-ENG: The plugin made for dowloading parcells geometry from The Central Office of Geodesy and Cartography of Poland "ULDK API"
+description=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. ENG: The plugin made for dowloading parcells geometry from The Central Office of Geodesy and Cartography of Poland "ULDK API".
 version=0.2
-author=Michał Włoga & Alicja Konkol, Envirosolutions Sp. z o.o.
+author=Michał Włoga, Alicja Konkol, Envirosolutions Sp. z o.o.
 email=office@envirosolutions.pl
 
-about=PL: Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii.
-ENG: The plugin allows user to download geometry of parcells, communies, regions. Plugin uses ULDK API of The Central Office of Geodesy and Cartography of Poland
+about=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii. ENG: The plugin allows user to download geometry of parcells, communies, regions. Plugin uses ULDK API of The Central Office of Geodesy and Cartography of Poland.
 
-website=https://www.envirosolutions.pl/news/105/129/Usluga-Lokalizacji-Dzialek-Katastralnych.html
-tracker=https://github.com/envirosolutionspl/uldk/issues
+tracker=https://github.com/envirosolutionspl/uldk
 repository=https://github.com/envirosolutionspl/uldk
 # End of mandatory metadata
 
@@ -39,4 +36,6 @@ experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
+
+
 

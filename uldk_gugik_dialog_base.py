@@ -98,7 +98,7 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.img_tab2 = QtWidgets.QLabel(self.tab2)
         self.img_tab2.setGeometry(QtCore.QRect(310, 60, 141, 141))
         self.img_tab2.setText("")
-        self.img_tab2.setPixmap(QtGui.QPixmap("../AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/uldk-master/images/coords.png"))
+        self.img_tab2.setPixmap(QtGui.QPixmap("images/coords.png"))
         self.img_tab2.setScaledContents(True)
         self.img_tab2.setObjectName("img_tab2")
         self.btn_download_tab2 = QtWidgets.QPushButton(self.tab2)
@@ -199,7 +199,7 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.img_main = QtWidgets.QLabel(ULDK_GUGIKDialogBase)
         self.img_main.setGeometry(QtCore.QRect(20, 310, 121, 111))
         self.img_main.setText("")
-        self.img_main.setPixmap(QtGui.QPixmap("../AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/uldk-master/images/icon_uldk2.png"))
+        self.img_main.setPixmap(QtGui.QPixmap("images/icon_uldk2.png"))
         self.img_main.setScaledContents(True)
         self.img_main.setObjectName("img_main")
 

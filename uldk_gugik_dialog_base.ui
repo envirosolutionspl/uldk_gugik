@@ -90,7 +90,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab1">
     <property name="enabled">
@@ -112,7 +112,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>images/icon_uldk2.png</pixmap>
+      <pixmap>../AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/uldk-master/images/icon_uldk2.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -274,12 +274,15 @@
    </widget>
    <widget class="QWidget" name="tab2">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <attribute name="title">
      <string>Wybór przez współrzędne</string>
     </attribute>
     <widget class="QLabel" name="lbl_desc_tab2">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -300,17 +303,17 @@
     <widget class="QLabel" name="img_tab2">
      <property name="geometry">
       <rect>
-       <x>430</x>
-       <y>0</y>
-       <width>121</width>
-       <height>111</height>
+       <x>310</x>
+       <y>60</y>
+       <width>141</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="text">
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>images/icon_uldk2.png</pixmap>
+      <pixmap>images/coords.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -318,7 +321,7 @@
     </widget>
     <widget class="QPushButton" name="btn_download_tab2">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -333,6 +336,9 @@
      </property>
     </widget>
     <widget class="QPushButton" name="btn_frommap">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -359,11 +365,14 @@
      </property>
     </widget>
     <widget class="QGroupBox" name="groupBox_2">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>50</y>
-       <width>181</width>
+       <width>271</width>
        <height>171</height>
       </rect>
      </property>
@@ -398,13 +407,19 @@
       <property name="buttonSymbols">
        <enum>QAbstractSpinBox::NoButtons</enum>
       </property>
+      <property name="decimals">
+       <number>6</number>
+      </property>
+      <property name="maximum">
+       <double>10000000.000000000000000</double>
+      </property>
      </widget>
      <widget class="QgsProjectionSelectionWidget" name="projectionWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>120</y>
-        <width>160</width>
+        <width>221</width>
         <height>27</height>
        </rect>
       </property>
@@ -427,13 +442,19 @@
       <property name="buttonSymbols">
        <enum>QAbstractSpinBox::NoButtons</enum>
       </property>
+      <property name="decimals">
+       <number>6</number>
+      </property>
+      <property name="maximum">
+       <double>10000000.000000000000000</double>
+      </property>
      </widget>
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
         <x>20</x>
         <y>80</y>
-        <width>55</width>
+        <width>16</width>
         <height>16</height>
        </rect>
       </property>
@@ -446,7 +467,7 @@
        <rect>
         <x>20</x>
         <y>50</y>
-        <width>55</width>
+        <width>16</width>
         <height>16</height>
        </rect>
       </property>
@@ -494,7 +515,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>images/icon_uldk2.png</pixmap>
+      <pixmap>../AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/uldk-master/images/icon_uldk2.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
