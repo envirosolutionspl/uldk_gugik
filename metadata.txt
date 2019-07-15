@@ -14,7 +14,7 @@ version=0.2 White Oak
 author=Michał Włoga, Alicja Konkol, Envirosolutions Sp. z o.o.
 email=office@envirosolutions.pl
 
-about=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii. ENG: The plugin allows user to download geometry of parcells, communies, regions. Plugin uses ULDK API of The Central Office of Geodesy and Cartography of Poland.
+about=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw za pomocą numeru TERYT lub współrzędnych w dowolnym układzie. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii. ENG: The plugin allows user to download geometry of parcells, communies, regions using the TERYT number or coordinates in any system. Plugin uses ULDK API of The Central Office of Geodesy and Cartography of Poland.
 
 tracker=https://github.com/envirosolutionspl/uldk
 repository=https://github.com/envirosolutionspl/uldk
