@@ -28,7 +28,7 @@ repository=https://github.com/envirosolutionspl/uldk
 # Tags are comma separated with spaces allowed
 tags=python, uldk, działki, dzialki, ewidencja, gugik, kataster
 
-homepage=http://envirososlutions.pl
+homepage=https://www.envirosolutions.pl/news/105/129/Usluga-Lokalizacji-Dzialek-Katastralnych.html
 category=Plugins
 icon=images/icon.png
 # experimental flag
