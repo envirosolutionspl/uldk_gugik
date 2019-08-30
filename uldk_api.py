@@ -1,10 +1,10 @@
 import requests
-from qgis.core import QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject
 
 URL = "http://uldk.gugik.gov.pl/"
 
-def getRequest(id, request):
-    PARAMS = {'request': request, 'id': id, 'result': 'geom_wkt'}
+
+def getRequest(id, request, result, srid):
+    PARAMS = {'request': request, 'id': id, 'result': result, 'srid': srid}
     r = requests.get(url=URL, params=PARAMS)
     r_txt = r.text
     if r.status_code == 200 and r_txt[0] == '0':
@@ -13,25 +13,35 @@ def getRequest(id, request):
         else:
             return r_txt.split('\n')[1]
     else:
-        print(r_txt)
         return None
 
-def getParcelById(id):
+
+def getParcelById(id, srid):
     request = "GetParcelById"
-    return getRequest(id,request)
+    result = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
+    return getRequest(id, request, result, srid)
 
-def getRegionById(id):
+
+def getRegionById(id, srid):
     request = "GetRegionById"
-    return getRequest(id,request)
+    result = "geom_wkt,teryt,region,commune,county,voivodeship"
+    return getRequest(id, request, result, srid)
 
-def getCommuneById(id):
+
+def getCommuneById(id, srid):
     request = "GetCommuneById"
-    return getRequest(id,request)
+    result = "geom_wkt,teryt,commune,county,voivodeship"
+    return getRequest(id, request, result, srid)
 
-def getCountyById(id):
+
+def getCountyById(id, srid):
     request = "GetCountyById"
-    return getRequest(id,request)
+    result = "geom_wkt,teryt,county,voivodeship"
+    return getRequest(id, request, result, srid)
 
-def getVoivodeshipById(id):
+
+def getVoivodeshipById(id, srid):
     request = "GetVoivodeshipById"
-    return getRequest(id,request)
+    result = "geom_wkt,teryt,voivodeship"
+    return getRequest(id, request, result, srid)
+

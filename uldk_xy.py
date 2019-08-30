@@ -5,46 +5,46 @@ from . import uldk_teryt
 URL = "http://uldk.gugik.gov.pl/"
 
 
-def getRequestXY(xy, request):
-    PARAMS = {'request': request, 'xy': xy, 'result': 'geom_wkt'}
+def getRequestXY(xy, request, result, srid):
+    PARAMS = {'request': request, 'xy': xy, 'result': result, 'srid': srid}
     r = requests.get(url=URL, params=PARAMS)
     r_txt = r.text
-
-    res = ['', '']
+    #print(r_txt)
     if r.status_code == 200 and r_txt[0] == '0':
-        print(r_txt)
         if ";" in r_txt:
-            res[0] = r_txt.split('\n')[1].split(';')[1]
+            return r_txt.split('\n')[1].split(';')[1]
         else:
-            res[0] = r_txt.split('\n')[1]
-
-        res[1] = uldk_teryt.getRequestTeryt(xy, request)
-        return res
+            return r_txt.split('\n')[1]
     else:
         print(r_txt)
         return None
 
 
-def getParcelByXY(xy):
+def getParcelByXY(xy, srid):
     request = "GetParcelByXY"
-    return getRequestXY(xy, request)
+    result = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
+    return getRequestXY(xy, request, result, srid)
 
 
-def getRegionByXY(xy):
+def getRegionByXY(xy, srid):
     request = "GetRegionByXY"
-    return getRequestXY(xy, request)
+    result = "geom_wkt,teryt,region,commune,county,voivodeship"
+    return getRequestXY(xy, request, result, srid)
 
 
-def getCommuneByXY(xy):
+def getCommuneByXY(xy, srid):
     request = "GetCommuneByXY"
-    return getRequestXY(xy, request)
+    result = "geom_wkt,teryt,commune,county,voivodeship"
+    return getRequestXY(xy, request, result, srid)
 
 
-def getCountyByXY(xy):
+def getCountyByXY(xy, srid):
     request = "GetCountyByXY"
-    return getRequestXY(xy, request)
+    result = "geom_wkt,teryt,county,voivodeship"
+    return getRequestXY(xy, request, result, srid)
 
 
-def getVoivodeshipByXY(xy):
+def getVoivodeshipByXY(xy, srid):
     request = "GetVoivodeshipByXY"
-    return getRequestXY(xy, request)
+    result = "geom_wkt,teryt,voivodeship"
+    return getRequestXY(xy, request, result, srid)
