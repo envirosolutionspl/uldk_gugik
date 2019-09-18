@@ -41,7 +41,7 @@ plugin_name = 'ULDK GUGiK'
 class UldkGugik:
     """QGIS Plugin Implementation."""
     nazwy_warstw = {1:"dzialki_ew_uldk", 2:"obreby_ew_uldk", 3:"gminy_uldk", 4:"powiaty_uldk", 5:"wojewodztwa_uldk"}
-    crs = None
+    crs = 2180
 
     def __init__(self, iface):
         """Constructor.
@@ -207,7 +207,7 @@ class UldkGugik:
         self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
 
-        self.crs = QgsProject.instance().crs().authid().split(":")[1]
+
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -222,7 +222,6 @@ class UldkGugik:
 
         # show the dialog
         self.dlg.show()
-
         self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(self.crs), QgsCoordinateReferenceSystem.EpsgCrsId))
 
     def btn_download_tab1_clicked(self):
