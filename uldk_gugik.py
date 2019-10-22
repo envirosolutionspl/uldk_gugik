@@ -23,7 +23,7 @@
 """
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QToolBar
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField, \
     QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog
@@ -35,7 +35,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy
 
 """Wersja wtyczki"""
-plugin_version = '1.0 RedOak'
+plugin_version = '1.0.1 RedOak'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -73,7 +73,13 @@ class UldkGugik:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Usługa Lokalizacji Działek Katastralnych')
+        self.menu = self.tr(u'&EnviroSolutions')
+
+        #toolbar definicja
+        self.toolbar = self.iface.mainWindow().findChild(QToolBar, 'EnviroSolutions')
+        if not self.toolbar:
+            self.toolbar = self.iface.addToolBar(u'EnviroSolutions')
+            self.toolbar.setObjectName(u'EnviroSolutions')
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -163,7 +169,8 @@ class UldkGugik:
 
         if add_to_toolbar:
             # Adds plugin icon to Plugins toolbar
-            self.iface.addToolBarIcon(action)
+            #self.iface.addToolBarIcon(action) # do plugins
+            self.toolbar.addAction(action) # do EnviroSolutions
 
         if add_to_menu:
             self.iface.addPluginToMenu(
@@ -180,7 +187,7 @@ class UldkGugik:
         icon_path = ':/plugins/uldk_gugik/images/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'ULDK'),
+            text=self.tr(u'Usługa Lokalizacji Działek Katastralnych (ULDK)'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -207,15 +214,14 @@ class UldkGugik:
         self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
 
-
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Usługa Lokalizacji Działek Katastralnych'),
+                self.tr(u'&EnviroSolutions'),
                 action)
-            self.iface.removeToolBarIcon(action)
+            #self.iface.removeToolBarIcon(action)
+            self.toolbar.removeAction(action)
 
     def run(self):
         """Run method that performs all the real work"""
@@ -300,13 +306,7 @@ class UldkGugik:
                                                     'API nie zwróciło obiektu dla id %s' % pid,
                                                     level=Qgis.Critical, duration=10)
                 return
-
             res = uldk_api.getParcelById(pid, self.crs).split("|")
-            if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
-                return
             wkt = res [0]
             teryt = res [1]
             parcel = res [2]
@@ -323,11 +323,6 @@ class UldkGugik:
                                                     level=Qgis.Critical, duration=10)
                 return
             res = uldk_api.getRegionById(pid, self.crs).split("|")
-            if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
-                return
             wkt = res[0]
             teryt = res[1]
             parcel = None
@@ -344,11 +339,6 @@ class UldkGugik:
                                                     level=Qgis.Critical, duration=10)
                 return
             res = uldk_api.getCommuneById(pid, self.crs).split("|")
-            if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
-                return
             wkt = res[0]
             teryt = res[1]
             parcel = None
@@ -365,11 +355,6 @@ class UldkGugik:
                                                     level=Qgis.Critical, duration=10)
                 return
             res = uldk_api.getCountyById(pid, self.crs).split("|")
-            if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
-                return
             wkt = res[0]
             teryt = res[1]
             parcel = None
@@ -385,11 +370,6 @@ class UldkGugik:
                                                     level=Qgis.Critical, duration=10)
                 return
             res = uldk_api.getVoivodeshipById(pid, self.crs).split("|")
-            if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
-                return
             wkt = res[0]
             teryt = res[1]
             parcel = None
