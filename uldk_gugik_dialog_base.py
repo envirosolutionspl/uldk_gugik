@@ -2,11 +2,12 @@
 
 # Form implementation generated from reading ui file 'uldk_gugik_dialog_base.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_ULDK_GUGIKDialogBase(object):
     def setupUi(self, ULDK_GUGIKDialogBase):
@@ -154,16 +155,26 @@ class Ui_ULDK_GUGIKDialogBase(object):
         font.setPointSize(11)
         self.lbl_desc_tab3.setFont(font)
         self.lbl_desc_tab3.setObjectName("lbl_desc_tab3")
-        self.img_tab3 = QtWidgets.QLabel(self.tab3)
-        self.img_tab3.setGeometry(QtCore.QRect(430, 10, 121, 111))
-        self.img_tab3.setText("")
-        self.img_tab3.setPixmap(QtGui.QPixmap("../AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/uldk-master/images/icon_uldk2.png"))
-        self.img_tab3.setScaledContents(True)
-        self.img_tab3.setObjectName("img_tab3")
         self.btn_download_tab3 = QtWidgets.QPushButton(self.tab3)
         self.btn_download_tab3.setEnabled(False)
         self.btn_download_tab3.setGeometry(QtCore.QRect(450, 250, 93, 28))
         self.btn_download_tab3.setObjectName("btn_download_tab3")
+        self.label_10 = QtWidgets.QLabel(self.tab3)
+        self.label_10.setGeometry(QtCore.QRect(10, 50, 421, 51))
+        self.label_10.setObjectName("label_10")
+        self.label_13 = QtWidgets.QLabel(self.tab3)
+        self.label_13.setGeometry(QtCore.QRect(10, 130, 421, 51))
+        self.label_13.setObjectName("label_13")
+        self.edit_id_3 = QtWidgets.QLineEdit(self.tab3)
+        self.edit_id_3.setGeometry(QtCore.QRect(10, 170, 411, 31))
+        self.edit_id_3.setText("")
+        self.edit_id_3.setObjectName("edit_id_3")
+        self.comboBox = QtWidgets.QComboBox(self.tab3)
+        self.comboBox.setEnabled(False)
+        self.comboBox.setGeometry(QtCore.QRect(10, 90, 411, 31))
+        self.comboBox.setAcceptDrops(False)
+        self.comboBox.setEditable(True)
+        self.comboBox.setObjectName("comboBox")
         self.tabWidget.addTab(self.tab3, "")
         self.groupBox = QtWidgets.QGroupBox(ULDK_GUGIKDialogBase)
         self.groupBox.setGeometry(QtCore.QRect(10, 90, 151, 171))
@@ -204,7 +215,7 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.img_main.setObjectName("img_main")
 
         self.retranslateUi(ULDK_GUGIKDialogBase)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(ULDK_GUGIKDialogBase)
 
     def retranslateUi(self, ULDK_GUGIKDialogBase):
@@ -233,6 +244,8 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab2), _translate("ULDK_GUGIKDialogBase", "Wybór przez współrzędne"))
         self.lbl_desc_tab3.setText(_translate("ULDK_GUGIKDialogBase", "Wybór obiektu przez nazwę obrębu i numer działki"))
         self.btn_download_tab3.setText(_translate("ULDK_GUGIKDialogBase", "Pobierz"))
+        self.label_10.setText(_translate("ULDK_GUGIKDialogBase", "Wprowadź nazwę obrębu (np. Mińsk Mazowiecki):"))
+        self.label_13.setText(_translate("ULDK_GUGIKDialogBase", "Wprowadź numer działki (np. 6509):"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab3), _translate("ULDK_GUGIKDialogBase", "Wybór przez nazwę obrębu i numer działki"))
         self.groupBox.setTitle(_translate("ULDK_GUGIKDialogBase", "Warstwa do pobrania"))
         self.rdb_dz.setText(_translate("ULDK_GUGIKDialogBase", "Działka"))
@@ -241,5 +254,6 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.rdb_pw.setText(_translate("ULDK_GUGIKDialogBase", "Powiat"))
         self.rdb_wo.setText(_translate("ULDK_GUGIKDialogBase", "Województwo"))
         self.lbl_title.setText(_translate("ULDK_GUGIKDialogBase", "Wybierz sposób wyszukania i pobrania obrysu"))
+
 
 from qgsprojectionselectionwidget import QgsProjectionSelectionWidget
