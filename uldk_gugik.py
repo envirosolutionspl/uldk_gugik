@@ -41,8 +41,7 @@ plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
     """QGIS Plugin Implementation."""
-    nazwy_warstw = {1:"dzialki_ew_uldk", 2:"obreby_ew_uldk", 3:"gminy_uldk", 4:"powiaty_uldk", 5:"wojewodztwa_uldk"}
-    crs = 2180
+    nazwy_warstw = {1: "dzialki_ew_uldk", 2: "obreby_ew_uldk", 3: "gminy_uldk", 4: "powiaty_uldk", 5: "wojewodztwa_uldk"}
 
     def __init__(self, iface):
         """Constructor.
@@ -97,7 +96,6 @@ class UldkGugik:
         self.shortcut = QShortcut(iface.mainWindow())
         self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_D))
         self.shortcut.activated.connect(self.shortcut_activated)
-
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -222,7 +220,6 @@ class UldkGugik:
         self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -233,27 +230,26 @@ class UldkGugik:
             self.toolbar.removeAction(action)
 
     def run(self):
-        """Run method that performs all the real work"""
+        """Otwarcie okna wtyczki"""
 
         # show the dialog
         self.dlg.show()
-        self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(self.crs), QgsCoordinateReferenceSystem.EpsgCrsId))
-
-
+        srid = QgsProject.instance().crs().authid().split(":")[1]
+        self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
 
     def btn_download_tab1_clicked(self):
-
+        """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
 
         self.objectType = self.checkedFeatureType()
 
-        objid = self.dlg.edit_id.text().strip()
+        teryt = self.dlg.edit_id.text().strip()
 
-        if not objid:
+        if not teryt:
             self.iface.messageBar().pushMessage("Błąd formularza:",
                                                 'musisz wpisać identyfikator',
                                                 level=Qgis.Warning, duration=10)
         elif utils.isInternetConnected():
-            self.performRequest(pid=objid)
+            self.performRequest(pid=teryt)
             self.dlg.hide()
 
         else:
@@ -262,54 +258,8 @@ class UldkGugik:
                                                 level=Qgis.Critical, duration=10)
 
     def btn_download_tab2_clicked(self):
-        """pobieranie według X i Y wpisanych ręcznie"""
-        # self.crs = QgsProject.instance().crs().authid().split(":")[1]
+        """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
-        self.downloadByXY(srid)
-
-    def downloadByXY(self, srid):
-        """pobranie według X i Y i SRID"""
-
-        self.objectType = self.checkedFeatureType()
-
-        objX = self.dlg.doubleSpinBoxX.text().strip()
-        objY = self.dlg.doubleSpinBoxY.text().strip()
-
-        if not objX:
-            self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                'musisz wpisać współrzędną X',
-                                                level=Qgis.Warning, duration=10)
-
-        if not objY:
-            self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                'musisz wpisać współrzędną Y',
-                                                level=Qgis.Warning, duration=10)
-
-        elif utils.isInternetConnected():
-            self.performRequestXY(x=objX, y=objY, srid=srid)
-            self.dlg.hide()
-
-        else:
-            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                'brak połączenia z internetem',
-                                                level=Qgis.Critical, duration=10)
-    def shortcut_activated(self):
-        self.canvas.setMapTool(self.clickTool)
-
-
-    def btn_frommap_clicked(self):
-        self.canvas.setMapTool(self.clickTool)
-        self.dlg.hide()
-
-    def canvasClicked(self, point):
-        """kliknięte na mapie"""
-        self.canvas.unsetMapTool(self.clickTool)
-        self.dlg.doubleSpinBoxX.setValue(point.x())
-        self.dlg.doubleSpinBoxY.setValue(point.y())
-
-        coords = "{}, {}".format(point.x(), point.y())
-        QgsMessageLog.logMessage(str(coords), 'ULDK')
-        srid = QgsProject.instance().crs().authid().split(":")[1]
         self.downloadByXY(srid)
 
     def btn_download_tab3_clicked(self):
@@ -337,6 +287,53 @@ class UldkGugik:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                 'brak połączenia z internetem',
                                                 level=Qgis.Critical, duration=10)
+
+    def downloadByXY(self, srid):
+        """pobranie według X i Y i SRID"""
+
+        self.objectType = self.checkedFeatureType()
+
+        objX = self.dlg.doubleSpinBoxX.text().strip()
+        objY = self.dlg.doubleSpinBoxY.text().strip()
+
+        if not objX:
+            self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                'musisz wpisać współrzędną X',
+                                                level=Qgis.Warning, duration=10)
+
+        if not objY:
+            self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                'musisz wpisać współrzędną Y',
+                                                level=Qgis.Warning, duration=10)
+
+        elif utils.isInternetConnected():
+            self.performRequestXY(x=objX, y=objY, srid=srid)
+            self.dlg.hide()
+
+        else:
+            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                'brak połączenia z internetem',
+                                                level=Qgis.Critical, duration=10)
+
+    def shortcut_activated(self):
+        """zdarzenie aktywowania klawisza skrótu wskazania działki na mapie"""
+        self.canvas.setMapTool(self.clickTool)
+
+    def btn_frommap_clicked(self):
+        """zdarzenie wciśnięcia w oknie wtyczki klawisza wskazania działki na mapie"""
+        self.canvas.setMapTool(self.clickTool)
+        self.dlg.hide()
+
+    def canvasClicked(self, point):
+        """kliknięcie na mapie"""
+        self.canvas.unsetMapTool(self.clickTool)
+        self.dlg.doubleSpinBoxX.setValue(point.x())
+        self.dlg.doubleSpinBoxY.setValue(point.y())
+
+        coords = "{}, {}".format(point.x(), point.y())
+        QgsMessageLog.logMessage(str(coords), 'ULDK')
+        srid = QgsProject.instance().crs().authid().split(":")[1]
+        self.downloadByXY(srid)
 
     def performRequestParcel(self, region, parcel):
 
@@ -644,6 +641,7 @@ class UldkGugik:
                                             level=Qgis.Success, duration=10)
 
     def performRequestXY(self, x, y, srid):
+        """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
         x = float(x.replace(",", "."))
         y = float(y.replace(",", "."))
@@ -836,6 +834,16 @@ class UldkGugik:
                                             level=Qgis.Success, duration=10)
 
     def checkedFeatureType(self):
+        """
+        Fukncja pomocnicza sprawdzająca jaki typ obiektu jest zaznaczony w oknie wtyczki
+        @returns:
+        1 - działka ewidencyjna
+        2 - obręb ewidencyjny
+        3 - gmina
+        4 - powiat
+        5 - województwo
+        0 - niezdefiniowany
+        """
         dlg = self.dlg
         if dlg.rdb_dz.isChecked():
             return 1
