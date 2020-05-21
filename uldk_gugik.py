@@ -97,6 +97,7 @@ class UldkGugik:
         self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_D))
         self.shortcut.activated.connect(self.shortcut_activated)
 
+
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -221,6 +222,7 @@ class UldkGugik:
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
 
+
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -287,7 +289,7 @@ class UldkGugik:
                                                 'brak połączenia z internetem',
                                                 level=Qgis.Critical, duration=10)
 
-    def downloadByXY(self, srid):
+    def downloadByXY(self, srid, zoomToFeature=True):
         """pobranie według X i Y i SRID"""
 
         self.objectType = self.checkedFeatureType()
@@ -306,7 +308,7 @@ class UldkGugik:
                                                 level=Qgis.Warning, duration=10)
 
         elif utils.isInternetConnected():
-            self.performRequestXY(x=objX, y=objY, srid=srid)
+            self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
             self.dlg.hide()
 
         else:
@@ -332,7 +334,7 @@ class UldkGugik:
         coords = "{}, {}".format(point.x(), point.y())
         QgsMessageLog.logMessage(str(coords), 'ULDK')
         srid = QgsProject.instance().crs().authid().split(":")[1]
-        self.downloadByXY(srid)
+        self.downloadByXY(srid, zoomToFeature=False)
 
     def performRequestParcel(self, region, parcel):
 
@@ -583,7 +585,7 @@ class UldkGugik:
                                             'pobrano obrys obiektu %s' % (teryt),
                                             level=Qgis.Success, duration=10)
 
-    def performRequestXY(self, x, y, srid):
+    def performRequestXY(self, x, y, srid, zoomToFeature=True):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
         objectType = self.checkedFeatureType()
 
@@ -694,33 +696,22 @@ class UldkGugik:
             region=region,
             commune=commune,
             county=county,
-            voivodeship=voivodeship
+            voivodeship=voivodeship,
+            zoomToFeature=zoomToFeature
         )
 
         self.iface.messageBar().pushMessage("Sukces:",
                                             'pobrano obrys obiektu %s' % teryt,
                                             level=Qgis.Success, duration=10)
 
-    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship):
+    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature=True):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
-
-        canvas = self.iface.mapCanvas()
 
         feat = QgsFeature()
         feat.setGeometry(QgsGeometry().fromWkt(wkt))
 
-        projectCrs = QgsProject.instance().crs().authid().split(":")[1]
 
-        if projectCrs != '2180':
-            sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-            destCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
-            tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
-            box = tr.transform(feat.geometry().boundingBox())
-        else:
-            box = feat.geometry().boundingBox()
 
-        canvas.setExtent(box)
-        canvas.refresh()
 
 
         # layer
@@ -792,6 +783,22 @@ class UldkGugik:
             attrMap = {featId: {con: county}}
             provider.changeAttributeValues(attrMap)
 
+        if zoomToFeature:
+            projectCrs = QgsProject.instance().crs().authid().split(":")[1]
+
+            if projectCrs != '2180':
+                sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                box = tr.transform(feat.geometry().boundingBox())
+            else:
+                box = feat.geometry().boundingBox()
+
+            self.canvas.setExtent(box)
+            self.canvas.refresh()
+        else:
+            layer.triggerRepaint()
+            
     def checkedFeatureType(self):
         """
         Fukncja pomocnicza sprawdzająca jaki typ obiektu jest zaznaczony w oknie wtyczki
