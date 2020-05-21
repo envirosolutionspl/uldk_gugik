@@ -27,6 +27,7 @@ changelog=
   Wersja 1.2.0
   * Dodanie skrótu klawiszowego ALT + D do pobierania obiektu poprzez kliknięcie z mapy
   * Poprawa wydajności i drobnych błędów
+  * Dostosowanie do QGIS 3.0
 
 # Tags are comma separated with spaces allowed
 tags=python, uldk, działki, dzialki, ewidencja, gugik, kataster

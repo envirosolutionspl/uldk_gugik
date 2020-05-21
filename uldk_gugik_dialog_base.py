@@ -254,4 +254,4 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.rdb_wo.setText(_translate("ULDK_GUGIKDialogBase", "Województwo"))
         self.lbl_title.setText(_translate("ULDK_GUGIKDialogBase", "Wybierz sposób wyszukania i pobrania obrysu"))
 
-from qgsprojectionselectionwidget import QgsProjectionSelectionWidget
+from qgis.gui import QgsProjectionSelectionWidget
