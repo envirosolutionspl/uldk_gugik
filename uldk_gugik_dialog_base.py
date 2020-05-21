@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file 'uldk_gugik_dialog_base.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_ULDK_GUGIKDialogBase(object):
     def setupUi(self, ULDK_GUGIKDialogBase):
@@ -215,7 +214,7 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.img_main.setObjectName("img_main")
 
         self.retranslateUi(ULDK_GUGIKDialogBase)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(ULDK_GUGIKDialogBase)
 
     def retranslateUi(self, ULDK_GUGIKDialogBase):
@@ -254,6 +253,5 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.rdb_pw.setText(_translate("ULDK_GUGIKDialogBase", "Powiat"))
         self.rdb_wo.setText(_translate("ULDK_GUGIKDialogBase", "Województwo"))
         self.lbl_title.setText(_translate("ULDK_GUGIKDialogBase", "Wybierz sposób wyszukania i pobrania obrysu"))
-
 
 from qgsprojectionselectionwidget import QgsProjectionSelectionWidget
