@@ -36,7 +36,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.1.1 RedOak'
+plugin_version = '1.2.0'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -219,6 +219,7 @@ class UldkGugik:
         self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
         self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
+        self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -239,8 +240,6 @@ class UldkGugik:
 
     def btn_download_tab1_clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
-
-        self.objectType = self.checkedFeatureType()
 
         teryt = self.dlg.edit_id.text().strip()
 
@@ -447,9 +446,9 @@ class UldkGugik:
 
     def performRequestTeryt(self, teryt):
         """wykonanie zapytania pobierającego obiekt na podstawie kodu TERYT"""
-        projectSrid = QgsProject.instance().crs().authid().split(":")[1]
+        objectType = self.checkedFeatureType()
 
-        if self.objectType == 1:
+        if objectType == 1:
             resp = uldk_api.getParcelById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -473,7 +472,7 @@ class UldkGugik:
             voivodeship = res[6]
             # print(teryt, parcel, region, commune, county, voivodeship)
 
-        elif self.objectType == 2:
+        elif objectType == 2:
             resp = uldk_api.getRegionById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -497,7 +496,7 @@ class UldkGugik:
             voivodeship = res[5]
             # print(teryt, region, commune, county, voivodeship)
 
-        elif self.objectType == 3:
+        elif objectType == 3:
             resp = uldk_api.getCommuneById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -521,7 +520,7 @@ class UldkGugik:
             voivodeship = res[4]
             # print(teryt, commune, county, voivodeship)
 
-        elif self.objectType == 4:
+        elif objectType == 4:
             resp = uldk_api.getCountyById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -545,7 +544,7 @@ class UldkGugik:
             voivodeship = res[3]
             # print(teryt, county, voivodeship)
 
-        elif self.objectType == 5:
+        elif objectType == 5:
             resp = uldk_api.getVoivodeshipById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -570,7 +569,7 @@ class UldkGugik:
             # print(teryt, voivodeship)
 
         self.addResultsToLayer(
-            objectType=self.objectType,
+            objectType=objectType,
             wkt=wkt,
             teryt=teryt,
             parcel=parcel,
@@ -586,6 +585,7 @@ class UldkGugik:
 
     def performRequestXY(self, x, y, srid):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
+        objectType = self.checkedFeatureType()
 
         x = float(x.replace(",", "."))
         y = float(y.replace(",", "."))
@@ -601,7 +601,7 @@ class UldkGugik:
         pid = str(requestPoint.x()) + "," + str(requestPoint.y())
 
 
-        if self.objectType == 1:# działka
+        if objectType == 1:# działka
             resp = uldk_xy.getParcelByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -618,7 +618,7 @@ class UldkGugik:
             voivodeship = res[6]
             print(teryt, parcel, region, commune, county, voivodeship)
 
-        elif self.objectType == 2:
+        elif objectType == 2:
             resp = uldk_xy.getRegionByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -635,7 +635,7 @@ class UldkGugik:
             voivodeship = res[5]
             print(teryt, region, commune, county, voivodeship)
 
-        elif self.objectType == 3:
+        elif objectType == 3:
             resp = uldk_xy.getCommuneByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -652,7 +652,7 @@ class UldkGugik:
             voivodeship = res[4]
             print(teryt, commune, county, voivodeship)
 
-        elif self.objectType == 4:
+        elif objectType == 4:
             resp = uldk_xy.getCountyByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -669,7 +669,7 @@ class UldkGugik:
             voivodeship = res[3]
             print(teryt, county, voivodeship)
 
-        elif self.objectType == 5:
+        elif objectType == 5:
             resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -687,7 +687,7 @@ class UldkGugik:
             print(teryt, voivodeship)
 
         self.addResultsToLayer(
-            objectType=self.objectType,
+            objectType=objectType,
             wkt=wkt,
             teryt=teryt,
             parcel=parcel,
@@ -729,7 +729,7 @@ class UldkGugik:
         if layers:
             # jezeli istnieje to dodaj obiekt do warstwy
             layer = layers[0]
-            featId = layer.featureCount()
+            featId = layer.featureCount() + 1
 
             provider = layer.dataProvider()
             provider.addFeature(feat)

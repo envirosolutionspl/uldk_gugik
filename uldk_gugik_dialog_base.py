@@ -107,7 +107,7 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.btn_download_tab2.setObjectName("btn_download_tab2")
         self.btn_frommap = QtWidgets.QPushButton(self.tab2)
         self.btn_frommap.setEnabled(True)
-        self.btn_frommap.setGeometry(QtCore.QRect(30, 260, 161, 27))
+        self.btn_frommap.setGeometry(QtCore.QRect(20, 260, 271, 27))
         self.btn_frommap.setObjectName("btn_frommap")
         self.label_12 = QtWidgets.QLabel(self.tab2)
         self.label_12.setGeometry(QtCore.QRect(80, 230, 55, 16))
@@ -214,7 +214,7 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.img_main.setObjectName("img_main")
 
         self.retranslateUi(ULDK_GUGIKDialogBase)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(ULDK_GUGIKDialogBase)
 
     def retranslateUi(self, ULDK_GUGIKDialogBase):
@@ -235,7 +235,7 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab1), _translate("ULDK_GUGIKDialogBase", "Wybór przez ID"))
         self.lbl_desc_tab2.setText(_translate("ULDK_GUGIKDialogBase", "Wybór obiektu przez współrzędne"))
         self.btn_download_tab2.setText(_translate("ULDK_GUGIKDialogBase", "Pobierz"))
-        self.btn_frommap.setText(_translate("ULDK_GUGIKDialogBase", "Wskaż punkt na mapie"))
+        self.btn_frommap.setText(_translate("ULDK_GUGIKDialogBase", "Wskaż punkt na mapie (ALT + D)"))
         self.label_12.setText(_translate("ULDK_GUGIKDialogBase", "lub"))
         self.label_11.setText(_translate("ULDK_GUGIKDialogBase", "Wprowadź współrzędne"))
         self.label_9.setText(_translate("ULDK_GUGIKDialogBase", "Y"))

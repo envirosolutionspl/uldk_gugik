@@ -90,7 +90,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab1">
     <property name="enabled">
@@ -341,14 +341,14 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>260</y>
-       <width>161</width>
+       <width>271</width>
        <height>27</height>
       </rect>
      </property>
      <property name="text">
-      <string>Wskaż punkt na mapie</string>
+      <string>Wskaż punkt na mapie (ALT + D)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_12">
