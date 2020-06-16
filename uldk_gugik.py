@@ -36,7 +36,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.2.0'
+plugin_version = '1.2.1'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -264,7 +264,6 @@ class UldkGugik:
         self.downloadByXY(srid)
 
     def btn_download_tab3_clicked(self):
-        self.objectType = self.checkedFeatureType()
 
         objRegion = self.dlg.edit_id_2.text().strip()
 
@@ -292,7 +291,7 @@ class UldkGugik:
     def downloadByXY(self, srid, zoomToFeature=True):
         """pobranie według X i Y i SRID"""
 
-        self.objectType = self.checkedFeatureType()
+
 
         objX = self.dlg.doubleSpinBoxX.text().strip()
         objY = self.dlg.doubleSpinBoxY.text().strip()
@@ -337,7 +336,7 @@ class UldkGugik:
         self.downloadByXY(srid, zoomToFeature=False)
 
     def performRequestParcel(self, region, parcel):
-
+        objectType = self.checkedFeatureType()
         self.crs = QgsProject.instance().crs().authid().split(":")[1]
 
         name = region + ' ' + parcel
@@ -365,7 +364,7 @@ class UldkGugik:
         # print(teryt, parcel, region, commune, county, voivodeship)
 
         # layer
-        nazwa = self.nazwy_warstw[self.objectType]
+        nazwa = self.nazwy_warstw[objectType]
         layers = QgsProject.instance().mapLayersByName(nazwa)
         geom = QgsGeometry().fromWkt(wkt)
         feat = QgsFeature()
@@ -448,9 +447,9 @@ class UldkGugik:
 
     def performRequestTeryt(self, teryt):
         """wykonanie zapytania pobierającego obiekt na podstawie kodu TERYT"""
-        objectType = self.checkedFeatureType()
+        object_type = self.checkedFeatureType()
 
-        if objectType == 1:
+        if object_type == 1:
             resp = uldk_api.getParcelById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -474,7 +473,7 @@ class UldkGugik:
             voivodeship = res[6]
             # print(teryt, parcel, region, commune, county, voivodeship)
 
-        elif objectType == 2:
+        elif object_type == 2:
             resp = uldk_api.getRegionById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -498,7 +497,7 @@ class UldkGugik:
             voivodeship = res[5]
             # print(teryt, region, commune, county, voivodeship)
 
-        elif objectType == 3:
+        elif object_type == 3:
             resp = uldk_api.getCommuneById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -522,7 +521,7 @@ class UldkGugik:
             voivodeship = res[4]
             # print(teryt, commune, county, voivodeship)
 
-        elif objectType == 4:
+        elif object_type == 4:
             resp = uldk_api.getCountyById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -546,7 +545,7 @@ class UldkGugik:
             voivodeship = res[3]
             # print(teryt, county, voivodeship)
 
-        elif objectType == 5:
+        elif object_type == 5:
             resp = uldk_api.getVoivodeshipById(teryt, '2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -571,7 +570,7 @@ class UldkGugik:
             # print(teryt, voivodeship)
 
         self.addResultsToLayer(
-            objectType=objectType,
+            objectType=object_type,
             wkt=wkt,
             teryt=teryt,
             parcel=parcel,
@@ -587,8 +586,8 @@ class UldkGugik:
 
     def performRequestXY(self, x, y, srid, zoomToFeature=True):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
-        objectType = self.checkedFeatureType()
 
+        objectType = self.checkedFeatureType()
         x = float(x.replace(",", "."))
         y = float(y.replace(",", "."))
         requestPoint = QgsPoint(x, y)
@@ -710,10 +709,6 @@ class UldkGugik:
         feat = QgsFeature()
         feat.setGeometry(QgsGeometry().fromWkt(wkt))
 
-
-
-
-
         # layer
         nazwa = self.nazwy_warstw[objectType]
         layers = QgsProject.instance().mapLayersByName(nazwa)
@@ -739,19 +734,19 @@ class UldkGugik:
             voivField = QgsField('województwo', QVariant.String, len=30)
             provider.addAttributes([voivField])
 
-            if self.objectType == 4 or self.objectType == 3 or self.objectType == 2 or self.objectType == 1:
+            if objectType == 4 or objectType == 3 or objectType == 2 or objectType == 1:
                 conField = QgsField('powiat', QVariant.String, len=30)
                 provider.addAttributes([conField])
 
-            if self.objectType == 3 or self.objectType == 2 or self.objectType == 1:
+            if objectType == 3 or objectType == 2 or objectType == 1:
                 comField = QgsField('gmina', QVariant.String, len=30)
                 provider.addAttributes([comField])
 
-            if self.objectType == 2 or self.objectType == 1:
+            if objectType == 2 or objectType == 1:
                 regField = QgsField('obręb', QVariant.String, len=30)
                 provider.addAttributes([regField])
 
-            if self.objectType == 1:
+            if objectType == 1:
                 parField = QgsField('numer', QVariant.String, len=30)
                 provider.addAttributes([parField])
 
