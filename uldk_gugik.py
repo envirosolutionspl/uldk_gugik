@@ -36,7 +36,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.2.1'
+plugin_version = '1.2.2'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -51,6 +51,12 @@ class UldkGugik:
             application at run time.
         :type iface: QgsInterface
         """
+
+        from .qgis_feed import QgisFeed
+        if Qgis.QGIS_VERSION_INT >= 31000:
+            self.feed = QgisFeed()
+            self.feed.initFeed()
+
         #DialogOnTop
 
         # Save reference to the QGIS interface
@@ -190,6 +196,7 @@ class UldkGugik:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
+
 
         icon_path = ':/plugins/uldk_gugik/images/icon.png'
         self.add_action(
