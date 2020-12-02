@@ -36,7 +36,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.2.2'
+plugin_version = '1.2.3'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -52,8 +52,9 @@ class UldkGugik:
         :type iface: QgsInterface
         """
 
-        from .qgis_feed import QgisFeed
+
         if Qgis.QGIS_VERSION_INT >= 31000:
+            from .qgis_feed import QgisFeed
             self.feed = QgisFeed()
             self.feed.initFeed()
 
