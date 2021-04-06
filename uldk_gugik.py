@@ -373,6 +373,8 @@ class UldkGugik:
 
         # layer
         nazwa = self.nazwy_warstw[objectType]
+        print(objectType)
+        print(nazwa)
         layers = QgsProject.instance().mapLayersByName(nazwa)
         geom = QgsGeometry().fromWkt(wkt)
         feat = QgsFeature()
@@ -380,9 +382,11 @@ class UldkGugik:
         canvas = self.iface.mapCanvas()
 
         if layers:
+            print('istnieje')
             # jezeli istnieje to dodaj obiekt do warstwy
             layer = layers[0]
         else:
+            print('nie istnieje')
             # jezeli nie istnieje to stworz warstwe
             epsg = "Polygon?crs=EPSG:" + self.crs
             layer = QgsVectorLayer(epsg, nazwa, "memory")
@@ -720,16 +724,10 @@ class UldkGugik:
         # layer
         nazwa = self.nazwy_warstw[objectType]
         layers = QgsProject.instance().mapLayersByName(nazwa)
-        if layers:
-            # jezeli istnieje to dodaj obiekt do warstwy
-            layer = layers[0]
-            featId = layer.featureCount() + 1
 
-            provider = layer.dataProvider()
-            provider.addFeature(feat)
-
-        else:
+        if not layers or layers[0].featureCount()==0:
             # jezeli nie istnieje to stworz warstwe
+            print('nie istnieje 2')
             layer = QgsVectorLayer("Polygon?crs=EPSG:2180", nazwa, "memory")
             QgsProject.instance().addMapLayer(layer)
 
@@ -761,6 +759,14 @@ class UldkGugik:
             layer.updateFields()
             featId = 1
 
+        else:
+
+            # jezeli istnieje to dodaj obiekt do warstwy
+            layer = layers[0]
+            featId = layer.featureCount() + 1
+
+            provider = layer.dataProvider()
+            provider.addFeature(feat)
 
         idx = layer.fields().indexFromName('identyfikator')
         voiv = layer.fields().indexFromName('województwo')
