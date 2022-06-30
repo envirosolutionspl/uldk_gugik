@@ -90,7 +90,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab1">
     <property name="enabled">
@@ -271,6 +271,22 @@
       <bool>true</bool>
      </property>
     </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>280</y>
+       <width>411</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>- dla działki: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab2">
     <property name="enabled">
@@ -414,7 +430,7 @@
        <double>10000000.000000000000000</double>
       </property>
      </widget>
-     <widget class="QgsProjectionSelectionWidget" name="projectionWidget">
+     <widget class="QgsProjectionSelectionWidget" name="projectionWidget" native="true">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -479,7 +495,7 @@
    </widget>
    <widget class="QWidget" name="tab3">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <attribute name="title">
      <string>Wybór przez nazwę obrębu i numer działki</string>
@@ -504,7 +520,7 @@
     </widget>
     <widget class="QPushButton" name="btn_download_tab3">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -557,10 +573,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
+    <widget class="QLineEdit" name="edit_id_4">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -569,11 +582,8 @@
        <height>31</height>
       </rect>
      </property>
-     <property name="acceptDrops">
-      <bool>false</bool>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>
@@ -584,7 +594,7 @@
      <x>10</x>
      <y>90</y>
      <width>151</width>
-     <height>171</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="title">
@@ -596,7 +606,7 @@
       <x>10</x>
       <y>30</y>
       <width>110</width>
-      <height>130</height>
+      <height>141</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -635,6 +645,13 @@
       <widget class="QRadioButton" name="rdb_wo">
        <property name="text">
         <string>Województwo</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rdb_bu">
+       <property name="text">
+        <string>Budynek</string>
        </property>
       </widget>
      </item>

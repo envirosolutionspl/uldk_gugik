@@ -41,7 +41,7 @@ plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
     """QGIS Plugin Implementation."""
-    nazwy_warstw = {1: "dzialki_ew_uldk", 2: "obreby_ew_uldk", 3: "gminy_uldk", 4: "powiaty_uldk", 5: "wojewodztwa_uldk"}
+    nazwy_warstw = {1: "dzialki_ew_uldk", 2: "obreby_ew_uldk", 3: "gminy_uldk", 4: "powiaty_uldk", 5: "wojewodztwa_uldk", 6: "budynki_uldk"}
 
     def __init__(self, iface):
         """Constructor.
@@ -273,7 +273,7 @@ class UldkGugik:
 
     def btn_download_tab3_clicked(self):
 
-        objRegion = self.dlg.edit_id_2.text().strip()
+        objRegion = self.dlg.edit_id_4.text().strip()
 
         objParcel = self.dlg.edit_id_3.text().strip()
 
@@ -577,6 +577,23 @@ class UldkGugik:
             county = None
             voivodeship = res[2]
             # print(teryt, voivodeship)
+        elif object_type == 6:
+            resp = uldk_api.getBuildingById(teryt, '2180')
+            #print(resp)
+            if not resp:
+                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                    'API nie zwróciło obiektu dla id %s' % teryt,
+                                                    level=Qgis.Critical, duration=10)
+                return
+            res = resp.split("|")
+            wkt = res[0]
+            teryt = None
+            parcel = None
+            region = res[2]
+            commune = res[3]
+            county = res[4]
+            voivodeship = res[5]
+            #print(region, commune, county, voivodeship)
 
         self.addResultsToLayer(
             objectType=object_type,
@@ -613,6 +630,9 @@ class UldkGugik:
 
         if objectType == 1:# działka
             resp = uldk_xy.getParcelByXY(xy=pid, srid='2180')
+            #print(resp)
+            #print(r)
+            #print(r_txt)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -627,7 +647,13 @@ class UldkGugik:
             county = res[5]
             voivodeship = res[6]
             print(teryt, parcel, region, commune, county, voivodeship)
+            '''
+def getBuildingByXY(xy, srid):
+    request = "GetBuildingByXY"
+    result = "geom_wkt,region,commune,county,voivodeship"
+    return getRequestXY(xy, request, result, srid)'''
 
+            
         elif objectType == 2:
             resp = uldk_xy.getRegionByXY(xy=pid, srid='2180')
             if not resp:
@@ -695,6 +721,24 @@ class UldkGugik:
             county = None
             voivodeship = res[2]
             print(teryt, voivodeship)
+            
+        elif objectType == 6:
+            resp = uldk_xy.getBuildingByXY(xy=pid, srid='2180')
+            #print(resp)
+            if not resp:
+                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                    'API nie zwróciło obiektu dla dla współrzędnych %s' % pid,
+                                                    level=Qgis.Critical, duration=10)
+                return
+            res = resp.split("|")
+            wkt = res[0]
+            teryt = None
+            parcel = None
+            region = res[2]
+            commune = res[3]
+            county = res[4]
+            voivodeship = res[5]
+            print(region, commune, county, voivodeship)
 
         self.addResultsToLayer(
             objectType=objectType,
@@ -732,9 +776,12 @@ class UldkGugik:
         if layers:
             # jezeli istnieje to dodaj obiekt do warstwy
             layer = layers[0]
-            featId = layer.featureCount() + 1
 
+
+            #print('featID: ')
+            #print(featId)
             provider = layer.dataProvider()
+            featId = provider.featureCount()+1
             provider.addFeature(feat)
 
         else:
@@ -779,20 +826,24 @@ class UldkGugik:
         if parcel:
             par = layer.fields().indexFromName('numer')
             attrMap = {featId: {par: parcel}}
+            print('attrmap'+str(attrMap))
             provider.changeAttributeValues(attrMap)
 
         if region:
             reg = layer.fields().indexFromName('obręb')
             attrMap = {featId: {reg: region}}
+
             provider.changeAttributeValues(attrMap)
         if commune:
             com = layer.fields().indexFromName('gmina')
             attrMap = {featId: {com: commune}}
+
             provider.changeAttributeValues(attrMap)
 
         if county:
             con = layer.fields().indexFromName('powiat')
             attrMap = {featId: {con: county}}
+
             provider.changeAttributeValues(attrMap)
 
         if zoomToFeature:
@@ -820,6 +871,7 @@ class UldkGugik:
         3 - gmina
         4 - powiat
         5 - województwo
+        6 - budynek
         0 - niezdefiniowany
         """
         dlg = self.dlg
@@ -833,5 +885,7 @@ class UldkGugik:
             return 4
         elif dlg.rdb_wo.isChecked():
             return 5
+        elif dlg.rdb_bu.isChecked():
+            return 6
         else:
             return 0
