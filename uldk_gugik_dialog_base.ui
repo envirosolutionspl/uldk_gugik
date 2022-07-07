@@ -534,24 +534,11 @@
       <string>Pobierz</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_10">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>421</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Wprowadź nazwę obrębu (np. Mińsk Mazowiecki):</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_13">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>180</y>
        <width>421</width>
        <height>51</height>
       </rect>
@@ -564,7 +551,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>170</y>
+       <y>220</y>
        <width>411</width>
        <height>31</height>
       </rect>
@@ -573,17 +560,96 @@
       <string/>
      </property>
     </widget>
-    <widget class="QLineEdit" name="edit_id_4">
+    <widget class="QComboBox" name="wojcomboBox">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>90</y>
-       <width>411</width>
-       <height>31</height>
+       <y>40</y>
+       <width>211</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="powcomboBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>211</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="gmicomboBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>211</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="obrcomboBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>211</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>40</y>
+       <width>121</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>Wybierz województwo</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>70</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Wybierz powiat</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>100</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Wybierz gminę</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>130</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Wybierz obręb</string>
      </property>
     </widget>
    </widget>
@@ -594,7 +660,7 @@
      <x>10</x>
      <y>90</y>
      <width>151</width>
-     <height>191</height>
+     <height>201</height>
     </rect>
    </property>
    <property name="title">
@@ -606,7 +672,7 @@
       <x>10</x>
       <y>30</y>
       <width>110</width>
-      <height>141</height>
+      <height>161</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">

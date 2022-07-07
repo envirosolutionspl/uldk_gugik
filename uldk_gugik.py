@@ -272,8 +272,10 @@ class UldkGugik:
         self.downloadByXY(srid)
 
     def btn_download_tab3_clicked(self):
-
-        objRegion = self.dlg.edit_id_4.text().strip()
+        if str(self.dlg.obrcomboBox.currentText().strip()):
+            objRegion = str(self.dlg.obrcomboBox.currentText().strip())
+        else:
+            objRegion = str(self.dlg.gmicomboBox.currentText().strip())
 
         objParcel = self.dlg.edit_id_3.text().strip()
 

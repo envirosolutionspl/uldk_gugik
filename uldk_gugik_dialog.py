@@ -23,9 +23,12 @@
 """
 
 import os
-
-from PyQt5 import uic
-from PyQt5 import QtWidgets
+from qgis.PyQt import QtGui, QtWidgets, uic
+from qgis.PyQt.QtCore import pyqtSignal, QRegExp
+from PyQt5.QtGui import QRegExpValidator
+from qgis.gui import QgsFileWidget
+from qgis.core import QgsMapLayerProxyModel
+from .uldk import RegionFetch
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -33,6 +36,8 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
+
+    closingPlugin = pyqtSignal()
     def __init__(self, parent=None):
         """Constructor."""
         super(UldkGugikDialog, self).__init__(parent)
@@ -42,3 +47,39 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        #self.folder_fileWidget.setStorageMode(QgsFileWidget.GetDirectory)
+
+
+        # ULDK
+
+        self.powiatDictionary = {}
+        self.gminaDictionary={}
+        self.obrebDictionary = {}
+        self.regionFetch = RegionFetch()
+
+        self.wojcomboBox.currentTextChanged.connect(self.wojcomboBox_currentTextChanged)
+        self.powcomboBox.currentTextChanged.connect(self.powcomboBox_currentTextChanged)
+        self.gmicomboBox.currentTextChanged.connect(self.gmicomboBox_currentTextChanged)
+        wojewodztwa = list(self.regionFetch.wojewodztwoDict.keys())
+        self.wojcomboBox.addItems(wojewodztwa)
+
+
+    def closeEvent(self, event):
+        self.closingPlugin.emit()
+        event.accept()
+
+    def wojcomboBox_currentTextChanged(self, text):
+        self.powcomboBox.clear()
+
+        self.powiatDictionary = self.regionFetch.getPowiatDictByWojewodztwoName(text)
+        self.powcomboBox.addItems(list(self.powiatDictionary.keys()))
+
+    def powcomboBox_currentTextChanged(self, text):
+        self.gmicomboBox.clear()
+        self.gminaDictionary = self.regionFetch.getGminaDictByPowiatName(text)
+        self.gmicomboBox.addItems(list(self.gminaDictionary.keys()))
+
+    def gmicomboBox_currentTextChanged(self, text):
+        self.obrcomboBox.clear()
+        self.obrebDictionary = self.regionFetch.getObrebDictByGminaName(text)
+        self.obrcomboBox.addItems(list(self.obrebDictionary.keys()))

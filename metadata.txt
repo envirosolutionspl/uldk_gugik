@@ -24,6 +24,8 @@ repository=https://github.com/envirosolutionspl/uldk
 
 # Uncomment the following line and add your changelog:
 changelog=
+  Wersja 1.2.5
+  * dfgdgfdgdf
   Wersja 1.2.4
   * poprawa błędu powodującego wyłaczenie QGISa po otwarciu zapisanego projektu z warstwą tymczasową
   Wersja 1.2.3
