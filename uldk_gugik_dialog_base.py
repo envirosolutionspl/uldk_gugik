@@ -223,6 +223,7 @@ class Ui_ULDK_GUGIKDialogBase(object):
         self.rdb_wo.setObjectName("rdb_wo")
         self.verticalLayout.addWidget(self.rdb_wo)
         self.rdb_bu = QtWidgets.QRadioButton(self.layoutWidget)
+        self.rdb_bu.setEnabled(False)
         self.rdb_bu.setObjectName("rdb_bu")
         self.verticalLayout.addWidget(self.rdb_bu)
         self.lbl_title = QtWidgets.QLabel(ULDK_GUGIKDialogBase)

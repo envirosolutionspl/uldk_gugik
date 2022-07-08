@@ -716,6 +716,9 @@
      </item>
      <item>
       <widget class="QRadioButton" name="rdb_bu">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Budynek</string>
        </property>
