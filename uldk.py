@@ -1,4 +1,5 @@
 import requests
+import os
 class RegionFetch:
     def __init__(self):
         self.wojewodztwoDict = self.__fetchWojewodztwoDict()
@@ -9,16 +10,23 @@ class RegionFetch:
         self.filteredGminaDict = {}
         self.filteredObrebDict = {}
 
+    def openObrebList(self):
+        with open(os.path.join(os.path.dirname(__file__),'obreby.csv'), encoding="ANSI") as f:
+            resp = f.readlines()
+            resp = [w.replace('\n', '') for w in resp]
+            resp = [x[:8]+x[13:] for x in resp]
+
+        return resp
+
     def __fetchObrebDict(self):
-        resp = requests.get(
-            'https://uldk.gugik.gov.pl/service.php?obiekt=obreb&wynik=gmina,powiat,teryt,wojewodztwo,obreb')
-        obList = resp.text.strip().split('\n')
+        resp=RegionFetch.openObrebList(self)
+        obList = resp
         obDict = {}
-        if len(obList) and obList[0] == '0':
-            obList = obList[1:]
+        if len(obList):
             for el in obList:
-                split = el.split('|')
-                obDict[split[2]] = split[4], split[0], split[1], split[3]
+                split = el.split(';')
+
+                obDict[split[1]] = split[0]
             return obDict
         else:
             return {}
@@ -81,20 +89,22 @@ class RegionFetch:
 
     def getObrebDictByGminaName(self, name_gmina):
         self.filteredObrebDict = {}
-        for k, v in self.obrebDict.items():
-            if v[1] == name_gmina:
-                self.filteredObrebDict[v[0]] = k, name_gmina
-        return self.filteredObrebDict
+        for kG, vG in self.filteredGminaDict.items():
+            for kO, vO in self.obrebDict.items():
+                if vG[0] == vO and kG == name_gmina:
+                    self.filteredObrebDict[kO] = vO, name_gmina
+        return  self.filteredObrebDict
 
 if __name__ == '__main__':
     regionFetch = RegionFetch()
     #print(regionFetch.wojewodztwoDict)
     #print(regionFetch.obrebDict)
-    #print(regionFetch.getGminaDictByPowiatName('wołomiński'))
+    #print(regionFetch.getGminaDictByPowiatName('bolesławiecki'))
     #print('---------------------------')
-    #print(regionFetch.getObrebDictByGminaName('Abramów'))
-    #print(regionFetch.obrebDict)
+    #print(regionFetch.getObrebDictByGminaName('Bolesławiec (miasto)'))
+    #print(regionFetch.gminaDict)
     #print(regionFetch.wojDict)
     #print(regionFetch.getPowiatDictByWojewodztwoName('mazowieckie'))
 
 
+    #print(regionFetch.openObrebList())

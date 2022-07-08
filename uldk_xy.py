@@ -9,9 +9,9 @@ def getRequestXY(xy, request, result, srid):
     PARAMS = {'request': request, 'xy': xy, 'result': result, 'srid': srid}
     r = requests.get(url=URL, params=PARAMS)
     r_txt = r.text
-    #print(r)
-    #print(r_txt)
-    #print(r_txt)
+    print(r)
+    print(r_txt)
+    print(r_txt)
     
     if r.status_code == 200 and r_txt[0] == '0':
         if ";" in r_txt:
@@ -19,7 +19,7 @@ def getRequestXY(xy, request, result, srid):
         else:
             return r_txt.split('\n')[1]
     else:
-        #print(r_txt)
+        print(r_txt)
         return None
 
 
