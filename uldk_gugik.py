@@ -36,7 +36,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.2.4'
+plugin_version = '1.2.5'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
