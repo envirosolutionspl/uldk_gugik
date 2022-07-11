@@ -43,7 +43,7 @@ changelog=
 # Tags are comma separated with spaces allowed
 tags=python, uldk, działki, dzialki, ewidencja, gugik, kataster
 
-homepage=https://www.envirosolutions.pl/wtyczka-qgis-uldk
+homepage=https://www.envirosolutions.pl/uldk.html
 category=Plugins
 icon=images/icon.png
 # experimental flag
