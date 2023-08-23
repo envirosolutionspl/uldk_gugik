@@ -41,11 +41,16 @@ class RegionFetch:
             gmList = gmList[1:]
             for el in gmList:
                 split = el.split('|')
+                if split[0] == "Warszawa (miasto)":
+                    split[2] = split[2][:-1] + "8"
+                    print("Wawa: ", split[2])
+                if split[0] in ["Kraków (miasto)", "Łódź (miasto)"]:
+                    split[2] = split[2][:-1] + "9"
+                    print("Łódź/Kraków: ", split[2])
                 gmDict[split[2]] = split[0], split[1], split[3]
             return gmDict
         else:
             return {}
-
     def __fetchPowiatDict(self):
         resp = requests.get('https://uldk.gugik.gov.pl/service.php?obiekt=powiat&wynik=powiat,teryt,wojewodztwo')
         powList = resp.text.strip().split('\n')
@@ -91,9 +96,37 @@ class RegionFetch:
         self.filteredObrebDict = {}
         for kG, vG in self.filteredGminaDict.items():
             for kO, vO in self.obrebDict.items():
-                if vG[0] == vO and kG == name_gmina:
-                    self.filteredObrebDict[kO] = vO, name_gmina
+                temp = vG[0]
+                if vG[0][-1] == "3": # 
+                    for i in [1, 2, 4, 5]: 
+                        temp = temp[:-1] + str(i)               
+                        if temp == vO and kG == name_gmina: 
+                            self.filteredObrebDict[kO] = vO, name_gmina
+                else:
+                    if name_gmina == "Warszawa (miasto)":
+                        self.replace_id(name_gmina, temp, [2, 20], vO, kG, kO)
+                    if name_gmina == "Kraków (miasto)":
+                        self.replace_id(name_gmina, temp, [2, 6], vO, kG, kO)
+                    if name_gmina == "Łódź (miasto)":
+                        self.replace_id(name_gmina, temp, [2, 7], vO, kG, kO)
+                    if temp == vO and kG == name_gmina: 
+                            self.filteredObrebDict[kO] = vO, name_gmina
         return  self.filteredObrebDict
+    
+    
+    def replace_at_idx(self, word: str, idx: list[int], to_replace: str):
+        new_word = list(word)
+        for i, index in enumerate(idx):
+            new_word[index] = to_replace[i]
+        return "".join(new_word)
+    
+    def replace_id(self, name_gmina: str, id: str, r: list[int], vO, kG, kO):
+        g = {"Warszawa (miasto)": "8", "Kraków (miasto)": "9", "Łódź (miasto)": "9"}
+        for i in range(r[0], r[1]):
+            x = f"{i:02d}"
+            temp = self.replace_at_idx(id, [4, 5], x)
+            if temp == vO and kG == name_gmina: 
+                    self.filteredObrebDict[kO] = vO, name_gmina
 
 if __name__ == '__main__':
     regionFetch = RegionFetch()
