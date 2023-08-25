@@ -1,15 +1,32 @@
-import requests
 import os
+
+from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkReply
+from PyQt5.QtCore import QUrl, QEventLoop
+
 class RegionFetch:
     def __init__(self):
-        self.wojewodztwoDict = self.__fetchWojewodztwoDict()
-        self.powiatDict = self.__fetchPowiatDict()
-        self.gminaDict = self.__fetchGminaDict()
+        self.wojManager = QNetworkAccessManager()
+        self.powManager = QNetworkAccessManager()
+        self.gminaManager = QNetworkAccessManager()
+        self.wojewodztwoDict = {}
+        self.powiatDict = {}
+        self.gminaDict = {}
         self.obrebDict = self.__fetchObrebDict()
+        self.pendingRequest = []
+        
+        self.__fetchWojewodztwoDict()
+        self.__fetchPowiatDict()
+        self.__fetchGminaDict()
+        
+        self.activeRequests = 3
+        self.executePendingRequest()
+        self.loop = QEventLoop()
+        self.loop.exec_()
+        
         self.filteredPowiatDict = {}
         self.filteredGminaDict = {}
         self.filteredObrebDict = {}
-
+            
     def openObrebList(self):
         with open(os.path.join(os.path.dirname(__file__),'obreby.csv'), encoding="ANSI") as f:
             resp = f.readlines()
@@ -25,52 +42,76 @@ class RegionFetch:
         if len(obList):
             for el in obList:
                 split = el.split(';')
-
                 obDict[split[1]] = split[0]
             return obDict
         else:
             return {}
 
-
-
-    def __fetchGminaDict(self):
-        resp = requests.get('https://uldk.gugik.gov.pl/service.php?obiekt=gmina&wynik=gmina,powiat,teryt,wojewodztwo')
-        gmList = resp.text.strip().split('\n')
-        gmDict = {}
-        if len(gmList) and gmList[0] == '0':
-            gmList = gmList[1:]
-            for el in gmList:
-                split = el.split('|')
-                gmDict[split[2]] = split[0], split[1], split[3]
-            return gmDict
-        else:
-            return {}
-
-    def __fetchPowiatDict(self):
-        resp = requests.get('https://uldk.gugik.gov.pl/service.php?obiekt=powiat&wynik=powiat,teryt,wojewodztwo')
-        powList = resp.text.strip().split('\n')
-        powDict = {}
-        if len(powList) and powList[0] == '0':
-            powList = powList[1:]
-            for el in powList:
-                split = el.split('|')
-                powDict[split[1]] = split[0], split[2]
-            return powDict
-        else:
-            return {}
-
     def __fetchWojewodztwoDict(self):
-        resp = requests.get('https://uldk.gugik.gov.pl/service.php?obiekt=wojewodztwo&wynik=wojewodztwo,teryt')
-        wojList = resp.text.strip().split('\n')
-        wojDict = {}
-        if len(wojList) and wojList[0] == '0':
-            wojList = wojList[1:]
-            for el in wojList:
-                split = el.split('|')
-                wojDict[split[0]] = split[1]
-            return wojDict
-        else:
-            return {}
+        req = QNetworkRequest(QUrl('https://uldk.gugik.gov.pl/service.php?obiekt=wojewodztwo&wynik=wojewodztwo,teryt'))    
+        self.pendingRequest.append((1, req))
+    
+    def __fetchPowiatDict(self):
+        req = QNetworkRequest(QUrl('https://uldk.gugik.gov.pl/service.php?obiekt=powiat&wynik=powiat,teryt,wojewodztwo'))
+        self.pendingRequest.append((2, req))
+        
+    def __fetchGminaDict(self):
+        req = QNetworkRequest(QUrl('https://uldk.gugik.gov.pl/service.php?obiekt=gmina&wynik=gmina,powiat,teryt,wojewodztwo'))
+        self.pendingRequest.append((3, req))
+    
+    def handleWoj(self, reply):
+        """Przygotowanie danych o województwach"""
+        if reply.error() == QNetworkReply.NoError:
+            data = reply.readAll().data().decode('utf-8')
+            data = data.strip().split('\n')            
+            if len(data) and data[0] == '0':
+                data = data[1:]
+                for el in data:
+                    split = el.split('|')
+                    self.wojewodztwoDict[split[0]] = split[1]
+        self.activeRequests -= 1
+        if self.activeRequests == 0:
+            self.loop.quit()
+        
+    def handlePow(self, reply):
+        """Przygotowanie danych o powiatach"""
+        if reply.error() == QNetworkReply.NoError:
+            data = reply.readAll().data().decode('utf-8')
+            data = data.strip().split('\n')
+            if len(data) and data[0] == '0':
+                data = data[1:]
+                for el in data:
+                    split = el.split('|')
+                    self.powiatDict[split[1]] = split[0], split[2]
+        self.activeRequests -= 1
+        if self.activeRequests == 0:
+            self.loop.quit()
+     
+    def handleGmin(self, reply):
+        """Przygotowanie danych o gmianach"""
+        if reply.error() == QNetworkReply.NoError:
+            data = reply.readAll().data().decode('utf-8')
+            data = data.strip().split('\n')
+            if len(data) and data[0] == '0':
+                data = data[1:]
+                for el in data:
+                    split = el.split('|')
+                    self.gminaDict[split[2]] = split[0], split[1], split[3]
+        self.activeRequests -= 1
+        if self.activeRequests == 0:
+            self.loop.quit()
+            
+    def executePendingRequest(self):
+        """Obsłużenie odpowiedzi z zapytań requests"""
+        managers = {
+            1: (self.wojManager, self.handleWoj), 
+            2: (self.powManager, self.handlePow), 
+            3: (self.gminaManager, self.handleGmin)
+        }
+        for idx, request in self.pendingRequest:
+            managers[idx][0].get(request)                       # self.wojManager.get(request)
+            managers[idx][0].finished.connect(managers[idx][1]) # self.wojManger.funished.connect(self.handleWoj)
+            
 
     def getPowiatDictByWojewodztwoName(self, name):
         self.filteredPowiatDict = {}
@@ -96,7 +137,9 @@ class RegionFetch:
         return  self.filteredObrebDict
 
 if __name__ == '__main__':
+    # app = QtCore.QCoreApplication([])
     regionFetch = RegionFetch()
+    # app.exec_()
     #print(regionFetch.wojewodztwoDict)
     #print(regionFetch.obrebDict)
     #print(regionFetch.getGminaDictByPowiatName('bolesławiecki'))
