@@ -86,7 +86,7 @@
      <x>190</x>
      <y>90</y>
      <width>581</width>
-     <height>341</height>
+     <height>351</height>   <!-- 341  -->
     </rect>
    </property>
    <property name="currentIndex">
@@ -277,7 +277,7 @@
        <x>20</x>
        <y>280</y>
        <width>411</width>
-       <height>21</height>
+       <height>31</height>   <!-- 21 -->
       </rect>
      </property>
      <property name="text">
