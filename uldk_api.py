@@ -3,7 +3,6 @@ from .request import Request
 
 def getParcelById(id, srid):
     request = "GetParcelById"
-    print('Tutaj')
     result = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
     params = {'request': request, 'id': id, 'result': result, 'srid': srid}
     res = Request(params)
