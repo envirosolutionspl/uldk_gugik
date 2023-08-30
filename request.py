@@ -27,12 +27,12 @@ class Request:
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
-            if returnedData[0] != '0':
+            if returnedData[0] == '0':
                 return
             if ';' in returnedData:
                 self._data = returnedData.split('\n')[1].split(';')[1]
             else:
-                self.d_ata = returnedData.split('\n')[1]
+                self._data = returnedData.split('\n')[1]
         self.loop.quit()
     
     @property
