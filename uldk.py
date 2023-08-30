@@ -25,7 +25,6 @@ class RegionFetch:
         if len(obList):
             for el in obList:
                 split = el.split(';')
-
                 obDict[split[1]] = split[0]
             return obDict
         else:
