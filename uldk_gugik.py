@@ -339,7 +339,6 @@ class UldkGugik:
         self.canvas.unsetMapTool(self.clickTool)
         self.dlg.doubleSpinBoxX.setValue(point.x())
         self.dlg.doubleSpinBoxY.setValue(point.y())
-
         coords = "{}, {}".format(point.x(), point.y())
         QgsMessageLog.logMessage(str(coords), 'ULDK')
         srid = QgsProject.instance().crs().authid().split(":")[1]
@@ -348,7 +347,6 @@ class UldkGugik:
     def performRequestParcel(self, region, parcel):
         objectType = self.checkedFeatureType()
         self.crs = QgsProject.instance().crs().authid().split(":")[1]
-
         name = region + ' ' + parcel
 
         result = uldk_parcel.getParcelById(name, self.crs)
@@ -459,9 +457,10 @@ class UldkGugik:
     def performRequestTeryt(self, teryt):
         """wykonanie zapytania pobierającego obiekt na podstawie kodu TERYT"""
         object_type = self.checkedFeatureType()
+        srid = QgsProject.instance().crs().authid().split(":")[1]
 
         if object_type == 1:
-            resp = uldk_api.getParcelById(teryt, '2180')
+            resp = uldk_api.getParcelById(teryt, srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -485,7 +484,7 @@ class UldkGugik:
             # print(teryt, parcel, region, commune, county, voivodeship)
 
         elif object_type == 2:
-            resp = uldk_api.getRegionById(teryt, '2180')
+            resp = uldk_api.getRegionById(teryt, srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -509,7 +508,7 @@ class UldkGugik:
             # print(teryt, region, commune, county, voivodeship)
 
         elif object_type == 3:
-            resp = uldk_api.getCommuneById(teryt, '2180')
+            resp = uldk_api.getCommuneById(teryt, srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -533,7 +532,7 @@ class UldkGugik:
             # print(teryt, commune, county, voivodeship)
 
         elif object_type == 4:
-            resp = uldk_api.getCountyById(teryt, '2180')
+            resp = uldk_api.getCountyById(teryt, srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -557,7 +556,7 @@ class UldkGugik:
             # print(teryt, county, voivodeship)
 
         elif object_type == 5:
-            resp = uldk_api.getVoivodeshipById(teryt, '2180')
+            resp = uldk_api.getVoivodeshipById(teryt, srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -580,7 +579,7 @@ class UldkGugik:
             voivodeship = res[2]
             # print(teryt, voivodeship)
         elif object_type == 6:
-            resp = uldk_api.getBuildingById(teryt, '2180')
+            resp = uldk_api.getBuildingById(teryt, srid)
             #print(resp)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -605,7 +604,8 @@ class UldkGugik:
             region=region,
             commune=commune,
             county=county,
-            voivodeship=voivodeship
+            voivodeship=voivodeship,
+            zoomToFeature=False
         )
 
         self.iface.messageBar().pushMessage("Sukces:",
@@ -620,7 +620,6 @@ class UldkGugik:
         y = float(y.replace(",", "."))
         requestPoint = QgsPoint(x, y)
         QgsMessageLog.logMessage(str(srid), 'ULDK')
-
         if srid != '2180':
             sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
             destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
@@ -628,10 +627,8 @@ class UldkGugik:
             requestPoint.transform(tr)
 
         pid = str(requestPoint.x()) + "," + str(requestPoint.y())
-
-
         if objectType == 1:# działka
-            resp = uldk_xy.getParcelByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getParcelByXY(xy=pid, srid=srid)
             #print(resp)
             #print(r)
             #print(r_txt)
@@ -648,7 +645,7 @@ class UldkGugik:
             commune = res[4]
             county = res[5]
             voivodeship = res[6]
-            print(teryt, parcel, region, commune, county, voivodeship)
+            # print(teryt, parcel, region, commune, county, voivodeship)
             '''
 def getBuildingByXY(xy, srid):
     request = "GetBuildingByXY"
@@ -657,7 +654,7 @@ def getBuildingByXY(xy, srid):
 
             
         elif objectType == 2:
-            resp = uldk_xy.getRegionByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getRegionByXY(xy=pid, srid=srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla dla współrzędnych %s' % pid,
@@ -671,10 +668,10 @@ def getBuildingByXY(xy, srid):
             commune = res[3]
             county = res[4]
             voivodeship = res[5]
-            print(teryt, region, commune, county, voivodeship)
+            # print(teryt, region, commune, county, voivodeship)
 
         elif objectType == 3:
-            resp = uldk_xy.getCommuneByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getCommuneByXY(xy=pid, srid=srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -688,10 +685,10 @@ def getBuildingByXY(xy, srid):
             commune = res[2]
             county = res[3]
             voivodeship = res[4]
-            print(teryt, commune, county, voivodeship)
+            # print(teryt, commune, county, voivodeship)
 
         elif objectType == 4:
-            resp = uldk_xy.getCountyByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getCountyByXY(xy=pid, srid=srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -705,10 +702,10 @@ def getBuildingByXY(xy, srid):
             commune = None
             county = res[2]
             voivodeship = res[3]
-            print(teryt, county, voivodeship)
+            # print(teryt, county, voivodeship)
 
         elif objectType == 5:
-            resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid=srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -722,10 +719,10 @@ def getBuildingByXY(xy, srid):
             commune = None
             county = None
             voivodeship = res[2]
-            print(teryt, voivodeship)
+            # print(teryt, voivodeship)
             
         elif objectType == 6:
-            resp = uldk_xy.getBuildingByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getBuildingByXY(xy=pid, srid=srid)
             #print(resp)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -740,7 +737,7 @@ def getBuildingByXY(xy, srid):
             commune = res[3]
             county = res[4]
             voivodeship = res[5]
-            print(region, commune, county, voivodeship)
+            # print(region, commune, county, voivodeship)
 
         self.addResultsToLayer(
             objectType=objectType,
@@ -767,7 +764,7 @@ def getBuildingByXY(xy, srid):
         # layer
         nazwa = self.nazwy_warstw[objectType]
         layers = QgsProject.instance().mapLayersByName(nazwa)
-
+        crs = QgsProject.instance().crs().authid().split(":")[1]
         # usuwanie pustych warstw z projektu
         for layer in layers:
             if layer.featureCount() == 0:
@@ -788,7 +785,7 @@ def getBuildingByXY(xy, srid):
 
         else:
             # jezeli nie istnieje to stworz warstwe
-            layer = QgsVectorLayer("Polygon?crs=EPSG:2180", nazwa, "memory")
+            layer = QgsVectorLayer("Polygon?crs=EPSG:" + crs, nazwa, "memory")
             QgsProject.instance().addMapLayer(layer)
 
             provider = layer.dataProvider()
@@ -828,7 +825,7 @@ def getBuildingByXY(xy, srid):
         if parcel:
             par = layer.fields().indexFromName('numer')
             attrMap = {featId: {par: parcel}}
-            print('attrmap'+str(attrMap))
+            # print('attrmap'+str(attrMap))
             provider.changeAttributeValues(attrMap)
 
         if region:
