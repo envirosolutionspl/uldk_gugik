@@ -259,7 +259,6 @@ class UldkGugik:
                                                 level=Qgis.Warning, duration=10)
         elif utils.isInternetConnected():
             self.performRequestTeryt(teryt=teryt)
-            self.dlg.hide()
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -291,7 +290,6 @@ class UldkGugik:
 
         elif utils.isInternetConnected():
             self.performRequestParcel(region=objRegion, parcel=objParcel)
-            self.dlg.hide()
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -318,7 +316,7 @@ class UldkGugik:
 
         elif utils.isInternetConnected():
             self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
-            self.dlg.hide()
+            self.dlg.show()
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -451,7 +449,7 @@ class UldkGugik:
             provider.changeAttributeValues(attrMap)
 
         self.iface.messageBar().pushMessage("Sukces:",
-                                            'pobrano obrys obiektu %s' % (name),
+                                            'Pobrano działkę dla obiektu: %s' % (name),
                                             level=Qgis.Success, duration=10)
 
     def performRequestTeryt(self, teryt):
@@ -608,8 +606,18 @@ class UldkGugik:
             zoomToFeature=False
         )
 
+        object ={
+            1: "działkę o nr teryt: %s",
+            2: "obręb ewidencyjny",
+            3: "gminę",
+            4: "powiat",
+            5: "województwo",
+            6: "budynek"
+        }
+        success_message = f"Pobrano {object[object_type]}"  % teryt if object_type == 1 else f"Pobrano {object[object_type]}"
+
         self.iface.messageBar().pushMessage("Sukces:",
-                                            'pobrano obrys obiektu %s' % (teryt),
+                                            success_message,
                                             level=Qgis.Success, duration=10)
 
     def performRequestXY(self, x, y, srid, zoomToFeature=True):
@@ -750,9 +758,18 @@ def getBuildingByXY(xy, srid):
             voivodeship=voivodeship,
             zoomToFeature=zoomToFeature
         )
+        object ={
+            1: "działkę o nr teryt: %s",
+            2: "obręb ewidencyjny",
+            3: "gminę",
+            4: "powiat",
+            5: "województwo",
+            6: "budynek"
+        }
+        success_message = f"Pobrano {object[objectType]}"  % teryt if objectType == 1 else f"Pobrano {object[objectType]}"
 
         self.iface.messageBar().pushMessage("Sukces:",
-                                            'pobrano obrys obiektu %s' % teryt,
+                                            success_message,
                                             level=Qgis.Success, duration=10)
 
     def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature=True):
