@@ -29,24 +29,34 @@ class Request:
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
-            
             for line in returnedData.split('\n'):
-                if len(line) < 3:
+                if len(line) < 3 or line == "-1 brak wyników":
                     continue
                 if ";" in line:
                     polygon = line.split(';')[1]
+                    if not self.teryt:
+                        self._data = polygon
+                        break
                     teryt = polygon.split('|')[1].split('.')[0]
-                    if not self.teryt or teryt[:-2] == self.teryt[:-2]:
+                    print("TERYT: ", self.teryt, " - ", teryt, " = ", self.teryt[:-2] == teryt[:-2])
+                    if teryt[:-2] == self.teryt[:-2]:
                         # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
                         self._data = polygon
                         break
                 else:
-                    self._data = line[1]
+                    if not self.teryt:
+                        self._data = line
+                        break
+                    teryt = line.split('|')[1].split('.')[0]
+                    print("TERYT: ", self.teryt, " - ", teryt, " = ", self.teryt[:-2] == teryt[:-2])
+                    if teryt[:-2] == self.teryt[:-2]:
+                        # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
+                        self._data = line
+                        break
             else: # brak zgodności - nie ma takiego nr działki
                 self._data = None
                 
         self.loop.quit()
-    
     @property
     def data(self):
         return self._data
