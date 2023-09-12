@@ -276,7 +276,13 @@ class UldkGugik:
         else:
             objRegion = str(self.dlg.gmicomboBox.currentText().strip())
 
-        objParcel = self.dlg.edit_id_3.text().strip()
+        commune = self.dlg.gmicomboBox.currentText().strip()
+        current_idx = self.dlg.gmicomboBox.currentIndex()
+        teryt = self.dlg.gmicomboBox.itemData(current_idx)
+        # print("Aktualny index: ", current_idx)
+        # print("Aktualny teryt: ", teryt)
+        
+        objParcel = self.dlg.edit_id_3.text().strip() # nr działki
 
         if not objRegion:
             self.iface.messageBar().pushMessage("Błąd formularza:",
@@ -289,7 +295,7 @@ class UldkGugik:
                                                 level=Qgis.Warning, duration=10)
 
         elif utils.isInternetConnected():
-            self.performRequestParcel(region=objRegion, parcel=objParcel)
+            self.performRequestParcel(region=objRegion, parcel=objParcel, teryt=teryt)
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -342,12 +348,11 @@ class UldkGugik:
         srid = QgsProject.instance().crs().authid().split(":")[1]
         self.downloadByXY(srid, zoomToFeature=False)
 
-    def performRequestParcel(self, region, parcel):
+    def performRequestParcel(self, region, parcel, teryt):
         objectType = self.checkedFeatureType()
         self.crs = QgsProject.instance().crs().authid().split(":")[1]
         name = region + ' ' + parcel
-
-        result = uldk_parcel.getParcelById(name, self.crs)
+        result = uldk_parcel.getParcelById(name, self.crs, teryt=teryt)
         if result is None:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                 'API nie zwróciło obiektu dla id %s' % name,
