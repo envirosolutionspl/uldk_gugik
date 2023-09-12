@@ -242,10 +242,15 @@ class UldkGugik:
 
     def run(self):
         """Otwarcie okna wtyczki"""
-
+        try:
+            srid = QgsProject.instance().crs().authid().split(":")[1]
+        except IndexError:
+            self.iface.messageBar().pushMessage("Projekt QGIS nie posiada zdefiniowanego układu współrzędnych.", 
+                                                "W celu dalszej pracy zdefiniuj układ współrzędnych dla projektu",
+                                                level=Qgis.Warning, duration=10)
+            return 1
         # show the dialog
         self.dlg.show()
-        srid = QgsProject.instance().crs().authid().split(":")[1]
         self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
 
     def btn_download_tab1_clicked(self):
