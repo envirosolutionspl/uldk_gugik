@@ -268,7 +268,7 @@ class UldkGugik:
     def btn_download_tab2_clicked(self):
         """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
-        self.downloadByXY(srid)
+        self.downloadByXY(srid, type="form")
 
     def btn_download_tab3_clicked(self):
         if str(self.dlg.obrcomboBox.currentText().strip()):
@@ -302,13 +302,14 @@ class UldkGugik:
                                                 'brak połączenia z internetem',
                                                 level=Qgis.Critical, duration=10)
 
-    def downloadByXY(self, srid, zoomToFeature=True):
+    def downloadByXY(self, srid, type, zoomToFeature=True):
         """pobranie według X i Y i SRID"""
-
-
 
         objX = self.dlg.doubleSpinBoxX.text().strip()
         objY = self.dlg.doubleSpinBoxY.text().strip()
+        if type == "form" and srid in ['2180', '4326']:
+            objX = self.dlg.doubleSpinBoxY.text().strip()
+            objY = self.dlg.doubleSpinBoxX.text().strip()
 
         if not objX:
             self.iface.messageBar().pushMessage("Błąd formularza:",
@@ -346,7 +347,7 @@ class UldkGugik:
         coords = "{}, {}".format(point.x(), point.y())
         QgsMessageLog.logMessage(str(coords), 'ULDK')
         srid = QgsProject.instance().crs().authid().split(":")[1]
-        self.downloadByXY(srid, zoomToFeature=False)
+        self.downloadByXY(srid, zoomToFeature=False, type="click")
 
     def performRequestParcel(self, region, parcel, teryt):
         objectType = self.checkedFeatureType()
