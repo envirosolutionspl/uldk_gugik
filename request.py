@@ -6,11 +6,13 @@ from PyQt5.QtCore import QUrl, QEventLoop
 
 class Request:
     
-    def __init__(self, params):
+    def __init__(self, params, **kwargs):
         self.params = params
         self._data = None
         self.url = "http://uldk.gugik.gov.pl/"
         self.manager = QNetworkAccessManager()
+        
+        self.teryt = kwargs.get('teryt', None)
         
         self.getRequest()
         self.loop = QEventLoop()
@@ -27,12 +29,22 @@ class Request:
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
-            # if returnedData[0] == '0':
-            #     return
-            if ';' in returnedData:
-                self._data = returnedData.split('\n')[1].split(';')[1]
-            else:
-                self._data = returnedData.split('\n')[1]
+            
+            for line in returnedData.split('\n'):
+                if len(line) < 3:
+                    continue
+                if ";" in line:
+                    polygon = line.split(';')[1]
+                    teryt = polygon.split('|')[1].split('.')[0]
+                    if not self.teryt or teryt[:-2] == self.teryt[:-2]:
+                        # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
+                        self._data = polygon
+                        break
+                else:
+                    self._data = line[1]
+            else: # brak zgodności - nie ma takiego nr działki
+                self._data = None
+                
         self.loop.quit()
     
     @property
