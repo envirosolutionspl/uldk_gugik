@@ -38,7 +38,6 @@ class Request:
                         self._data = polygon
                         break
                     teryt = polygon.split('|')[1].split('.')[0]
-                    print(self.teryt, " - ", teryt, " = ", self.teryt[:-2] == teryt[:-2])
                     if teryt[:-4] == self.teryt[:-4]:
                         # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
                         self._data = polygon
