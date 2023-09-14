@@ -9,12 +9,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>758</width>
     <height>514</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ULDK GUGiK 1.0</string>
+   <string>ULDK GUGiK 1.2.6</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -30,7 +30,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>ULDK GUGiK 1.0</string>
+    <string>ULDK GUGiK 1.2.6</string>
    </property>
   </widget>
   <widget class="QLabel" name="lbl_copyrights">
@@ -43,7 +43,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>© 2019 &lt;a href=&quot;http://www.envirosolutions.pl/&quot;&gt;EnviroSolutions Sp. z o.o.&lt;/a&gt;</string>
+    <string>© 2023 &lt;a href=&quot;http://www.envirosolutions.pl/&quot;&gt;EnviroSolutions Sp. z o.o.&lt;/a&gt;</string>
    </property>
    <property name="textFormat">
     <enum>Qt::RichText</enum>
@@ -58,7 +58,7 @@
   <widget class="QLabel" name="lbl_email">
    <property name="geometry">
     <rect>
-     <x>620</x>
+     <x>590</x>
      <y>490</y>
      <width>151</width>
      <height>20</height>
@@ -85,8 +85,8 @@
     <rect>
      <x>190</x>
      <y>90</y>
-     <width>581</width>
-     <height>351</height>   <!-- 341  -->
+     <width>531</width>
+     <height>351</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -123,8 +123,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>410</width>
-       <height>22</height>
+       <width>421</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="font">
@@ -133,14 +133,14 @@
       </font>
      </property>
      <property name="text">
-      <string>Wybór obiektu przez pełny identyfikator (np działki)</string>
+      <string>Wybór obiektu przez pełny identyfikator (np. działki)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>60</y>
+       <x>10</x>
+       <y>40</y>
        <width>421</width>
        <height>51</height>
       </rect>
@@ -152,8 +152,8 @@
     <widget class="QLineEdit" name="edit_id">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>100</y>
+       <x>10</x>
+       <y>80</y>
        <width>411</width>
        <height>31</height>
       </rect>
@@ -165,8 +165,8 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>450</x>
-       <y>250</y>
+       <x>410</x>
+       <y>260</y>
        <width>93</width>
        <height>28</height>
       </rect>
@@ -178,8 +178,8 @@
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>150</y>
+       <x>10</x>
+       <y>130</y>
        <width>241</width>
        <height>21</height>
       </rect>
@@ -194,8 +194,8 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>180</y>
+       <x>10</x>
+       <y>160</y>
        <width>411</width>
        <height>21</height>
       </rect>
@@ -210,8 +210,8 @@
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>200</y>
+       <x>10</x>
+       <y>180</y>
        <width>411</width>
        <height>21</height>
       </rect>
@@ -226,8 +226,8 @@
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>220</y>
+       <x>10</x>
+       <y>200</y>
        <width>411</width>
        <height>21</height>
       </rect>
@@ -242,8 +242,8 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>240</y>
+       <x>10</x>
+       <y>220</y>
        <width>411</width>
        <height>21</height>
       </rect>
@@ -258,8 +258,8 @@
     <widget class="QLabel" name="label_7">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>260</y>
+       <x>10</x>
+       <y>240</y>
        <width>411</width>
        <height>21</height>
       </rect>
@@ -274,10 +274,10 @@
     <widget class="QLabel" name="label_14">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>280</y>
+       <x>10</x>
+       <y>260</y>
        <width>411</width>
-       <height>31</height>   <!-- 21 -->
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -341,7 +341,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>450</x>
+       <x>330</x>
        <y>250</y>
        <width>93</width>
        <height>28</height>
@@ -357,8 +357,8 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>260</y>
+       <x>10</x>
+       <y>250</y>
        <width>271</width>
        <height>27</height>
       </rect>
@@ -370,8 +370,8 @@
     <widget class="QLabel" name="label_12">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>230</y>
+       <x>20</x>
+       <y>220</y>
        <width>55</width>
        <height>16</height>
       </rect>
@@ -386,10 +386,10 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>50</y>
        <width>271</width>
-       <height>171</height>
+       <height>161</height>
       </rect>
      </property>
      <property name="title">
@@ -399,7 +399,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>20</y>
+        <y>10</y>
         <width>151</width>
         <height>16</height>
        </rect>
@@ -412,7 +412,7 @@
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>80</y>
+        <y>70</y>
         <width>101</width>
         <height>22</height>
        </rect>
@@ -430,11 +430,11 @@
        <double>10000000.000000000000000</double>
       </property>
      </widget>
-     <widget class="QgsProjectionSelectionWidget" name="projectionWidget" native="true">
+     <widget class="QgsProjectionSelectionWidget" name="projectionWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>120</y>
+        <y>110</y>
         <width>221</width>
         <height>27</height>
        </rect>
@@ -447,7 +447,7 @@
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>50</y>
+        <y>40</y>
         <width>101</width>
         <height>22</height>
        </rect>
@@ -469,7 +469,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>80</y>
+        <y>70</y>
         <width>16</width>
         <height>16</height>
        </rect>
@@ -482,7 +482,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>50</y>
+        <y>40</y>
         <width>16</width>
         <height>16</height>
        </rect>
@@ -524,8 +524,8 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>450</x>
-       <y>250</y>
+       <x>360</x>
+       <y>220</y>
        <width>93</width>
        <height>28</height>
       </rect>
@@ -552,7 +552,7 @@
       <rect>
        <x>10</x>
        <y>220</y>
-       <width>411</width>
+       <width>321</width>
        <height>31</height>
       </rect>
      </property>
@@ -769,7 +769,7 @@
   <customwidget>
    <class>QgsProjectionSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>qgis.gui</header>
+   <header>qgsprojectionselectionwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
