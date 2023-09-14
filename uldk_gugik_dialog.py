@@ -60,8 +60,11 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.wojcomboBox.currentTextChanged.connect(self.wojcomboBox_currentTextChanged)
         self.powcomboBox.currentTextChanged.connect(self.powcomboBox_currentTextChanged)
         self.gmicomboBox.currentTextChanged.connect(self.gmicomboBox_currentTextChanged)
-        wojewodztwa = list(self.regionFetch.wojewodztwoDict.keys())
-        self.wojcomboBox.addItems(wojewodztwa)
+        wojewodztwa = self.regionFetch.wojewodztwoDict
+        self.wojcomboBox.addItems(wojewodztwa.keys())
+        data = {k: v for k, v in wojewodztwa.items()}
+        for idx, po in enumerate(data.keys()):
+            self.wojcomboBox.setItemData(idx, data[po])
 
 
     def closeEvent(self, event):
@@ -71,7 +74,10 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
     def wojcomboBox_currentTextChanged(self, text):
         self.powcomboBox.clear()
         self.powiatDictionary = self.regionFetch.getPowiatDictByWojewodztwoName(text)
+        data = {k: v[0] for k, v in self.powiatDictionary.items()}
         self.powcomboBox.addItems(list(self.powiatDictionary.keys()))
+        for idx, po in enumerate(data.keys()):
+            self.powcomboBox.setItemData(idx, data[po])
 
     def powcomboBox_currentTextChanged(self, text):
         self.gmicomboBox.clear()

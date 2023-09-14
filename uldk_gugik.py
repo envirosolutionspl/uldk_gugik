@@ -246,6 +246,7 @@ class UldkGugik:
     def active_gm(self):
         self.active_ob()
         self.dlg.obrcomboBox.setEnabled(False)
+        self.dlg.obrcomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę gminy")
         self.dlg.label_3.setText(" - dla gminy: WWPPGG_R")
         self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla gminy: 040101_1)")
@@ -253,27 +254,32 @@ class UldkGugik:
     def active_pw(self):
         self.active_gm()
         self.dlg.gmicomboBox.setEnabled(False)
+        self.dlg.gmicomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę powiatu")
         self.dlg.label_3.setText(" - dla powiatu: WWPP")
         self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla powiatu: 0401)")
     
     def active_wo(self):
         self.active_pw()
-        self.dlg.powcomboBox.setEnabled(False)
+        self.dlg.powcomboBox.setEnabled(False)       
+        self.dlg.powcomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę województwa")
         self.dlg.label_3.setText(" - dla województwa: WW")
         self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla województwa: 04)")
-        
+
     def active_all(self):
         self.dlg.edit_id_3.setEnabled(True)
         self.dlg.obrcomboBox.setEnabled(True)
+        self.dlg.obrcomboBox.setStyleSheet("QComboBox { color: black }")
         self.dlg.gmicomboBox.setEnabled(True)
+        self.dlg.gmicomboBox.setStyleSheet("QComboBox { color: black }")
         self.dlg.powcomboBox.setEnabled(True)
+        self.dlg.powcomboBox.setStyleSheet("QComboBox { color: black }")
         self.dlg.wojcomboBox.setEnabled(True)
+        self.dlg.wojcomboBox.setStyleSheet("QComboBox { color: black }")
         self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę obrębu i numer działki")
         self.dlg.label_3.setText(" - dla działki: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD")
         self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla działki: 040101_1.0001.1395)")
-    
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -325,10 +331,10 @@ class UldkGugik:
         else:
             objRegion = str(self.dlg.gmicomboBox.currentText().strip())
         objectType = self.checkedFeatureType()
-        current_idx = self.dlg.gmicomboBox.currentIndex()
-        teryt = self.dlg.gmicomboBox.itemData(current_idx)
         srid = QgsProject.instance().crs().authid().split(":")[1]
         if objectType == 1:
+            current_idx = self.dlg.gmicomboBox.currentIndex()
+            teryt = self.dlg.gmicomboBox.itemData(current_idx)
             objParcel = self.dlg.edit_id_3.text().strip() # nr działki
             if not objRegion:
                 self.iface.messageBar().pushMessage("Błąd formularza:",
@@ -374,7 +380,8 @@ class UldkGugik:
             county = res[4]
             voivodeship = res[5]  
         elif objectType == 3:  # gmina
-            commune = self.dlg.gmicomboBox.currentText().strip()
+            current_idx = self.dlg.gmicomboBox.currentIndex()
+            teryt = self.dlg.gmicomboBox.itemData(current_idx)
             resp = uldk_api.getCommuneById(teryt, srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać gminy:",
@@ -397,6 +404,8 @@ class UldkGugik:
             county = res[3]
             voivodeship = res[4]
         elif objectType == 4:
+            current_idx = self.dlg.powcomboBox.currentIndex()
+            teryt = self.dlg.powcomboBox.itemData(current_idx)
             resp = uldk_api.getCountyById(teryt, srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać powiatu:",
@@ -419,6 +428,8 @@ class UldkGugik:
             county = res[2]
             voivodeship = res[3]
         elif objectType == 5: # województwo
+            current_idx = self.dlg.wojcomboBox.currentIndex()
+            teryt = self.dlg.wojcomboBox.itemData(current_idx)
             resp = uldk_api.getVoivodeshipById(teryt, srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać województwa:",
