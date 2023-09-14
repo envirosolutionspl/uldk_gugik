@@ -23,7 +23,7 @@
 """
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt
 from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
-from PyQt5.QtWidgets import QAction, QToolBar, QShortcut, QWidget
+from PyQt5.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField, \
     QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog
@@ -225,7 +225,7 @@ class UldkGugik:
 
         #eventy
         self.dlg.rdb_dz.toggled.connect(self.active_all)   # działka  
-        self.dlg.rdb_ob.toggled.connect(self.active_dz)   # obręb     label_18
+        self.dlg.rdb_ob.toggled.connect(self.active_ob)   # obręb     label_18
         self.dlg.rdb_gm.toggled.connect(self.active_gm) # gmina       label_17
         self.dlg.rdb_pw.toggled.connect(self.active_pw) # powiat      label_16
         self.dlg.rdb_wo.toggled.connect(self.active_wo) # województwo label_15
@@ -236,28 +236,45 @@ class UldkGugik:
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
 
-    def active_dz(self):
+    def active_ob(self):
         self.active_all()
         self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę obrębu")
+        self.dlg.label_3.setText(" - dla obrębu: WWPPGG_R.OOOO")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla obrębu: 040101_1.0001)")
 
     def active_gm(self):
-        self.active_dz()
+        self.active_ob()
         self.dlg.obrcomboBox.setEnabled(False)
+        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę gminy")
+        self.dlg.label_3.setText(" - dla gminy: WWPPGG_R")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla gminy: 040101_1)")
         
     def active_pw(self):
         self.active_gm()
         self.dlg.gmicomboBox.setEnabled(False)
+        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę powiatu")
+        self.dlg.label_3.setText(" - dla powiatu: WWPP")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla powiatu: 0401)")
     
     def active_wo(self):
         self.active_pw()
         self.dlg.powcomboBox.setEnabled(False)
+        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę województwa")
+        self.dlg.label_3.setText(" - dla województwa: WW")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla województwa: 04)")
         
     def active_all(self):
         self.dlg.edit_id_3.setEnabled(True)
         self.dlg.obrcomboBox.setEnabled(True)
         self.dlg.gmicomboBox.setEnabled(True)
         self.dlg.powcomboBox.setEnabled(True)
-        self.dlg.wojcomboBox.setEnabled(True)      
+        self.dlg.wojcomboBox.setEnabled(True)
+        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę obrębu i numer działki")
+        self.dlg.label_3.setText(" - dla działki: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla działki: 040101_1.0001.1395)")
+        
+    
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
