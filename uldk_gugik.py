@@ -273,7 +273,6 @@ class UldkGugik:
         self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę obrębu i numer działki")
         self.dlg.label_3.setText(" - dla działki: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD")
         self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla działki: 040101_1.0001.1395)")
-        
     
 
     def unload(self):
