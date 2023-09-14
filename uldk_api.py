@@ -17,11 +17,11 @@ def getBuildingById(id, srid):
     return res.data
 
 
-def getRegionById(id, srid):
+def getRegionById(id, srid, **kwargs):
     request = "GetRegionById"
     result = "geom_wkt,teryt,region,commune,county,voivodeship"
     params = {'request': request, 'id': id, 'result': result, 'srid': srid}
-    res = Request(params)
+    res = Request(params, **kwargs)
     return res.data
 
 

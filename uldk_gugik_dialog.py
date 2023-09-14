@@ -70,20 +70,20 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def wojcomboBox_currentTextChanged(self, text):
         self.powcomboBox.clear()
-
         self.powiatDictionary = self.regionFetch.getPowiatDictByWojewodztwoName(text)
         self.powcomboBox.addItems(list(self.powiatDictionary.keys()))
 
     def powcomboBox_currentTextChanged(self, text):
         self.gmicomboBox.clear()
         self.gminaDictionary = self.regionFetch.getGminaDictByPowiatName(text)
-        data = {k: v[1] for k, v in self.gminaDictionary.items()}
-        self.gmicomboBox.addItems(list(data.keys()))
-        for idx, gmina in enumerate(data.keys()):
-            self.gmicomboBox.setItemData(idx, data[gmina])
+        self.gmicomboBox.addItems(list(self.gminaDictionary.keys()))
         
 
     def gmicomboBox_currentTextChanged(self, text):
         self.obrcomboBox.clear()
         self.obrebDictionary = self.regionFetch.getObrebDictByGminaName(text)
+        data = {k: v for k, v in self.obrebDictionary.items()}
         self.obrcomboBox.addItems(list(self.obrebDictionary.keys()))
+        for idx, ob in enumerate(data.keys()):
+            self.gmicomboBox.setItemData(idx, data[ob])
+            self.obrcomboBox.setItemData(idx, data[ob])
