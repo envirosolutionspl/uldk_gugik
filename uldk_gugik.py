@@ -343,7 +343,7 @@ class UldkGugik:
                                                 level=Qgis.Warning, duration=10)
         elif utils.isInternetConnected():
             self.performRequestTeryt(teryt=teryt)
-            self.dlg.hide()
+            # self.dlg.hide()
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -379,7 +379,7 @@ class UldkGugik:
 
             elif utils.isInternetConnected():
                 self.performRequestParcel(region=objRegion, parcel=objParcel)
-                self.dlg.hide()
+                # self.dlg.hide()
 
             else:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -534,7 +534,7 @@ class UldkGugik:
 
         elif utils.isInternetConnected():
             self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
-            self.dlg.hide() #jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
+            # self.dlg.hide() #jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
