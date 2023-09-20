@@ -36,7 +36,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.2.5'
+plugin_version = '1.3.0'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -224,11 +224,12 @@ class UldkGugik:
         self.dlg.lbl_pluginVersion.setText('%s %s' % (plugin_name, plugin_version))
 
         #eventy
-        self.dlg.rdb_dz.toggled.connect(self.active_all)   # działka  
-        self.dlg.rdb_ob.toggled.connect(self.active_ob)   # obręb     label_18
-        self.dlg.rdb_gm.toggled.connect(self.active_gm) # gmina       label_17
-        self.dlg.rdb_pw.toggled.connect(self.active_pw) # powiat      label_16
-        self.dlg.rdb_wo.toggled.connect(self.active_wo) # województwo label_15
+        self.dlg.rdb_dz.toggled.connect(self.active_par)   # działka
+        self.dlg.rdb_ob.toggled.connect(self.active_ob)    # obręb       label_18
+        self.dlg.rdb_gm.toggled.connect(self.active_gm)    # gmina       label_17
+        self.dlg.rdb_pw.toggled.connect(self.active_pw)    # powiat      label_16
+        self.dlg.rdb_wo.toggled.connect(self.active_wo)    # województwo label_15
+        self.dlg.rdb_bu.toggled.connect(self.active_bud)   # budynki
         
         self.dlg.btn_download_tab1.clicked.connect(self.btn_download_tab1_clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
@@ -236,36 +237,67 @@ class UldkGugik:
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
 
+    def active_bud(self):
+        tab_text = "Wybór obiektu przez numer działki i budynku"
+        self.active_all()
+        self.dlg.edit_id_3.setEnabled(True)
+        self.dlg.tab3.findChild(QWidget).setText(tab_text)
+        self.dlg.label_3.setText(" - dla budynku: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)")
+        self.dlg.tabWidget.setTabText(2, tab_text)
+        self.dlg.label_13.setText("Wprowadź numer działki i budynku (np. 6509.5_BUD):")
+
+    def active_par(self):
+        tab_text = "Wybór obiektu przez nazwę obrębu i numer działki"
+        self.active_all()
+        self.dlg.tab3.findChild(QWidget).setText(tab_text)
+        self.dlg.label_3.setText(" - dla działki: WWPPGG_R.OOOO.[AR_NR].NR_DZ, WWPPGG_R.OOOO.NR_DZ")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1.0001.1395)")
+        self.dlg.tabWidget.setTabText(2, tab_text)
+        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
+
     def active_ob(self):
+        tab_text = "Wybór obiektu przez nazwę obrębu"
         self.active_all()
         self.dlg.edit_id_3.setEnabled(False)
-        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę obrębu")
+        self.dlg.tab3.findChild(QWidget).setText(tab_text)
         self.dlg.label_3.setText(" - dla obrębu: WWPPGG_R.OOOO")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla obrębu: 040101_1.0001)")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1.0001)")
+        self.dlg.tabWidget.setTabText(2, tab_text)
+        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
 
     def active_gm(self):
+        tab_text = "Wybór obiektu przez nazwę gminy"
         self.active_ob()
         self.dlg.obrcomboBox.setEnabled(False)
         self.dlg.obrcomboBox.setStyleSheet("QComboBox { color: transparent }")
-        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę gminy")
+        self.dlg.tab3.findChild(QWidget).setText(tab_text)
         self.dlg.label_3.setText(" - dla gminy: WWPPGG_R")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla gminy: 040101_1)")
-        
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1)")
+        self.dlg.tabWidget.setTabText(2, tab_text)
+        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
+
     def active_pw(self):
+        tab_text = "Wybór obiektu przez nazwę powiatu"
         self.active_gm()
         self.dlg.gmicomboBox.setEnabled(False)
         self.dlg.gmicomboBox.setStyleSheet("QComboBox { color: transparent }")
-        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę powiatu")
+        self.dlg.tab3.findChild(QWidget).setText(tab_text)
         self.dlg.label_3.setText(" - dla powiatu: WWPP")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla powiatu: 0401)")
-    
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 0401)")
+        self.dlg.tabWidget.setTabText(2, tab_text)
+        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
+
     def active_wo(self):
+        tab_text = "Wybór obiektu przez nazwę województwa"
         self.active_pw()
-        self.dlg.powcomboBox.setEnabled(False)       
+        self.dlg.powcomboBox.setEnabled(False)
         self.dlg.powcomboBox.setStyleSheet("QComboBox { color: transparent }")
-        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę województwa")
+        self.dlg.tab3.findChild(QWidget).setText(tab_text)
         self.dlg.label_3.setText(" - dla województwa: WW")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla województwa: 04)")
+        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 04)")
+        self.dlg.tabWidget.setTabText(2,tab_text)
+        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
 
     def active_all(self):
         self.dlg.edit_id_3.setEnabled(True)
@@ -277,9 +309,6 @@ class UldkGugik:
         self.dlg.powcomboBox.setStyleSheet("QComboBox { color: black }")
         self.dlg.wojcomboBox.setEnabled(True)
         self.dlg.wojcomboBox.setStyleSheet("QComboBox { color: black }")
-        self.dlg.tab3.findChild(QWidget).setText("Wybór obiektu przez nazwę obrębu i numer działki")
-        self.dlg.label_3.setText(" - dla działki: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. dla działki: 040101_1.0001.1395)")
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -314,6 +343,7 @@ class UldkGugik:
                                                 level=Qgis.Warning, duration=10)
         elif utils.isInternetConnected():
             self.performRequestTeryt(teryt=teryt)
+            self.dlg.hide()
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -324,6 +354,7 @@ class UldkGugik:
         """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
         self.downloadByXY(srid, type="form")
+        self.dlg.hide()
 
     def btn_download_tab3_clicked(self):
         if str(self.dlg.obrcomboBox.currentText().strip()):
@@ -348,6 +379,7 @@ class UldkGugik:
 
             elif utils.isInternetConnected():
                 self.performRequestParcel(region=objRegion, parcel=objParcel)
+                self.dlg.hide()
 
             else:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -502,7 +534,7 @@ class UldkGugik:
 
         elif utils.isInternetConnected():
             self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
-            self.dlg.show()
+            self.dlg.hide() #jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
