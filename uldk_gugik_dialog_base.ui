@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>758</width>
+    <width>858</width>
     <height>514</height>
    </rect>
   </property>
@@ -20,63 +20,6 @@
    <iconset>
     <normaloff>:/plugins/uldk_gugik/images/icon.png</normaloff>:/plugins/uldk_gugik/images/icon.png</iconset>
   </property>
-  <widget class="QLabel" name="lbl_pluginVersion">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>490</y>
-     <width>161</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>ULDK GUGiK 1.3.0</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_copyrights">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>490</y>
-     <width>201</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>© 2023 &lt;a href=&quot;http://www.envirosolutions.pl/&quot;&gt;EnviroSolutions Sp. z o.o.&lt;/a&gt;</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::RichText</enum>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::TextBrowserInteraction</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_email">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>490</y>
-     <width>151</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;a href=&quot;mailto:office@envirosolutions.pl&quot;&gt;office@envirosolutions.pl&lt;/a&gt;</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::RichText</enum>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::TextBrowserInteraction</set>
-   </property>
-  </widget>
   <widget class="QTabWidget" name="tabWidget">
    <property name="enabled">
     <bool>true</bool>
@@ -85,7 +28,7 @@
     <rect>
      <x>190</x>
      <y>90</y>
-     <width>531</width>
+     <width>631</width>
      <height>351</height>
     </rect>
    </property>
@@ -165,8 +108,8 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>410</x>
-       <y>260</y>
+       <x>500</x>
+       <y>270</y>
        <width>93</width>
        <height>28</height>
       </rect>
@@ -197,7 +140,7 @@
        <x>10</x>
        <y>160</y>
        <width>411</width>
-       <height>41</height>
+       <height>91</height>
       </rect>
      </property>
      <property name="text">
@@ -692,6 +635,60 @@
    <property name="scaledContents">
     <bool>true</bool>
    </property>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>470</y>
+     <width>821</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QLabel" name="lbl_pluginVersion">
+      <property name="text">
+       <string>ULDK GUGiK 1.3.0</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="lbl_copyrights">
+      <property name="text">
+       <string>© 2023 &lt;a href=&quot;http://www.envirosolutions.pl/&quot;&gt;EnviroSolutions Sp. z o.o.&lt;/a&gt;</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::RichText</enum>
+      </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::TextBrowserInteraction</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="lbl_email">
+      <property name="text">
+       <string>&lt;a href=&quot;mailto:office@envirosolutions.pl&quot;&gt;office@envirosolutions.pl&lt;/a&gt;</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::RichText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::TextBrowserInteraction</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <customwidgets>
