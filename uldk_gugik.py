@@ -229,7 +229,7 @@ class UldkGugik:
         self.dlg.rdb_gm.toggled.connect(self.active_gm)    # gmina       label_17
         self.dlg.rdb_pw.toggled.connect(self.active_pw)    # powiat      label_16
         self.dlg.rdb_wo.toggled.connect(self.active_wo)    # województwo label_15
-        self.dlg.rdb_bu.toggled.connect(self.active_bud)   # budynki
+        # self.dlg.rdb_bu.toggled.connect(self.active_bud)   # budynki
         
         self.dlg.btn_download_tab1.clicked.connect(self.btn_download_tab1_clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
@@ -237,15 +237,15 @@ class UldkGugik:
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
 
-    def active_bud(self):
-        tab_text = "Wybór obiektu przez numer działki i budynku"
-        self.active_all()
-        self.dlg.edit_id_3.setEnabled(True)
-        self.dlg.tab3.findChild(QWidget).setText(tab_text)
-        self.dlg.label_3.setText(" - dla budynku: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)")
-        self.dlg.tabWidget.setTabText(2, tab_text)
-        self.dlg.label_13.setText("Wprowadź numer działki i budynku (np. 6509.5_BUD):")
+    # def active_bud(self):
+    #     tab_text = "Wybór obiektu przez numer działki i budynku"
+    #     self.active_all()
+    #     self.dlg.edit_id_3.setEnabled(True)
+    #     self.dlg.tab3.findChild(QWidget).setText(tab_text)
+    #     self.dlg.label_3.setText(" - dla budynku: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD")
+    #     self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)")
+    #     self.dlg.tabWidget.setTabText(2, tab_text)
+    #     self.dlg.label_13.setText("Wprowadź numer działki i budynku (np. 6509.5_BUD):")
 
     def active_par(self):
         tab_text = "Wybór obiektu przez nazwę obrębu i numer działki"
@@ -343,7 +343,7 @@ class UldkGugik:
                                                 level=Qgis.Warning, duration=10)
         elif utils.isInternetConnected():
             self.performRequestTeryt(teryt=teryt)
-            # self.dlg.hide()
+            self.dlg.hide()
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -379,7 +379,7 @@ class UldkGugik:
 
             elif utils.isInternetConnected():
                 self.performRequestParcel(region=objRegion, parcel=objParcel)
-                # self.dlg.hide()
+                self.dlg.hide()
 
             else:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -513,7 +513,7 @@ class UldkGugik:
                 zoomToFeature=False
             ) 
 
-    def downloadByXY(self, srid, type, zoomToFeature=True):
+    def downloadByXY(self, srid, type, zoomToFeature=False):
         """pobranie według X i Y i SRID"""
 
         objX = self.dlg.doubleSpinBoxX.text().strip()
@@ -838,7 +838,7 @@ class UldkGugik:
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def performRequestXY(self, x, y, srid, zoomToFeature=True):
+    def performRequestXY(self, x, y, srid, zoomToFeature=False):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
         objectType = self.checkedFeatureType()
@@ -990,7 +990,7 @@ def getBuildingByXY(xy, srid):
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature=True):
+    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature=False):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
         feat = QgsFeature()
