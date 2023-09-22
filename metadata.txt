@@ -26,8 +26,8 @@ repository=https://github.com/envirosolutionspl/uldk
 changelog=
   Wersja 1.3.0
   * Poprawa funkcjonowania pobierania elementów z usługi ULDK
-  * Dodanie możliwości pobierania obrysów budynków
   * Poprawa wydajności funkcjonowania wtyczki
+  * Zmiana funkcjonowania interfejsu
   Wersja 1.2.5
   * Dodanie funkcjonalności pobierania obiektu (działki) przez wybór obrębu z listy
   Wersja 1.2.4

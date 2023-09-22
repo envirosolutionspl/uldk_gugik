@@ -89,7 +89,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)</string>
+      <string>Wprowadź identyfikator obiektu (np. 040101_1.0001.1395)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="edit_id">
@@ -144,7 +144,7 @@
       </rect>
      </property>
      <property name="text">
-      <string> - dla budynku: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD</string>
+      <string> - dla działki: WWPPGG_R.OOOO.[AR_NR].NR_DZ, WWPPGG_R.OOOO.NR_DZ</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -416,7 +416,7 @@
      <bool>true</bool>
     </property>
     <attribute name="title">
-     <string>Wybór obiektu przez numer działki i budynku</string>
+     <string>Wybór obiektu przez nazwę obrębu i numer działki</string>
     </attribute>
     <widget class="QLabel" name="lbl_desc_tab3">
      <property name="geometry">
@@ -433,7 +433,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Wybór obiektu przez numer działki i budynku</string>
+      <string>Wybór obiektu przez nazwę obrębu i numer działki</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_13">
@@ -446,7 +446,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Wprowadź numer działki i budynku (np. 6509.5_BUD):</string>
+      <string>Wprowadź numer działki i budynku (np. 6509):</string>
      </property>
     </widget>
     <widget class="QComboBox" name="wojcomboBox">
@@ -638,19 +638,6 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="rdb_bu">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="text">
-        <string>Budynek</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QRadioButton" name="rdb_dz">
        <property name="text">
         <string>Działka</string>
@@ -659,7 +646,7 @@
         <bool>true</bool>
        </property>
        <property name="checked">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -795,7 +782,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>rdb_bu</tabstop>
   <tabstop>rdb_dz</tabstop>
   <tabstop>rdb_ob</tabstop>
   <tabstop>rdb_gm</tabstop>
