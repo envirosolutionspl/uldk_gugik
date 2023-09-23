@@ -1,6 +1,6 @@
 from urllib.parse import urlencode
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkReply
-from PyQt5.QtCore import QUrl, QEventLoop
+from qgis.PyQt.QtCore import QUrl, QEventLoop
 
 
 

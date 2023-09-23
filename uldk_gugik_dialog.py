@@ -25,7 +25,7 @@
 import os
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal, QRegExp
-from PyQt5.QtGui import QRegExpValidator
+from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.gui import QgsFileWidget
 from qgis.core import QgsMapLayerProxyModel
 from .uldk import RegionFetch
