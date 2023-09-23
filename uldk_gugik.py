@@ -21,9 +21,9 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt
-from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
-from PyQt5.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt
+from qgis.PyQt.QtGui import QIcon, QPixmap, QKeySequence
+from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField, \
     QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog
@@ -100,8 +100,8 @@ class UldkGugik:
         self.dlg = UldkGugikDialog()
 
         # skrot klawiszowy
-        self.shortcut = QShortcut(iface.mainWindow())
-        self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_D))
+        self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_D), iface.mainWindow())
+        self.shortcut.setContext(Qt.ApplicationShortcut)
         self.shortcut.activated.connect(self.shortcut_activated)
 
 
@@ -342,8 +342,14 @@ class UldkGugik:
                                                 'musisz wpisać identyfikator',
                                                 level=Qgis.Warning, duration=10)
         elif utils.isInternetConnected():
-            self.performRequestTeryt(teryt=teryt)
-            self.dlg.hide()
+            try:
+                self.performRequestTeryt(teryt=teryt)
+                self.dlg.hide()
+            except:
+                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                    'API nie zwróciło odpowiedzi dla zadanego zapytania',
+                                                    level=Qgis.Critical, duration=10)
+
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -354,7 +360,7 @@ class UldkGugik:
         """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
         self.downloadByXY(srid, type="form")
-        self.dlg.hide()
+        # self.dlg.hide()
 
     def btn_download_tab3_clicked(self):
         if str(self.dlg.obrcomboBox.currentText().strip()):
@@ -510,14 +516,15 @@ class UldkGugik:
                 commune=commune,
                 county=county,
                 voivodeship=voivodeship,
-                zoomToFeature=False
+                zoomToFeature=True
             ) 
 
-    def downloadByXY(self, srid, type, zoomToFeature=False):
+    def downloadByXY(self, srid, type, zoomToFeature=True):
         """pobranie według X i Y i SRID"""
 
         objX = self.dlg.doubleSpinBoxX.text().strip()
         objY = self.dlg.doubleSpinBoxY.text().strip()
+        print(srid)
         if type == "form" and srid in ['2180', '4326']:
             objX = self.dlg.doubleSpinBoxY.text().strip()
             objY = self.dlg.doubleSpinBoxX.text().strip()
@@ -533,8 +540,14 @@ class UldkGugik:
                                                 level=Qgis.Warning, duration=10)
 
         elif utils.isInternetConnected():
-            self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
-            # self.dlg.hide() #jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
+            try:
+                self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
+                self.dlg.hide()  # jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
+            except:
+                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                    'API nie zwróciło obiektu dla wybranego zapytania',
+                                                    level=Qgis.Critical, duration=10)
+
 
         else:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -558,7 +571,7 @@ class UldkGugik:
         coords = "{}, {}".format(point.x(), point.y())
         QgsMessageLog.logMessage(str(coords), 'ULDK')
         srid = QgsProject.instance().crs().authid().split(":")[1]
-        self.downloadByXY(srid, zoomToFeature=False, type="click")
+        self.downloadByXY(srid, zoomToFeature=True, type="click")
 
     def performRequestParcel(self, region, parcel, teryt=None):
         objectType = self.checkedFeatureType()
@@ -821,7 +834,7 @@ class UldkGugik:
             commune=commune,
             county=county,
             voivodeship=voivodeship,
-            zoomToFeature=False
+            zoomToFeature=True
         )
 
         object ={
@@ -838,7 +851,7 @@ class UldkGugik:
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def performRequestXY(self, x, y, srid, zoomToFeature=False):
+    def performRequestXY(self, x, y, srid, zoomToFeature=True):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
         objectType = self.checkedFeatureType()
@@ -854,7 +867,7 @@ class UldkGugik:
 
         pid = str(requestPoint.x()) + "," + str(requestPoint.y())
         if objectType == 1:# działka
-            resp = uldk_xy.getParcelByXY(xy=pid, srid=srid)
+            resp = uldk_xy.getParcelByXY(xy=pid, srid='2180')
             #print(resp)
             #print(r)
             #print(r_txt)
@@ -880,10 +893,10 @@ def getBuildingByXY(xy, srid):
 
             
         elif objectType == 2:
-            resp = uldk_xy.getRegionByXY(xy=pid, srid=srid)
+            resp = uldk_xy.getRegionByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla dla współrzędnych %s' % pid,
+                                                    'API nie zwróciło obiektu dla współrzędnych %s' % pid,
                                                     level=Qgis.Critical, duration=10)
                 return
             res = resp.split("|")
@@ -897,7 +910,7 @@ def getBuildingByXY(xy, srid):
             # print(teryt, region, commune, county, voivodeship)
 
         elif objectType == 3:
-            resp = uldk_xy.getCommuneByXY(xy=pid, srid=srid)
+            resp = uldk_xy.getCommuneByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -914,7 +927,7 @@ def getBuildingByXY(xy, srid):
             # print(teryt, commune, county, voivodeship)
 
         elif objectType == 4:
-            resp = uldk_xy.getCountyByXY(xy=pid, srid=srid)
+            resp = uldk_xy.getCountyByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -931,7 +944,7 @@ def getBuildingByXY(xy, srid):
             # print(teryt, county, voivodeship)
 
         elif objectType == 5:
-            resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid=srid)
+            resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid='2180')
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -948,7 +961,7 @@ def getBuildingByXY(xy, srid):
             # print(teryt, voivodeship)
             
         elif objectType == 6:
-            resp = uldk_xy.getBuildingByXY(xy=pid, srid=srid)
+            resp = uldk_xy.getBuildingByXY(xy=pid, srid='2180')
             #print(resp)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -990,7 +1003,7 @@ def getBuildingByXY(xy, srid):
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature=False):
+    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature=True):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
         feat = QgsFeature()
@@ -1020,7 +1033,7 @@ def getBuildingByXY(xy, srid):
 
         else:
             # jezeli nie istnieje to stworz warstwe
-            layer = QgsVectorLayer("Polygon?crs=EPSG:" + crs, nazwa, "memory")
+            layer = QgsVectorLayer("Polygon?crs=EPSG:2180", nazwa, "memory")
             QgsProject.instance().addMapLayer(layer)
 
             provider = layer.dataProvider()
@@ -1091,14 +1104,14 @@ def getBuildingByXY(xy, srid):
             else:
                 box = feat.geometry().boundingBox()
 
-            self.canvas.setExtent(box)
+            # self.canvas.setExtent(box)
             self.canvas.refresh()
         else:
             layer.triggerRepaint()
-            
+        self.iface.mapCanvas().refreshAllLayers()
     def checkedFeatureType(self):
         """
-        Fukncja pomocnicza sprawdzająca jaki typ obiektu jest zaznaczony w oknie wtyczki
+        Funkcja pomocnicza sprawdzająca jaki typ obiektu jest zaznaczony w oknie wtyczki
         @returns:
         1 - działka ewidencyjna
         2 - obręb ewidencyjny
