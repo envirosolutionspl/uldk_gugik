@@ -100,8 +100,8 @@ class UldkGugik:
         self.dlg = UldkGugikDialog()
 
         # skrot klawiszowy
-        self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_D), iface.mainWindow())
-        self.shortcut.setContext(Qt.ApplicationShortcut)
+        self.shortcut = QShortcut(iface.mainWindow())
+        self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_D))
         self.shortcut.activated.connect(self.shortcut_activated)
 
 
@@ -867,7 +867,7 @@ class UldkGugik:
 
         pid = str(requestPoint.x()) + "," + str(requestPoint.y())
         if objectType == 1:# działka
-            resp = uldk_xy.getParcelByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getParcelByXY(xy=pid, srid=srid)
             #print(resp)
             #print(r)
             #print(r_txt)
@@ -893,7 +893,7 @@ def getBuildingByXY(xy, srid):
 
             
         elif objectType == 2:
-            resp = uldk_xy.getRegionByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getRegionByXY(xy=pid, srid=srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -910,7 +910,7 @@ def getBuildingByXY(xy, srid):
             # print(teryt, region, commune, county, voivodeship)
 
         elif objectType == 3:
-            resp = uldk_xy.getCommuneByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getCommuneByXY(xy=pid, srid=srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -927,7 +927,7 @@ def getBuildingByXY(xy, srid):
             # print(teryt, commune, county, voivodeship)
 
         elif objectType == 4:
-            resp = uldk_xy.getCountyByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getCountyByXY(xy=pid, srid=srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -944,7 +944,7 @@ def getBuildingByXY(xy, srid):
             # print(teryt, county, voivodeship)
 
         elif objectType == 5:
-            resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid=srid)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -961,7 +961,7 @@ def getBuildingByXY(xy, srid):
             # print(teryt, voivodeship)
             
         elif objectType == 6:
-            resp = uldk_xy.getBuildingByXY(xy=pid, srid='2180')
+            resp = uldk_xy.getBuildingByXY(xy=pid, srid=srid)
             #print(resp)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -1033,7 +1033,7 @@ def getBuildingByXY(xy, srid):
 
         else:
             # jezeli nie istnieje to stworz warstwe
-            layer = QgsVectorLayer("Polygon?crs=EPSG:2180", nazwa, "memory")
+            layer = QgsVectorLayer("Polygon?crs=EPSG:" + crs, nazwa, "memory")
             QgsProject.instance().addMapLayer(layer)
 
             provider = layer.dataProvider()
