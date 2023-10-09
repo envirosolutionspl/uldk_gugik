@@ -12,13 +12,6 @@ def getParcelByXY(xy, srid):
     params = {'request': request, 'xy': xy, 'result': result, 'srid': srid}
     res = Request(params)
     return res.data
-
-def getBuildingByXY(xy, srid):
-    request = "GetBuildingByXY"
-    result = "geom_wkt,region,commune,county,voivodeship"
-    params = {'request': request, 'xy': xy, 'result': result, 'srid': srid}
-    res = Request(params)
-    return res.data
     
 def getRegionByXY(xy, srid):
     request = "GetRegionByXY"
