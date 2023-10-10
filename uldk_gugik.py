@@ -444,10 +444,16 @@ class UldkGugik:
 
                     for i in arkusze.split("\n"):
                         print(i)
-                        if len(i) < 3 or i == "-1 brak wyników":
+                        if i == "-1 brak wyników":
+                            self.iface.messageBar().pushMessage("Ostrzeżenie:",
+                                                                'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                                level=Qgis.Warning, duration=10)
+                            continue
+                        if len(i) < 3:
                             pass
                         else:
                             if ";" in i:
+                                print(self.dlg.wojcomboBox.currentText(),' - ',i.rstrip().split(";")[1].split("|")[-1])
                                 if self.dlg.wojcomboBox.currentText() in i.rstrip().split(";")[1].split("|")[-1]:
                                     self.dlg.btn_download_tab3.setEnabled(True)
                                     if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
@@ -456,10 +462,11 @@ class UldkGugik:
                                         pass
                                 else:
                                     self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                                        'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                                        'Jedna ze zwróconych działek jest niezgodna z podanymi parametrami',
                                                                         level=Qgis.Warning, duration=10)
                                     self.dlg.btn_download_tab3.setEnabled(False)
                             else:
+                                print(self.dlg.wojcomboBox.currentText(),' - ',i.rstrip().split("|")[-1])
                                 if self.dlg.wojcomboBox.currentText() in i.rstrip().split("|")[-1]:
                                     self.dlg.btn_download_tab3.setEnabled(True)
                                     if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
@@ -468,7 +475,7 @@ class UldkGugik:
                                         pass
                                 else:
                                     self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                                        'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                                        'Jedna ze zwróconych działek jest niezgodna z podanymi parametrami',
                                                                         level=Qgis.Warning, duration=10)
                                     self.dlg.btn_download_tab3.setEnabled(False)
 
