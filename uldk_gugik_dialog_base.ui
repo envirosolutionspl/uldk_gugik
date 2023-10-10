@@ -264,7 +264,7 @@
        <double>10000000.000000000000000</double>
       </property>
      </widget>
-     <widget class="QgsProjectionSelectionWidget" name="projectionWidget">
+     <widget class="QgsProjectionSelectionWidget" name="projectionWidget" native="true">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -604,10 +604,80 @@
       <item>
        <widget class="QPushButton" name="btn_download_tab3">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="text">
          <string>Pobierz</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QComboBox" name="arkcomboBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>211</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_19">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>160</y>
+       <width>300</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>300</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Wybierz arkusz</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_4">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>170</y>
+       <width>141</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_search_tab3_2">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Wyszukaj działkę</string>
         </property>
        </widget>
       </item>
@@ -791,14 +861,16 @@
   <tabstop>btn_download_tab1</tabstop>
   <tabstop>doubleSpinBoxX</tabstop>
   <tabstop>doubleSpinBoxY</tabstop>
-  <tabstop>projectionWidget</tabstop>
   <tabstop>btn_frommap</tabstop>
   <tabstop>btn_download_tab2</tabstop>
   <tabstop>wojcomboBox</tabstop>
   <tabstop>powcomboBox</tabstop>
   <tabstop>gmicomboBox</tabstop>
   <tabstop>obrcomboBox</tabstop>
+  <tabstop>arkcomboBox</tabstop>
   <tabstop>edit_id_3</tabstop>
+  <tabstop>btn_search_tab3_2</tabstop>
+  <tabstop>btn_download_tab3</tabstop>
  </tabstops>
  <resources/>
  <connections/>

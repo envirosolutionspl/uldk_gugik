@@ -67,7 +67,6 @@ class RegionFetch:
                 self.powiatDict.clear()
                 for el in data:
                     split = el.split('|')
-                    # self.powiatDict[split[1]] = split[0], split[2]
                     self.powiatDict[split[0]] = split[1], split[2]
         self.loop.quit()
 
@@ -87,7 +86,7 @@ class RegionFetch:
     def getObreb(self, reply):
         if reply.error() == QNetworkReply.NoError:
             data = reply.readAll().data().decode('utf-8')
-            data = data.strip().split('\n') 
+            data = data.strip().split('\n')
             if len(data) and data[0] == '0':
                 data = data[1:]
                 self.obrebDict.clear()

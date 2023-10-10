@@ -1,13 +1,21 @@
-from .request import Request
+from .request import Request as RQ
+from .request_search import Request as RS
+
 
 
 def getParcelById(name, srid, **kwargs):
     request = "GetParcelByIdOrNr"
     result = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
     params = {'request': request, 'id': name, 'result': result, 'srid': srid}
-    res = Request(params, **kwargs)
+    res = RQ(params, **kwargs)
     return res.data
 
+def getParcelById2(name, srid, **kwargs):
+    request = "GetParcelByIdOrNr"
+    result = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
+    params = {'request': request, 'id': name, 'result': result, 'srid': srid}
+    res = RS(params, **kwargs)
+    return res.data
 
 
 # def getArkusz(id, request, result):

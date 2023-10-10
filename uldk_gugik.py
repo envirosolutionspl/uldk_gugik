@@ -234,6 +234,14 @@ class UldkGugik:
         self.dlg.btn_download_tab1.clicked.connect(self.btn_download_tab1_clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
         self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
+        self.dlg.btn_search_tab3_2.clicked.connect(self.btn_search_tab3_clicked)
+
+        self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark) #Kontrola wyświetlania numeru arkusza
+        self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark) #Kontrola wyświetlania numeru arkusza
+        self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark) #Kontrola wyświetlania numeru arkusza
+        self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark) #Kontrola wyświetlania numeru arkusza
+        self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
+        
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
 
@@ -246,10 +254,16 @@ class UldkGugik:
     #     self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)")
     #     self.dlg.tabWidget.setTabText(2, tab_text)
     #     self.dlg.label_13.setText("Wprowadź numer działki i budynku (np. 6509.5_BUD):")
+    def ctrl_ark(self):
+        self.dlg.arkcomboBox.clear()
+        self.dlg.btn_download_tab3.setEnabled(False)
 
     def active_par(self):
         tab_text = "Wybór obiektu przez nazwę obrębu i numer działki"
         self.active_all()
+        # self.dlg.arkcomboBoxcomboBox.setStyleSheet("QComboBox { color: white }")
+        self.dlg.btn_search_tab3_2.setEnabled(True)
+        self.dlg.btn_download_tab3.setEnabled(False)
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
         self.dlg.label_3.setText(" - dla działki: WWPPGG_R.OOOO.[AR_NR].NR_DZ, WWPPGG_R.OOOO.NR_DZ")
         self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1.0001.1395)")
@@ -259,7 +273,11 @@ class UldkGugik:
     def active_ob(self):
         tab_text = "Wybór obiektu przez nazwę obrębu"
         self.active_all()
+        self.control_ark()
+        self.dlg.btn_search_tab3_2.setEnabled(False)
+        self.dlg.btn_download_tab3.setEnabled(True)
         self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.edit_id_3.setText('')
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
         self.dlg.label_3.setText(" - dla obrębu: WWPPGG_R.OOOO")
         self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1.0001)")
@@ -269,6 +287,11 @@ class UldkGugik:
     def active_gm(self):
         tab_text = "Wybór obiektu przez nazwę gminy"
         self.active_ob()
+        self.control_ark()
+        self.dlg.btn_search_tab3_2.setEnabled(False)
+        self.dlg.btn_download_tab3.setEnabled(True)
+        self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.edit_id_3.setText('')
         self.dlg.obrcomboBox.setEnabled(False)
         self.dlg.obrcomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
@@ -280,6 +303,11 @@ class UldkGugik:
     def active_pw(self):
         tab_text = "Wybór obiektu przez nazwę powiatu"
         self.active_gm()
+        self.control_ark()
+        self.dlg.btn_search_tab3_2.setEnabled(False)
+        self.dlg.btn_download_tab3.setEnabled(True)
+        self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.edit_id_3.setText('')
         self.dlg.gmicomboBox.setEnabled(False)
         self.dlg.gmicomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
@@ -291,6 +319,11 @@ class UldkGugik:
     def active_wo(self):
         tab_text = "Wybór obiektu przez nazwę województwa"
         self.active_pw()
+        self.control_ark()
+        self.dlg.btn_search_tab3_2.setEnabled(False)
+        self.dlg.btn_download_tab3.setEnabled(True)
+        self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.edit_id_3.setText('')
         self.dlg.powcomboBox.setEnabled(False)
         self.dlg.powcomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
@@ -299,8 +332,15 @@ class UldkGugik:
         self.dlg.tabWidget.setTabText(2,tab_text)
         self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
 
+    def control_ark(self):
+        self.dlg.arkcomboBox.clear()
+        self.dlg.arkcomboBox.setEnabled(False)
+        self.dlg.arkcomboBox.setStyleSheet("QComboBox { color: transparent }")
+
     def active_all(self):
         self.dlg.edit_id_3.setEnabled(True)
+        self.dlg.arkcomboBox.setEnabled(True)
+        self.dlg.arkcomboBox.setStyleSheet("QComboBox { color: black }")
         self.dlg.obrcomboBox.setEnabled(True)
         self.dlg.obrcomboBox.setStyleSheet("QComboBox { color: black }")
         self.dlg.gmicomboBox.setEnabled(True)
@@ -309,6 +349,7 @@ class UldkGugik:
         self.dlg.powcomboBox.setStyleSheet("QComboBox { color: black }")
         self.dlg.wojcomboBox.setEnabled(True)
         self.dlg.wojcomboBox.setStyleSheet("QComboBox { color: black }")
+
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -362,6 +403,74 @@ class UldkGugik:
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
         self.downloadByXY(srid, type="form")
         # self.dlg.hide()
+
+    def btn_search_tab3_clicked(self):
+        if str(self.dlg.obrcomboBox.currentText().strip()):
+            objRegion = str(self.dlg.obrcomboBox.currentText().strip())
+            objectType = self.checkedFeatureType()
+            srid = str(2180)
+        else:
+            objRegion = str(self.dlg.gmicomboBox.currentText().strip())
+            objectType = self.checkedFeatureType()
+            srid = str(2180)
+        if objectType == 1:
+            current_idx = self.dlg.gmicomboBox.currentIndex()
+            teryt = self.dlg.gmicomboBox.itemData(current_idx)
+            objParcel = self.dlg.edit_id_3.text().strip() # nr działki
+            if not objRegion:
+                self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                    'musisz wpisać obręb',
+                                                    level=Qgis.Warning, duration=10)
+
+            if not objParcel:
+                self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                    'musisz wpisać numer działki',
+                                                    level=Qgis.Warning, duration=10)
+
+            elif utils.isInternetConnected():
+                self.dlg.arkcomboBox.clear()
+                name = objRegion + ' ' + objParcel
+                result = uldk_parcel.getParcelById2(name, srid=str(2180), teryt=teryt)
+                print("Wynik odpowiedzi Obwód i Nr: ", result)
+                if result == {'-1 brak wyników\n'}:
+                    self.iface.messageBar().pushMessage("Ostrzeżenie:",'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                    level=Qgis.Warning, duration=10)
+                    self.dlg.btn_download_tab3.setEnabled(False)
+                else:
+                    self.dlg.btn_download_tab3.setEnabled(True)
+                    arkusze = None
+                    for i in result:
+                        arkusze = i
+
+                    for i in arkusze.split("\n"):
+                        print(i)
+                        if len(i) < 3 or i == "-1 brak wyników":
+                            pass
+                        else:
+                            if ";" in i:
+                                if self.dlg.wojcomboBox.currentText() in i.rstrip().split(";")[1].split("|")[-1]:
+                                    self.dlg.btn_download_tab3.setEnabled(True)
+                                    if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
+                                        self.dlg.arkcomboBox.addItem(i.split(";")[1].split("|")[1].split(".")[-2].strip())
+                                    else:
+                                        pass
+                                else:
+                                    self.iface.messageBar().pushMessage("Ostrzeżenie:",
+                                                                        'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                                        level=Qgis.Warning, duration=10)
+                                    self.dlg.btn_download_tab3.setEnabled(False)
+                            else:
+                                if self.dlg.wojcomboBox.currentText() in i.rstrip().split("|")[-1]:
+                                    self.dlg.btn_download_tab3.setEnabled(True)
+                                    if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
+                                        self.dlg.arkcomboBox.addItem(i.split("|")[1].split(".")[-2].strip())
+                                    else:
+                                        pass
+                                else:
+                                    self.iface.messageBar().pushMessage("Ostrzeżenie:",
+                                                                        'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                                        level=Qgis.Warning, duration=10)
+                                    self.dlg.btn_download_tab3.setEnabled(False)
 
     def btn_download_tab3_clicked(self):
         if str(self.dlg.obrcomboBox.currentText().strip()):
@@ -517,11 +626,9 @@ class UldkGugik:
                 region=region,
                 commune=commune,
                 county=county,
-                voivodeship=voivodeship,
-                zoomToFeature=True
-            ) 
+                voivodeship=voivodeship)
 
-    def downloadByXY(self, srid, type, zoomToFeature=True):
+    def downloadByXY(self, srid, type):
         """pobranie według X i Y i SRID"""
 
         objX = self.dlg.doubleSpinBoxX.text().strip()
@@ -543,7 +650,7 @@ class UldkGugik:
 
         elif utils.isInternetConnected():
             try:
-                self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
+                self.performRequestXY(x=objX, y=objY, srid=srid)
                 self.dlg.hide()  # jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
             except:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -573,14 +680,18 @@ class UldkGugik:
         coords = "{}, {}".format(point.x(), point.y())
         QgsMessageLog.logMessage(str(coords), 'ULDK')
         srid = QgsProject.instance().crs().authid().split(":")[1]
-        self.downloadByXY(srid, zoomToFeature=True, type="click")
+        self.downloadByXY(srid, type="click")
 
     def performRequestParcel(self, region, parcel, teryt=None):
         objectType = self.checkedFeatureType()
-        name = region + ' ' + parcel
-        result = uldk_parcel.getParcelById(name, srid=str(2180), teryt=teryt)
 
-        print("RESULT: ", result)
+        if self.dlg.arkcomboBox.currentText() != '':
+            name = region + ' ' + self.dlg.arkcomboBox.currentText() + '.' + parcel
+        else:
+            name = region + ' ' + parcel
+        result = uldk_parcel.getParcelById(name, srid=str(2180), teryt=teryt)
+        print("Wynik odpowiedzi Obwód i Nr: ",result)
+
         if result is None:
             self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                 'API nie zwróciło obiektu dla id %s' % name,
@@ -668,7 +779,7 @@ class UldkGugik:
         provider.changeAttributeValues(attrMap)
 
         voiv = layer.fields().indexFromName('województwo')
-        attrMap = {counter: {voiv: voivodeship}}
+        attrMap = {counter: {voiv: voivodeship.rstrip()}}
         provider.changeAttributeValues(attrMap)
 
         if parcel is not None:
@@ -844,9 +955,7 @@ class UldkGugik:
             region=region,
             commune=commune,
             county=county,
-            voivodeship=voivodeship,
-            zoomToFeature=True
-        )
+            voivodeship=voivodeship)
 
         object ={
             1: "działkę o nr teryt: %s",
@@ -862,7 +971,7 @@ class UldkGugik:
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def performRequestXY(self, x, y, srid, zoomToFeature=True):
+    def performRequestXY(self, x, y, srid):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
         objectType = self.checkedFeatureType()
@@ -1000,9 +1109,7 @@ def getBuildingByXY(xy, srid):
             region=region,
             commune=commune,
             county=county,
-            voivodeship=voivodeship,
-            zoomToFeature=zoomToFeature
-        )
+            voivodeship=voivodeship)
         object ={
             1: "działkę o nr teryt: %s",
             2: "obręb ewidencyjny",
@@ -1017,7 +1124,7 @@ def getBuildingByXY(xy, srid):
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature=True):
+    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
         feat = QgsFeature()
@@ -1107,21 +1214,21 @@ def getBuildingByXY(xy, srid):
 
             provider.changeAttributeValues(attrMap)
 
-        if zoomToFeature:
-            # projectCrs = 2180
-
-            # if projectCrs != '2180':
-            #     sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
-            #     destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-            #     tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
-            #     box = tr.transform(feat.geometry().boundingBox())
-            # else:
-            box = feat.geometry().boundingBox()
-
-            # self.canvas.setExtent(box)
-            self.canvas.refresh()
-        else:
-            layer.triggerRepaint()
+        # if zoomToFeature:
+        #     # projectCrs = 2180
+        #
+        #     # if projectCrs != '2180':
+        #     #     sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
+        #     #     destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+        #     #     tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+        #     #     box = tr.transform(feat.geometry().boundingBox())
+        #     # else:
+        #     # box = feat.geometry().boundingBox()
+        #
+        #     # self.canvas.setExtent(box)
+        # self.canvas.refresh()
+        # else:
+        # layer.triggerRepaint()
         self.iface.mapCanvas().refreshAllLayers()
     def checkedFeatureType(self):
         """

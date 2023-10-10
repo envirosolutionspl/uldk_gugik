@@ -1,13 +1,14 @@
 from urllib.parse import urlencode
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkReply
 from qgis.PyQt.QtCore import QUrl, QEventLoop
+from .uldk_gugik_dialog import UldkGugikDialog
 
 
 class Request:
 
     def __init__(self, params, **kwargs):
         self.params = params
-        self._data = None
+        self._data = set()
         self.url = "http://uldk.gugik.gov.pl/"
         self.manager = QNetworkAccessManager()
 
@@ -26,32 +27,15 @@ class Request:
 
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
+        self._data.clear()
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
-            for line in returnedData.split('\n'):
+
+            for line in returnedData.split('\\n'):
                 if len(line) < 3 or line == "-1 brak wyników":
                     continue
-                if ";" in line:
-                    polygon = line.split(';')[1]
-                    if not self.teryt:
-                        self._data = polygon
-                        break
-                    teryt = polygon.split('|')[1].split('.')[0]
-                    if teryt[:-4] == self.teryt[:-4]:
-                        # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
-                        self._data = polygon
-                        break
                 else:
-                    if not self.teryt:
-                        self._data = line
-                        break
-                    teryt = line.split('|')[1].split('.')[0]
-                    if teryt[:-4] == self.teryt[:-4]:
-                        self._data = line
-                        break
-            else:  # brak zgodności - nie ma takiego nr działki
-                self._data = None
-
+                    self._data.add(line.replace('\r',''))
         self.loop.quit()
 
     @property
