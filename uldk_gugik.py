@@ -26,7 +26,7 @@ from qgis.PyQt.QtGui import QIcon, QPixmap, QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField, \
-    QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog,QgsMultiPolygon
+    QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
@@ -88,22 +88,19 @@ class UldkGugik:
             self.toolbar = self.iface.addToolBar(u'EnviroSolutions')
             self.toolbar.setObjectName(u'EnviroSolutions')
 
+        self.shortcut = None
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
 
         self.canvas = self.iface.mapCanvas()
+        
         # out click tool will emit a QgsPoint on every click
         self.clickTool = QgsMapToolEmitPoint(self.canvas)
         self.clickTool.canvasClicked.connect(self.canvasClicked)
 
-        self.dlg = UldkGugikDialog()
-
-        # skrot klawiszowy
-        self.shortcut = QShortcut(iface.mainWindow())
-        self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_D))
-        self.shortcut.activated.connect(self.shortcut_activated)
-
+        self.dlg = UldkGugikDialog()     
+        
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -359,6 +356,17 @@ class UldkGugik:
                                                 "W celu dalszej pracy zdefiniuj układ współrzędnych dla projektu",
                                                 level=Qgis.Warning, duration=10)
             return 1
+        if self.first_start == True:
+            self.first_start = False
+            if Qgis.QGIS_VERSION_INT >= 30000:
+                # skrot klawiszowy
+                self.shortcut = QShortcut(self.iface.mainWindow())
+                self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_D))
+                self.shortcut.activated.connect(self.shortcut_activated)
+            else:
+                self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_D), self.iface.mainWindow())
+                self.shortcut.setContext(Qt.ApplicationShortcut)
+                self.shortcut.activated.connect(self.shortcut_activated) 
         # show the dialog
         self.dlg.show()
         self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
