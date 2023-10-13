@@ -386,7 +386,6 @@ class UldkGugik:
         elif utils.isInternetConnected():
             try:
                 self.performRequestTeryt(teryt=teryt)
-                self.dlg.hide()
             except:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło odpowiedzi dla zadanego zapytania',
@@ -402,7 +401,6 @@ class UldkGugik:
         """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
         self.downloadByXY(srid, type="form")
-        # self.dlg.hide()
 
     def btn_search_tab3_clicked(self):
         if str(self.dlg.obrcomboBox.currentText().strip()):
@@ -503,7 +501,6 @@ class UldkGugik:
 
             elif utils.isInternetConnected():
                 self.performRequestParcel(region=objRegion, parcel=objParcel)
-                self.dlg.hide()
 
             else:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -658,7 +655,7 @@ class UldkGugik:
         elif utils.isInternetConnected():
             try:
                 self.performRequestXY(x=objX, y=objY, srid=srid)
-                self.dlg.hide()  # jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
+                # self.dlg.hide()  # jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
             except:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla wybranego zapytania',
