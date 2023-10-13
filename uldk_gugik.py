@@ -220,6 +220,12 @@ class UldkGugik:
         self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
         self.dlg.lbl_pluginVersion.setText('%s %s' % (plugin_name, plugin_version))
 
+        self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
+        self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
+        self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
+        self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
+        self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
+
         #eventy
         self.dlg.rdb_dz.toggled.connect(self.active_par)   # działka
         self.dlg.rdb_ob.toggled.connect(self.active_ob)    # obręb       label_18
@@ -231,12 +237,6 @@ class UldkGugik:
         self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
         self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
         self.dlg.btn_search_tab3_2.clicked.connect(self.btn_search_tab3_clicked)
-
-        self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark) #Kontrola wyświetlania numeru arkusza
-        self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark) #Kontrola wyświetlania numeru arkusza
-        self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark) #Kontrola wyświetlania numeru arkusza
-        self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark) #Kontrola wyświetlania numeru arkusza
-        self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
         
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
@@ -261,9 +261,9 @@ class UldkGugik:
         self.active_all()
         self.control_ark()
         self.dlg.btn_search_tab3_2.setEnabled(False)
-        self.dlg.btn_download_tab3.setEnabled(True)
-        self.dlg.edit_id_3.setEnabled(False)
         self.dlg.edit_id_3.setText('')
+        self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.btn_download_tab3.setEnabled(True)
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
         self.dlg.label_3.setText(" - dla obrębu: WWPPGG_R.OOOO")
         self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1.0001)")
@@ -275,9 +275,9 @@ class UldkGugik:
         self.active_ob()
         self.control_ark()
         self.dlg.btn_search_tab3_2.setEnabled(False)
-        self.dlg.btn_download_tab3.setEnabled(True)
-        self.dlg.edit_id_3.setEnabled(False)
         self.dlg.edit_id_3.setText('')
+        self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.btn_download_tab3.setEnabled(True)
         self.dlg.obrcomboBox.setEnabled(False)
         self.dlg.obrcomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
@@ -291,9 +291,9 @@ class UldkGugik:
         self.active_gm()
         self.control_ark()
         self.dlg.btn_search_tab3_2.setEnabled(False)
-        self.dlg.btn_download_tab3.setEnabled(True)
-        self.dlg.edit_id_3.setEnabled(False)
         self.dlg.edit_id_3.setText('')
+        self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.btn_download_tab3.setEnabled(True)
         self.dlg.gmicomboBox.setEnabled(False)
         self.dlg.gmicomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
@@ -307,9 +307,9 @@ class UldkGugik:
         self.active_pw()
         self.control_ark()
         self.dlg.btn_search_tab3_2.setEnabled(False)
-        self.dlg.btn_download_tab3.setEnabled(True)
-        self.dlg.edit_id_3.setEnabled(False)
         self.dlg.edit_id_3.setText('')
+        self.dlg.edit_id_3.setEnabled(False)
+        self.dlg.btn_download_tab3.setEnabled(True)
         self.dlg.powcomboBox.setEnabled(False)
         self.dlg.powcomboBox.setStyleSheet("QComboBox { color: transparent }")
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
@@ -455,48 +455,55 @@ class UldkGugik:
                 name = self.region_name + '.' + objParcel
 
                 result = uldk_parcel.getParcelById2(name, srid=str(2180))
-                if result == {'-1 brak wyników'}:
-                    self.iface.messageBar().pushMessage("Ostrzeżenie:",'Nie zwrócono żadnej działki dla podanych parametrów',
-                                                    level=Qgis.Warning, duration=10)
-                    self.dlg.btn_download_tab3.setEnabled(False)
-                else:
-                    self.dlg.btn_download_tab3.setEnabled(True)
+
+
+                for rezultat in result:
+                    if rezultat in ["-1 brak wyników","usługa nie zwróciła odpowiedzi","błędny format odpowiedzi XML, usługa zwróciła odpowiedź","błędny format"]:
+                        response = False
+                    else:
+                        response = True
+                if response == True:
                     for i in result:
-                        # Sprawdzenie, czy wypuszczono jakieś identyfikatory, które są po prostu błędami
-                        if i.find("-1 brak wyników") >=1 or i.find("usługa nie zwróciła odpowiedzi") >= 1 or i.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź")>=1 or i.find("błędny format")>=1:
-                            self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                                'Nie zwrócono żadnej działki dla podanych parametrów',
-                                                                level=Qgis.Warning, duration=10)
-                            break
-                        elif len(i) < 3:
+                        if len(i) < 3:
                             pass
+                        elif ";" in i:
+                            try:
+                                if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
+                                    arkusze_numery.add(i.split(";")[1].split("|")[1].split(".")[-2].strip())
+                                else:
+                                    pass
+                            except IndexError:
+                                pass
                         else:
-                            if ";" in i:
-
-                                self.dlg.btn_download_tab3.setEnabled(True)
-                                try:
-                                    if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
-                                        arkusze_numery.add(i.split(";")[1].split("|")[1].split(".")[-2].strip())
-                                    else:
-                                        pass
-                                except IndexError:
+                            try:
+                                if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
+                                    arkusze_numery.add(i.split("|")[1].split(".")[-2].strip())
+                                else:
                                     pass
-                            else:
+                            except IndexError:
+                                pass
 
-                                self.dlg.btn_download_tab3.setEnabled(True)
-                                try:
-                                    if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
-                                        arkusze_numery.add(i.split("|")[1].split(".")[-2].strip())
-                                    else:
-                                        pass
-                                except IndexError:
-                                    pass
                     if len(arkusze_numery) >= 1:
                         for arkusz in arkusze_numery:
                             self.dlg.arkcomboBox.addItem(arkusz)
                     else:
                         pass
-
+                    self.successDownload(arkusze_numery)
+                elif response == False:
+                    self.iface.messageBar().pushMessage("Ostrzeżenie:",
+                                                        'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                        level=Qgis.Warning, duration=10)
+                    self.dlg.btn_download_tab3.setEnabled(False)
+    def successDownload(self,arkusze_numery):
+        if len(arkusze_numery) >= 1:
+            self.iface.messageBar().pushMessage("Informacja:",
+                                                'Znaleziono działkę/i dla podanych parametrów, wybierz numer arkusza.',
+                                                level=Qgis.Info, duration=10)
+        else:
+            self.iface.messageBar().pushMessage("Informacja:",
+                                                'Znaleziono działkę dla podanych parametrów.',
+                                                level=Qgis.Info, duration=10)
+        self.dlg.btn_download_tab3.setEnabled(True)
     def btn_download_tab3_clicked(self):
         if self.region_name:
             objRegion = self.region_name
@@ -810,6 +817,9 @@ class UldkGugik:
                                                 'Pobrano działkę dla obiektu: %s' % (name),
                                                 level=Qgis.Success, duration=10)
         except IndexError:
+            self.iface.messageBar().pushMessage("Ostrzeżenie:",
+                                                'Nie pobrano żadnej działki dla podanych parametrów',
+                                                level=Qgis.Warning, duration=10)
             pass
 
     def performRequestTeryt(self, teryt):
