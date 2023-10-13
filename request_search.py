@@ -17,11 +17,9 @@ class Request:
         self.loop.exec_()
 
 
-
     def getRequest(self):
         """Wysłanie zapytania z odpowiednimi parametrami"""
         finalUrl = self.url + "?" + urlencode(self.params)
-        print("finalnyURL: ",finalUrl)
         req = QNetworkRequest(QUrl(finalUrl))
         reply = self.manager.get(req)
         reply.finished.connect(lambda: self.handleRequest(reply))
@@ -33,7 +31,6 @@ class Request:
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
             for line in returnedData.split('\n'):
-                print("linia odpowiedzi: ",line)
                 if len(line) < 3 :
                     pass
                 if line in "-1 brak wyników":

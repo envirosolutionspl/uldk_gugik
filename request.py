@@ -57,5 +57,4 @@ class Request:
 
     @property
     def data(self):
-        print("Zwró○cone dane w funkcji request: ",self._data)
         return self._data

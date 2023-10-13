@@ -229,7 +229,6 @@ class UldkGugik:
         self.dlg.rdb_gm.toggled.connect(self.active_gm)    # gmina       label_17
         self.dlg.rdb_pw.toggled.connect(self.active_pw)    # powiat      label_16
         self.dlg.rdb_wo.toggled.connect(self.active_wo)    # województwo label_15
-        # self.dlg.rdb_bu.toggled.connect(self.active_bud)   # budynki
         
         self.dlg.btn_download_tab1.clicked.connect(self.btn_download_tab1_clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
@@ -245,15 +244,6 @@ class UldkGugik:
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
 
-    # def active_bud(self):
-    #     tab_text = "Wybór obiektu przez numer działki i budynku"
-    #     self.active_all()
-    #     self.dlg.edit_id_3.setEnabled(True)
-    #     self.dlg.tab3.findChild(QWidget).setText(tab_text)
-    #     self.dlg.label_3.setText(" - dla budynku: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD")
-    #     self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)")
-    #     self.dlg.tabWidget.setTabText(2, tab_text)
-    #     self.dlg.label_13.setText("Wprowadź numer działki i budynku (np. 6509.5_BUD):")
     def ctrl_ark(self):
         self.dlg.arkcomboBox.clear()
         self.dlg.btn_download_tab3.setEnabled(False)
@@ -261,7 +251,6 @@ class UldkGugik:
     def active_par(self):
         tab_text = "Wybór obiektu przez nazwę obrębu i numer działki"
         self.active_all()
-        # self.dlg.arkcomboBoxcomboBox.setStyleSheet("QComboBox { color: white }")
         self.dlg.btn_search_tab3_2.setEnabled(True)
         self.dlg.btn_download_tab3.setEnabled(False)
         self.dlg.tab3.findChild(QWidget).setText(tab_text)
@@ -444,12 +433,9 @@ class UldkGugik:
                 
                 for obreb in result_obreb:
                     if obreb.split("|")[-1] in self.dlg.wojcomboBox.currentText():
-                        print("----------------Właściwy obręb1",obreb,"----------------------")
                         if obreb.split("|")[-2] in self.dlg.powcomboBox.currentText():
-                            print("----------------Właściwy obręb2",obreb,"----------------------")
                             if obreb.split("|")[-3] in self.dlg.gmicomboBox.currentText():
-                                wlasciwy_obreb = obreb.split("|")[0]
-                                print("----------------Właściwy obręb3",wlasciwy_obreb,"----------------------")
+                                pass
                             else:
                                 result_obreb.remove(obreb)
                         else:
@@ -457,12 +443,10 @@ class UldkGugik:
                     else:
                         result_obreb.remove(obreb)
 
-                print("Wyszukane obreby: ",result_obreb)
                 self.region_name = result_obreb[0].split("|")[0]
                 name = self.region_name + '.' + objParcel
 
                 result = uldk_parcel.getParcelById2(name, srid=str(2180))
-                print("Wynik odpowiedzi Obwód i Nr: ", result)
                 if result == {'-1 brak wyników'}:
                     self.iface.messageBar().pushMessage("Ostrzeżenie:",'Nie zwrócono żadnej działki dla podanych parametrów',
                                                     level=Qgis.Warning, duration=10)
@@ -470,6 +454,7 @@ class UldkGugik:
                 else:
                     self.dlg.btn_download_tab3.setEnabled(True)
                     for i in result:
+                        # Sprawdzenie, czy wypuszczono jakieś identyfikatory, które są po prostu błędami
                         if i.find("-1 brak wyników") >=1 or i.find("usługa nie zwróciła odpowiedzi") >= 1 or i.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź")>=1 or i.find("błędny format")>=1:
                             self.iface.messageBar().pushMessage("Ostrzeżenie:",
                                                                 'Nie zwrócono żadnej działki dla podanych parametrów',
@@ -479,8 +464,7 @@ class UldkGugik:
                             pass
                         else:
                             if ";" in i:
-                                # print(self.dlg.wojcomboBox.currentText(),' - ',i.rstrip().split(";")[1].split("|")[-1]) #sprawdzenie województw
-                                # if self.dlg.wojcomboBox.currentText() in i.rstrip().split(";")[1].split("|")[-1]:
+
                                 self.dlg.btn_download_tab3.setEnabled(True)
                                 try:
                                     if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
@@ -490,8 +474,7 @@ class UldkGugik:
                                 except IndexError:
                                     pass
                             else:
-                                # print(self.dlg.wojcomboBox.currentText(),' - ',i.rstrip().split("|")[-1]) #sprawdzenie województw
-                                # if self.dlg.wojcomboBox.currentText() in i.rstrip().split("|")[-1]:
+
                                 self.dlg.btn_download_tab3.setEnabled(True)
                                 try:
                                     if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
@@ -502,7 +485,6 @@ class UldkGugik:
                                     pass
                     if len(arkusze_numery) >= 1:
                         for arkusz in arkusze_numery:
-                            print("Nr arkusza: ",i)
                             self.dlg.arkcomboBox.addItem(arkusz)
                     else:
                         pass
@@ -510,7 +492,7 @@ class UldkGugik:
     def btn_download_tab3_clicked(self):
         if self.region_name:
             objRegion = self.region_name
-            print("Region: ",objRegion)
+
         else:
             objRegion = str(self.dlg.gmicomboBox.currentText().strip())
         objectType = self.checkedFeatureType()
@@ -586,6 +568,7 @@ class UldkGugik:
             commune = res[2]
             county = res[3]
             voivodeship = res[4]
+
         elif objectType == 4:
             current_idx = self.dlg.powcomboBox.currentIndex()
             teryt = self.dlg.powcomboBox.itemData(current_idx)
@@ -610,6 +593,7 @@ class UldkGugik:
             commune = None
             county = res[2]
             voivodeship = res[3]
+
         elif objectType == 5: # województwo
             current_idx = self.dlg.wojcomboBox.currentIndex()
             teryt = self.dlg.wojcomboBox.itemData(current_idx)
@@ -634,23 +618,6 @@ class UldkGugik:
             commune = None
             county = None
             voivodeship = res[2]
-            # print(teryt, voivodeship)
-        # elif objectType == 6:
-        #     resp = uldk_api.getBuildingById(teryt, srid)
-        #     #print(resp)
-        #     if not resp:
-        #         self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-        #                                             'API nie zwróciło obiektu dla id %s' % teryt,
-        #                                             level=Qgis.Critical, duration=10)
-        #         return
-        #     res = resp.split("|")
-        #     wkt = res[0]
-        #     teryt = None
-        #     parcel = None
-        #     region = res[2]
-        #     commune = res[3]
-        #     county = res[4]
-        #     voivodeship = res[5]
 
         self.addResultsToLayer(
                 objectType=objectType,
@@ -667,7 +634,7 @@ class UldkGugik:
 
         objX = self.dlg.doubleSpinBoxX.text().strip()
         objY = self.dlg.doubleSpinBoxY.text().strip()
-        print(srid)
+
         if type == "form" and srid in ['2180', '4326', '3857','2176', '2177', '2178', '2179']:
             objX = self.dlg.doubleSpinBoxY.text().strip()
             objY = self.dlg.doubleSpinBoxX.text().strip()
@@ -724,7 +691,6 @@ class UldkGugik:
             else:
                 name = region + '.' + parcel
             result = uldk_parcel.getParcelById(name, srid=str(2180), teryt=teryt)
-            print("Wynik odpowiedzi Obwód i Nr: ",result)
 
             if result is None:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -745,7 +711,6 @@ class UldkGugik:
             commune = res [4]
             county = res [5]
             voivodeship = res [6]
-            # print(teryt, parcel, region, commune, county, voivodeship)
 
             # layer
             nazwa = self.nazwy_warstw[objectType]
@@ -774,9 +739,7 @@ class UldkGugik:
                 layer = QgsVectorLayer(epsg, nazwa, "memory")
                 QgsProject.instance().addMapLayer(layer)
 
-            # box = feat.geometry().boundingBox()
 
-            # canvas.setExtent(box)
             provider = layer.dataProvider()
             provider.addFeature(feat)
             layer.updateExtents()
@@ -868,7 +831,7 @@ class UldkGugik:
             commune = res[4]
             county = res[5]
             voivodeship = res[6]
-            # print(teryt, parcel, region, commune, county, voivodeship)
+
 
         elif object_type == 2:
             resp = uldk_api.getRegionById(teryt, srid)
@@ -892,7 +855,7 @@ class UldkGugik:
             commune = res[3]
             county = res[4]
             voivodeship = res[5]
-            # print(teryt, region, commune, county, voivodeship)
+
 
         elif object_type == 3:
             resp = uldk_api.getCommuneById(teryt, srid)
@@ -916,7 +879,7 @@ class UldkGugik:
             commune = res[2]
             county = res[3]
             voivodeship = res[4]
-            # print(teryt, commune, county, voivodeship)
+
 
         elif object_type == 4:
             resp = uldk_api.getCountyById(teryt, srid)
@@ -940,7 +903,6 @@ class UldkGugik:
             commune = None
             county = res[2]
             voivodeship = res[3]
-            # print(teryt, county, voivodeship)
 
         elif object_type == 5:
             resp = uldk_api.getVoivodeshipById(teryt, 2180)
@@ -964,24 +926,6 @@ class UldkGugik:
             commune = None
             county = None
             voivodeship = res[2]
-            # print(teryt, voivodeship)
-        # elif object_type == 6:
-        #     resp = uldk_api.getBuildingById(teryt, 2180)
-        #     #print(resp)
-        #     if not resp:
-        #         self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-        #                                             'API nie zwróciło obiektu dla id %s' % teryt,
-        #                                             level=Qgis.Critical, duration=10)
-        #         return
-        #     res = resp.split("|")
-        #     wkt = res[0]
-        #     teryt = None
-        #     parcel = None
-        #     region = res[2]
-        #     commune = res[3]
-        #     county = res[4]
-        #     voivodeship = res[5]
-        #     #print(region, commune, county, voivodeship)
 
         self.addResultsToLayer(
             objectType=object_type,
@@ -1015,21 +959,16 @@ class UldkGugik:
         y = float(y.replace(",", "."))
         requestPoint = QgsPoint(x, y)
         QgsMessageLog.logMessage(str(srid), 'ULDK')
-        print("request point: ",requestPoint)
-        print(srid,"typ: ", type(srid))
         if srid != '2180':
             sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
             destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-            print("Transformacja z:",sourceCrs,"Transformacja do", destCrs)
             tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
             requestPoint.transform(tr)
 
         pid = str(requestPoint.x()) + "," + str(requestPoint.y())
         if objectType == 1:# działka
             resp = uldk_xy.getParcelByXY(xy=pid, srid=2180)
-            #print(resp)
-            #print(r)
-            #print(r_txt)
+
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -1043,13 +982,6 @@ class UldkGugik:
             commune = res[4]
             county = res[5]
             voivodeship = res[6]
-            # print(teryt, parcel, region, commune, county, voivodeship)
-            '''
-def getBuildingByXY(xy, srid):
-    request = "GetBuildingByXY"
-    result = "geom_wkt,region,commune,county,voivodeship"
-    return getRequestXY(xy, request, result, srid)'''
-
             
         elif objectType == 2:
             resp = uldk_xy.getRegionByXY(xy=pid, srid=2180)
@@ -1066,7 +998,7 @@ def getBuildingByXY(xy, srid):
             commune = res[3]
             county = res[4]
             voivodeship = res[5]
-            # print(teryt, region, commune, county, voivodeship)
+
 
         elif objectType == 3:
             resp = uldk_xy.getCommuneByXY(xy=pid, srid=2180)
@@ -1083,7 +1015,7 @@ def getBuildingByXY(xy, srid):
             commune = res[2]
             county = res[3]
             voivodeship = res[4]
-            # print(teryt, commune, county, voivodeship)
+
 
         elif objectType == 4:
             resp = uldk_xy.getCountyByXY(xy=pid, srid=2180)
@@ -1100,7 +1032,7 @@ def getBuildingByXY(xy, srid):
             commune = None
             county = res[2]
             voivodeship = res[3]
-            # print(teryt, county, voivodeship)
+
 
         elif objectType == 5:
             resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid=2180)
@@ -1117,11 +1049,11 @@ def getBuildingByXY(xy, srid):
             commune = None
             county = None
             voivodeship = res[2]
-            # print(teryt, voivodeship)
+
             
         elif objectType == 6:
             resp = uldk_xy.getBuildingByXY(xy=pid, srid=2180)
-            #print(resp)
+
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla dla współrzędnych %s' % pid,
@@ -1135,7 +1067,6 @@ def getBuildingByXY(xy, srid):
             commune = res[3]
             county = res[4]
             voivodeship = res[5]
-            # print(region, commune, county, voivodeship)
 
         self.addResultsToLayer(
             objectType=objectType,
@@ -1175,15 +1106,11 @@ def getBuildingByXY(xy, srid):
             if layer.featureCount() == 0:
                 QgsProject.instance().removeMapLayer(layer)
                 layers.remove(layer)
-        # layers = list(filter(lambda layer: isinstance(layer,QgsVectorLayer), layers))
+
 
         if layers:
             # jezeli istnieje to dodaj obiekt do warstwy
             layer = layers[0]
-
-
-            #print('featID: ')
-            #print(featId)
             provider = layer.dataProvider()
             featId = provider.featureCount()+1
             provider.addFeature(feat)
@@ -1230,7 +1157,6 @@ def getBuildingByXY(xy, srid):
         if parcel:
             par = layer.fields().indexFromName('numer')
             attrMap = {featId: {par: parcel}}
-            # print('attrmap'+str(attrMap))
             provider.changeAttributeValues(attrMap)
 
         if region:
@@ -1250,21 +1176,7 @@ def getBuildingByXY(xy, srid):
 
             provider.changeAttributeValues(attrMap)
 
-        # if zoomToFeature:
-        #     # projectCrs = 2180
-        #
-        #     # if projectCrs != '2180':
-        #     #     sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
-        #     #     destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-        #     #     tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
-        #     #     box = tr.transform(feat.geometry().boundingBox())
-        #     # else:
-        # box = feat.geometry().boundingBox()
-    
-        # self.canvas.setExtent(box)
-        # self.canvas.refresh()
-        # else:
-        # layer.triggerRepaint()
+        # Funkcja odświeża wszystkie elementy jakie są w warstwie
         self.iface.mapCanvas().refreshAllLayers()
     def checkedFeatureType(self):
         """

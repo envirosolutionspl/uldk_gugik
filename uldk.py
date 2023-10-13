@@ -118,15 +118,4 @@ if __name__ == '__main__':
     # app = QtCore.QCoreApplication([])
     regionFetch = RegionFetch()
     # app.exec_()
-    #print(regionFetch.wojewodztwoDict)
-    #print(regionFetch.obrebDict)
-    #print(regionFetch.getGminaDictByPowiatName('bolesławiecki'))
-    #print('---------------------------')
-    #print(regionFetch.getObrebDictByGminaName('Bolesławiec (miasto)'))
-    #print(regionFetch.gminaDict)
-    #print(regionFetch.wojDict)
-    #print(regionFetch.getPowiatDictByWojewodztwoName('mazowieckie'))
-
-
-    #print(regionFetch.openObrebList())
     

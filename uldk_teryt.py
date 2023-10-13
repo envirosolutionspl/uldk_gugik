@@ -23,7 +23,6 @@ def getRequestTeryt(xy, request):
         loop.quit()
     PARAMS = {'request': request, 'xy': xy, 'result': 'teryt'}    
     url = URL + "?" + urlencode(PARAMS)
-    print("Aktualny URL: ",url)
     result = None
     request = QNetworkRequest(QUrl(url))
     manager = QNetworkAccessManager()
