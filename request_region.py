@@ -12,6 +12,7 @@ class Request:
         self.url = "http://uldk.gugik.gov.pl/"
         self.manager = QNetworkAccessManager()
 
+        
         self.getRequest()
         self.loop = QEventLoop()
         self.loop.exec_()
@@ -32,6 +33,7 @@ class Request:
         self._data.clear()
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
+            print("Nazwa obrębu: ",returnedData)
             for line in returnedData.split('\n'):
                 print("linia odpowiedzi: ",line)
                 if len(line) < 3 :

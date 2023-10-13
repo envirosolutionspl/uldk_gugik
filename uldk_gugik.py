@@ -403,6 +403,7 @@ class UldkGugik:
         self.downloadByXY(srid, type="form")
 
     def btn_search_tab3_clicked(self):
+        arkusze_numery = set()
         if str(self.dlg.obrcomboBox.currentText().strip()):
             objRegion = str(self.dlg.obrcomboBox.currentText().strip())
             objectType = self.checkedFeatureType()
@@ -427,59 +428,88 @@ class UldkGugik:
 
             elif utils.isInternetConnected():
                 self.dlg.arkcomboBox.clear()
-                name = objRegion + ' ' + objParcel
-                result = uldk_parcel.getParcelById2(name, srid=str(2180), teryt=teryt)
+                
+                obreb_name = str(self.dlg.obrcomboBox.currentText().strip())
+                result_obreb = uldk_parcel.GetRegionById(obreb_name, srid=str(2180))
+                result_obreb = list(result_obreb)
+                
+
+                for obreb in result_obreb:
+                    if len(obreb) < 3:
+                        result_obreb.remove(obreb)
+                    else:
+                        pass
+                
+                #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
+                
+                for obreb in result_obreb:
+                    if obreb.split("|")[-1] in self.dlg.wojcomboBox.currentText():
+                        print("----------------Właściwy obręb1",obreb,"----------------------")
+                        if obreb.split("|")[-2] in self.dlg.powcomboBox.currentText():
+                            print("----------------Właściwy obręb2",obreb,"----------------------")
+                            if obreb.split("|")[-3] in self.dlg.gmicomboBox.currentText():
+                                wlasciwy_obreb = obreb.split("|")[0]
+                                print("----------------Właściwy obręb3",wlasciwy_obreb,"----------------------")
+                            else:
+                                result_obreb.remove(obreb)
+                        else:
+                            result_obreb.remove(obreb)
+                    else:
+                        result_obreb.remove(obreb)
+
+                print("Wyszukane obreby: ",result_obreb)
+                self.region_name = result_obreb[0].split("|")[0]
+                name = self.region_name + '.' + objParcel
+
+                result = uldk_parcel.getParcelById2(name, srid=str(2180))
                 print("Wynik odpowiedzi Obwód i Nr: ", result)
-                if result == {'-1 brak wyników\n'}:
+                if result == {'-1 brak wyników'}:
                     self.iface.messageBar().pushMessage("Ostrzeżenie:",'Nie zwrócono żadnej działki dla podanych parametrów',
                                                     level=Qgis.Warning, duration=10)
                     self.dlg.btn_download_tab3.setEnabled(False)
                 else:
                     self.dlg.btn_download_tab3.setEnabled(True)
-                    arkusze = None
                     for i in result:
-                        arkusze = i
-
-                    for i in arkusze.split("\n"):
-                        print(i)
-                        if i == "-1 brak wyników":
+                        if i.find("-1 brak wyników") >=1 or i.find("usługa nie zwróciła odpowiedzi") >= 1 or i.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź")>=1 or i.find("błędny format")>=1:
                             self.iface.messageBar().pushMessage("Ostrzeżenie:",
                                                                 'Nie zwrócono żadnej działki dla podanych parametrów',
                                                                 level=Qgis.Warning, duration=10)
-                            continue
-                        if len(i) < 3:
+                            break
+                        elif len(i) < 3:
                             pass
                         else:
                             if ";" in i:
-                                print(self.dlg.wojcomboBox.currentText(),' - ',i.rstrip().split(";")[1].split("|")[-1])
-                                if self.dlg.wojcomboBox.currentText() in i.rstrip().split(";")[1].split("|")[-1]:
-                                    self.dlg.btn_download_tab3.setEnabled(True)
+                                # print(self.dlg.wojcomboBox.currentText(),' - ',i.rstrip().split(";")[1].split("|")[-1]) #sprawdzenie województw
+                                # if self.dlg.wojcomboBox.currentText() in i.rstrip().split(";")[1].split("|")[-1]:
+                                self.dlg.btn_download_tab3.setEnabled(True)
+                                try:
                                     if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
-                                        self.dlg.arkcomboBox.addItem(i.split(";")[1].split("|")[1].split(".")[-2].strip())
+                                        arkusze_numery.add(i.split(";")[1].split("|")[1].split(".")[-2].strip())
                                     else:
                                         pass
-                                else:
-                                    self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                                        'Jedna ze zwróconych działek jest niezgodna z podanymi parametrami',
-                                                                        level=Qgis.Warning, duration=10)
-                                    self.dlg.btn_download_tab3.setEnabled(False)
+                                except IndexError:
+                                    pass
                             else:
-                                print(self.dlg.wojcomboBox.currentText(),' - ',i.rstrip().split("|")[-1])
-                                if self.dlg.wojcomboBox.currentText() in i.rstrip().split("|")[-1]:
-                                    self.dlg.btn_download_tab3.setEnabled(True)
+                                # print(self.dlg.wojcomboBox.currentText(),' - ',i.rstrip().split("|")[-1]) #sprawdzenie województw
+                                # if self.dlg.wojcomboBox.currentText() in i.rstrip().split("|")[-1]:
+                                self.dlg.btn_download_tab3.setEnabled(True)
+                                try:
                                     if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
-                                        self.dlg.arkcomboBox.addItem(i.split("|")[1].split(".")[-2].strip())
+                                        arkusze_numery.add(i.split("|")[1].split(".")[-2].strip())
                                     else:
                                         pass
-                                else:
-                                    self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                                        'Jedna ze zwróconych działek jest niezgodna z podanymi parametrami',
-                                                                        level=Qgis.Warning, duration=10)
-                                    self.dlg.btn_download_tab3.setEnabled(False)
+                                except IndexError:
+                                    pass
+                    if len(arkusze_numery) >= 1:
+                        for arkusz in arkusze_numery:
+                            print("Nr arkusza: ",i)
+                            self.dlg.arkcomboBox.addItem(arkusz)
+                    else:
+                        pass
 
     def btn_download_tab3_clicked(self):
-        if str(self.dlg.obrcomboBox.currentText().strip()):
-            objRegion = str(self.dlg.obrcomboBox.currentText().strip())
+        if self.region_name:
+            objRegion = self.region_name
             print("Region: ",objRegion)
         else:
             objRegion = str(self.dlg.gmicomboBox.currentText().strip())
@@ -688,126 +718,128 @@ class UldkGugik:
 
     def performRequestParcel(self, region, parcel, teryt=None):
         objectType = self.checkedFeatureType()
+        try:
+            if self.dlg.arkcomboBox.currentText() != '':
+                name = region + '.' + self.dlg.arkcomboBox.currentText() + '.' + parcel
+            else:
+                name = region + '.' + parcel
+            result = uldk_parcel.getParcelById(name, srid=str(2180), teryt=teryt)
+            print("Wynik odpowiedzi Obwód i Nr: ",result)
 
-        if self.dlg.arkcomboBox.currentText() != '':
-            name = region + ' ' + self.dlg.arkcomboBox.currentText() + '.' + parcel
-        else:
-            name = region + ' ' + parcel
-        result = uldk_parcel.getParcelById(name, srid=str(2180), teryt=teryt)
-        print("Wynik odpowiedzi Obwód i Nr: ",result)
+            if result is None:
+                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                    'API nie zwróciło obiektu dla id %s' % name,
+                                                    level=Qgis.Critical, duration=10)
+                return
 
-        if result is None:
-            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                'API nie zwróciło obiektu dla id %s' % name,
-                                                level=Qgis.Critical, duration=10)
-            return
+            res = result.split("|")
+            if res[0] == '':
+                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
+                                                    'API nie zwróciło geometrii dla id %s' % name,
+                                                    level=Qgis.Critical, duration=10)
+                return
+            wkt = res [0]
+            teryt = res [1]
+            parcel = res [2]
+            region = res [3]
+            commune = res [4]
+            county = res [5]
+            voivodeship = res [6]
+            # print(teryt, parcel, region, commune, county, voivodeship)
 
-        res = result.split("|")
-        if res[0] == '':
-            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                'API nie zwróciło geometrii dla id %s' % name,
-                                                level=Qgis.Critical, duration=10)
-            return
-        wkt = res [0]
-        teryt = res [1]
-        parcel = res [2]
-        region = res [3]
-        commune = res [4]
-        county = res [5]
-        voivodeship = res [6]
-        # print(teryt, parcel, region, commune, county, voivodeship)
+            # layer
+            nazwa = self.nazwy_warstw[objectType]
 
-        # layer
-        nazwa = self.nazwy_warstw[objectType]
+            layers = QgsProject.instance().mapLayersByName(nazwa)
+            geom = QgsGeometry().fromWkt(wkt)
+            feat = QgsFeature()
 
-        layers = QgsProject.instance().mapLayersByName(nazwa)
-        geom = QgsGeometry().fromWkt(wkt)
-        feat = QgsFeature()
+            projectCrs = str(2180)
+            if str(projectCrs) != '2180':
+                sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
+                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                geometry = geom.transform(tr)
+                feat.setGeometry(geometry)
+            else:
+                feat.setGeometry(geom)
+            canvas = self.iface.mapCanvas()
 
-        projectCrs = str(2180)
-        if str(projectCrs) != '2180':
-            sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
-            destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-            tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
-            geometry = geom.transform(tr)
-            feat.setGeometry(geometry)
-        else:
-            feat.setGeometry(geom)
-        canvas = self.iface.mapCanvas()
+            if layers:
+                # jezeli istnieje to dodaj obiekt do warstwy
+                layer = layers[0]
+            else:
+                # jezeli nie istnieje to stworz warstwe
+                epsg = "Polygon?crs=EPSG:2180"
+                layer = QgsVectorLayer(epsg, nazwa, "memory")
+                QgsProject.instance().addMapLayer(layer)
 
-        if layers:
-            # jezeli istnieje to dodaj obiekt do warstwy
-            layer = layers[0]
-        else:
-            # jezeli nie istnieje to stworz warstwe
-            epsg = "Polygon?crs=EPSG:2180"
-            layer = QgsVectorLayer(epsg, nazwa, "memory")
-            QgsProject.instance().addMapLayer(layer)
+            # box = feat.geometry().boundingBox()
 
-        box = feat.geometry().boundingBox()
+            # canvas.setExtent(box)
+            provider = layer.dataProvider()
+            provider.addFeature(feat)
+            layer.updateExtents()
+            canvas.refresh()
 
-        canvas.setExtent(box)
-        provider = layer.dataProvider()
-        provider.addFeature(feat)
-        layer.updateExtents()
-        canvas.refresh()
+            counter = layer.featureCount()
+            # add attributes
+            if not layers:
+                identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
+                provider.addAttributes([identyfikatorField])
 
-        counter = layer.featureCount()
-        # add attributes
-        if not layers:
-            identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
-            provider.addAttributes([identyfikatorField])
+                voivField = QgsField('województwo', QVariant.String, len=30)
+                provider.addAttributes([voivField])
 
-            voivField = QgsField('województwo', QVariant.String, len=30)
-            provider.addAttributes([voivField])
+                conField = QgsField('powiat', QVariant.String, len=30)
+                provider.addAttributes([conField])
 
-            conField = QgsField('powiat', QVariant.String, len=30)
-            provider.addAttributes([conField])
+                comField = QgsField('gmina', QVariant.String, len=30)
+                provider.addAttributes([comField])
 
-            comField = QgsField('gmina', QVariant.String, len=30)
-            provider.addAttributes([comField])
+                regField = QgsField('obręb', QVariant.String, len=30)
+                provider.addAttributes([regField])
+                layer.updateFields()
 
-            regField = QgsField('obręb', QVariant.String, len=30)
-            provider.addAttributes([regField])
-            layer.updateFields()
+                parField = QgsField('numer', QVariant.String, len=30)
+                provider.addAttributes([parField])
+                layer.updateFields()
 
-            parField = QgsField('numer', QVariant.String, len=30)
-            provider.addAttributes([parField])
-            layer.updateFields()
+                layer.updateFields()
+                counter = 1
 
-            layer.updateFields()
-            counter = 1
-
-        idx = layer.fields().indexFromName('identyfikator')
-        attrMap = {counter: {idx: teryt}}
-        provider.changeAttributeValues(attrMap)
-
-        voiv = layer.fields().indexFromName('województwo')
-        attrMap = {counter: {voiv: voivodeship.rstrip()}}
-        provider.changeAttributeValues(attrMap)
-
-        if parcel is not None:
-            par = layer.fields().indexFromName('numer')
-            attrMap = {counter: {par: parcel}}
+            idx = layer.fields().indexFromName('identyfikator')
+            attrMap = {counter: {idx: teryt}}
             provider.changeAttributeValues(attrMap)
 
-        if region is not None:
-            reg = layer.fields().indexFromName('obręb')
-            attrMap = {counter: {reg: region}}
-            provider.changeAttributeValues(attrMap)
-        if commune is not None:
-            com = layer.fields().indexFromName('gmina')
-            attrMap = {counter: {com: commune}}
+            voiv = layer.fields().indexFromName('województwo')
+            attrMap = {counter: {voiv: voivodeship.rstrip()}}
             provider.changeAttributeValues(attrMap)
 
-        if county is not None:
-            con = layer.fields().indexFromName('powiat')
-            attrMap = {counter: {con: county}}
-            provider.changeAttributeValues(attrMap)
+            if parcel is not None:
+                par = layer.fields().indexFromName('numer')
+                attrMap = {counter: {par: parcel}}
+                provider.changeAttributeValues(attrMap)
 
-        self.iface.messageBar().pushMessage("Sukces:",
-                                            'Pobrano działkę dla obiektu: %s' % (name),
-                                            level=Qgis.Success, duration=10)
+            if region is not None:
+                reg = layer.fields().indexFromName('obręb')
+                attrMap = {counter: {reg: region}}
+                provider.changeAttributeValues(attrMap)
+            if commune is not None:
+                com = layer.fields().indexFromName('gmina')
+                attrMap = {counter: {com: commune}}
+                provider.changeAttributeValues(attrMap)
+
+            if county is not None:
+                con = layer.fields().indexFromName('powiat')
+                attrMap = {counter: {con: county}}
+                provider.changeAttributeValues(attrMap)
+
+            self.iface.messageBar().pushMessage("Sukces:",
+                                                'Pobrano działkę dla obiektu: %s' % (name),
+                                                level=Qgis.Success, duration=10)
+        except IndexError:
+            pass
 
     def performRequestTeryt(self, teryt):
         """wykonanie zapytania pobierającego obiekt na podstawie kodu TERYT"""
@@ -1227,9 +1259,9 @@ def getBuildingByXY(xy, srid):
         #     #     tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
         #     #     box = tr.transform(feat.geometry().boundingBox())
         #     # else:
-        #     # box = feat.geometry().boundingBox()
-        #
-        #     # self.canvas.setExtent(box)
+        # box = feat.geometry().boundingBox()
+    
+        # self.canvas.setExtent(box)
         # self.canvas.refresh()
         # else:
         # layer.triggerRepaint()

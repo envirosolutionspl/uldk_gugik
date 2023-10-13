@@ -264,7 +264,7 @@
        <double>10000000.000000000000000</double>
       </property>
      </widget>
-     <widget class="QgsProjectionSelectionWidget" name="projectionWidget" native="true">
+     <widget class="QgsProjectionSelectionWidget" name="projectionWidget">
       <property name="geometry">
        <rect>
         <x>10</x>

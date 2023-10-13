@@ -28,6 +28,7 @@ class Request:
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
+            
             for line in returnedData.split('\n'):
                 if len(line) < 3 or line == "-1 brak wyników":
                     continue
@@ -56,4 +57,5 @@ class Request:
 
     @property
     def data(self):
+        print("Zwró○cone dane w funkcji request: ",self._data)
         return self._data
