@@ -99,7 +99,8 @@ class UldkGugik:
         self.clickTool = QgsMapToolEmitPoint(self.canvas)
         self.clickTool.canvasClicked.connect(self.canvasClicked)
 
-        self.dlg = UldkGugikDialog()     
+        self.dlg = UldkGugikDialog()   
+        self.region_name = None  
         
 
     # noinspection PyMethodMayBeStatic
@@ -220,12 +221,6 @@ class UldkGugik:
         self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
         self.dlg.lbl_pluginVersion.setText('%s %s' % (plugin_name, plugin_version))
 
-        self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
-        self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
-        self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
-        self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
-        self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
-
         #eventy
         self.dlg.rdb_dz.toggled.connect(self.active_par)   # działka
         self.dlg.rdb_ob.toggled.connect(self.active_ob)    # obręb       label_18
@@ -243,7 +238,8 @@ class UldkGugik:
 
     def ctrl_ark(self):
         self.dlg.arkcomboBox.clear()
-        self.dlg.btn_download_tab3.setEnabled(False)
+        if self.dlg.rdb_dz.isChecked():
+            self.dlg.btn_download_tab3.setEnabled(False)
 
     def active_par(self):
         tab_text = "Wybór obiektu przez nazwę obrębu i numer działki"
@@ -370,6 +366,14 @@ class UldkGugik:
         # show the dialog
         self.dlg.show()
         self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
+        
+        
+        print("aktywne są działki")
+        self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
+        self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
+        self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
+        self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
+        self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
 
     def btn_download_tab1_clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
@@ -409,10 +413,12 @@ class UldkGugik:
             objRegion = str(self.dlg.gmicomboBox.currentText().strip())
             objectType = self.checkedFeatureType()
             srid = str(2180)
+        
         if objectType == 1:
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
             objParcel = self.dlg.edit_id_3.text().strip() # nr działki
+
             if not objRegion:
                 self.iface.messageBar().pushMessage("Błąd formularza:",
                                                     'musisz wpisać obręb',
@@ -463,12 +469,12 @@ class UldkGugik:
 
                 result = uldk_parcel.getParcelById2(name, srid=str(2180))
 
-
                 for rezultat in result:
-                    if rezultat in ["-1 brak wyników","usługa nie zwróciła odpowiedzi","błędny format odpowiedzi XML, usługa zwróciła odpowiedź","błędny format"]:
+                    if rezultat.find("-1 brak wyników") >= 1 or rezultat.find("usługa nie zwróciła odpowiedzi") >= 1 or rezultat.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź") >= 1 or rezultat.find("XML") >= 1 or rezultat.find("błędny format") >= 1:
                         response = False
                     else:
                         response = True
+                        
                 if response == True:
                     for i in result:
                         if len(i) < 3:
@@ -501,6 +507,7 @@ class UldkGugik:
                                                         'Nie zwrócono żadnej działki dla podanych parametrów',
                                                         level=Qgis.Warning, duration=10)
                     self.dlg.btn_download_tab3.setEnabled(False)
+
     def successDownload(self,arkusze_numery):
         if len(arkusze_numery) >= 1:
             self.iface.messageBar().pushMessage("Informacja:",
@@ -508,6 +515,7 @@ class UldkGugik:
                                                 level=Qgis.Info, duration=10)
         self.dlg.btn_download_tab3.setEnabled(True)
     def btn_download_tab3_clicked(self):
+
         if self.region_name:
             objRegion = self.region_name
 
@@ -647,7 +655,7 @@ class UldkGugik:
                 county=county,
                 voivodeship=voivodeship)
 
-    def downloadByXY(self, srid, type):
+    def downloadByXY(self, srid, type, zoomToFeature=True):
         """pobranie według X i Y i SRID"""
 
         objX = self.dlg.doubleSpinBoxX.text().strip()
@@ -669,7 +677,7 @@ class UldkGugik:
 
         elif utils.isInternetConnected():
             try:
-                self.performRequestXY(x=objX, y=objY, srid=srid)
+                self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
                 # self.dlg.hide()  # jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
             except:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -699,7 +707,7 @@ class UldkGugik:
         coords = "{}, {}".format(point.x(), point.y())
         QgsMessageLog.logMessage(str(coords), 'ULDK')
         srid = QgsProject.instance().crs().authid().split(":")[1]
-        self.downloadByXY(srid, type="click")
+        self.downloadByXY(srid, type="click", zoomToFeature=False)
 
     def performRequestParcel(self, region, parcel, teryt=None):
         objectType = self.checkedFeatureType()
@@ -977,7 +985,7 @@ class UldkGugik:
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def performRequestXY(self, x, y, srid):
+    def performRequestXY(self, x, y, srid, zoomToFeature=True):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
         objectType = self.checkedFeatureType()
@@ -1106,7 +1114,9 @@ class UldkGugik:
             region=region,
             commune=commune,
             county=county,
-            voivodeship=voivodeship)
+            voivodeship=voivodeship,
+            zoomToFeature=zoomToFeature)
+
         object ={
             1: "działkę o nr teryt: %s",
             2: "obręb ewidencyjny",
@@ -1121,7 +1131,7 @@ class UldkGugik:
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship):
+    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature=True):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
         feat = QgsFeature()
@@ -1205,6 +1215,22 @@ class UldkGugik:
             attrMap = {featId: {con: county}}
 
             provider.changeAttributeValues(attrMap)
+
+        if zoomToFeature:
+            projectCrs = QgsProject.instance().crs().authid().split(":")[1]
+
+            if projectCrs != '2180':
+                sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                box = tr.transform(feat.geometry().boundingBox())
+            else:
+                box = feat.geometry().boundingBox()
+
+            self.canvas.setExtent(box)
+            self.canvas.refresh()
+        else:
+            layer.triggerRepaint()
 
         # Funkcja odświeża wszystkie elementy jakie są w warstwie
         self.iface.mapCanvas().refreshAllLayers()
