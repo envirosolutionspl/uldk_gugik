@@ -430,24 +430,31 @@ class UldkGugik:
                 result_obreb = uldk_parcel.GetRegionById(obreb_name, srid=str(2180))
                 result_obreb = list(result_obreb)
                 
-
+                #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
                 for obreb in result_obreb:
                     if len(obreb) < 3:
                         result_obreb.remove(obreb)
                     else:
                         pass
-                
-                #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
-                
+
+                #sprawdzanie czy obręb leży w tym województwie, w którym powinien
                 for obreb in result_obreb:
-                    if obreb.split("|")[-1] in self.dlg.wojcomboBox.currentText():
-                        if obreb.split("|")[-2] in self.dlg.powcomboBox.currentText():
-                            if obreb.split("|")[-3] in self.dlg.gmicomboBox.currentText():
-                                pass
-                            else:
-                                result_obreb.remove(obreb)
-                        else:
-                            result_obreb.remove(obreb)
+                    if obreb.split("|")[-1].rstrip() == self.dlg.wojcomboBox.currentText():
+                        pass
+                    else:
+                        result_obreb.remove(obreb)
+                    
+                #sprawdzanie czy obręb leży w tym powiecie, w którym powinien
+                for obreb in result_obreb:
+                    if obreb.split("|")[-2] == self.dlg.powcomboBox.currentText():
+                        pass
+                    else:
+                        result_obreb.remove(obreb)
+                
+                #sprawdzanie czy obręb leży w tej gminie, w której powinien
+                for obreb in result_obreb:
+                    if obreb.split("|")[-3] == self.dlg.gmicomboBox.currentText():
+                        pass
                     else:
                         result_obreb.remove(obreb)
 
@@ -842,6 +849,10 @@ class UldkGugik:
                                                     level=Qgis.Critical, duration=10)
                 return
 
+            if teryt != res[1]:
+                self.iface.messageBar().pushMessage("Informacja:",
+                                                    'Znaleziono w wybranym obrębie więcej działek dla id %s' % teryt,
+                                                    level=Qgis.Info, duration=10)
             wkt = res[0]
             teryt = res[1]
             parcel = res[2]
