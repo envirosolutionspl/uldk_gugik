@@ -984,8 +984,12 @@ class UldkGugik:
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
         objectType = self.checkedFeatureType()
-        x = float(x.replace(",", "."))
-        y = float(y.replace(",", "."))
+        
+        #Sprawdzenie, czy współrzędne są z przecinkiem czy kropką
+        if "," in x or "," in y:
+            x = float(x.replace(",", "."))
+            y = float(y.replace(",", "."))
+
         requestPoint = QgsPoint(x, y)
         QgsMessageLog.logMessage(str(srid), 'ULDK')
         if srid != '2180':
