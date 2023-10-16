@@ -303,7 +303,7 @@
        <enum>QAbstractSpinBox::NoButtons</enum>
       </property>
       <property name="decimals">
-       <number>6</number>
+       <number>2</number>
       </property>
       <property name="maximum">
        <double>1000000000.000000000000000</double>
@@ -322,7 +322,7 @@
        <enum>QAbstractSpinBox::NoButtons</enum>
       </property>
       <property name="decimals">
-       <number>6</number>
+       <number>2</number>
       </property>
       <property name="maximum">
        <double>1000000000.000000000000000</double>
