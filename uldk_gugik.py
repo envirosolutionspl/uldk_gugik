@@ -506,10 +506,6 @@ class UldkGugik:
             self.iface.messageBar().pushMessage("Informacja:",
                                                 'Znaleziono działkę/i dla podanych parametrów, wybierz numer arkusza.',
                                                 level=Qgis.Info, duration=10)
-        else:
-            self.iface.messageBar().pushMessage("Informacja:",
-                                                'Znaleziono działkę dla podanych parametrów.',
-                                                level=Qgis.Info, duration=10)
         self.dlg.btn_download_tab3.setEnabled(True)
     def btn_download_tab3_clicked(self):
         if self.region_name:
@@ -827,6 +823,7 @@ class UldkGugik:
             self.iface.messageBar().pushMessage("Ostrzeżenie:",
                                                 'Nie pobrano żadnej działki dla podanych parametrów',
                                                 level=Qgis.Warning, duration=10)
+            self.dlg.btn_download_tab3.setEnabled(False)
             pass
 
     def performRequestTeryt(self, teryt):
