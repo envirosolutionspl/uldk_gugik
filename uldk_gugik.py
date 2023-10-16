@@ -849,9 +849,9 @@ class UldkGugik:
                                                     level=Qgis.Critical, duration=10)
                 return
 
-            if teryt != res[1]:
+            if teryt != res[1] and "AR" in res[1]:
                 self.iface.messageBar().pushMessage("Informacja:",
-                                                    'Znaleziono w wybranym obrębie więcej działek dla id %s' % teryt,
+                                                    'Znaleziono w wybranym obrębie więcej działek o identyfikatorze TERYT: %s. \r\nDodaj numer arkusza w celu odnalezienia właściwej działki' % teryt,
                                                     level=Qgis.Info, duration=10)
             wkt = res[0]
             teryt = res[1]
