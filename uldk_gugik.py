@@ -474,7 +474,7 @@ class UldkGugik:
                         response = False
                     else:
                         response = True
-                        
+
                 if response == True:
                     for i in result:
                         if len(i) < 3:
@@ -512,6 +512,10 @@ class UldkGugik:
         if len(arkusze_numery) >= 1:
             self.iface.messageBar().pushMessage("Informacja:",
                                                 'Znaleziono działkę/i dla podanych parametrów, wybierz numer arkusza.',
+                                                level=Qgis.Info, duration=10)
+        else:
+            self.iface.messageBar().pushMessage("Informacja:",
+                                                'Znaleziono działkę dla podanych parametrów. Aby pobrać działkę, kliknij przycisk Pobierz.',
                                                 level=Qgis.Info, duration=10)
         self.dlg.btn_download_tab3.setEnabled(True)
     def btn_download_tab3_clicked(self):
