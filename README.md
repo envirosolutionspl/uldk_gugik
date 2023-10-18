@@ -1,9 +1,7 @@
-# ULDK
-EN: The plugin allows user to download geometry of parcells, communies, regions. Plugin uses ULDK API of The Central Office of Geodesy and Cartography of Poland;
-PL: Wtyczka QGIS, która pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii.
+
 
 ### PL
-
+Wtyczka QGIS, która pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii.
 
 
 ## Instrukcja pobrania
@@ -50,7 +48,7 @@ Wszelkie pytania oraz problemy, kieruj na
 
 
 ### EN
-
+The plugin allows user to download geometry of parcells, communies, regions. Plugin uses ULDK API of The Central Office of Geodesy and Cartography of Poland
 
 ## Installation Instructions
 1. To install the plugin, you should either install it as a ZIP file in QGIS or upload the plugin files to the following location: C:\Users\User\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins.
