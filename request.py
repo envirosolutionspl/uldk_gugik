@@ -21,7 +21,6 @@ class Request:
     def getRequest(self):
         """Wysłanie zapytania z odpowiednimi parametrami"""
         finalUrl = self.url + "?" + urlencode(self.params)
-        print(finalUrl)
         req = QNetworkRequest(QUrl(finalUrl))
         reply = self.manager.get(req)
         reply.finished.connect(lambda: self.handleRequest(reply))
@@ -30,11 +29,9 @@ class Request:
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
-            
-            print('object type: ',self.objectType)
+
 
             for line in returnedData.split('\n'):
-                print("Wynik ",line)
                 if len(line) < 3 or line == "-1 brak wyników" or line.find("XML")>-1 or line.find("błęd")>-1:
                     continue
                 if ";" in line:
@@ -59,7 +56,6 @@ class Request:
                     if teryt[:-4] == self.teryt[:-4]:
                         # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
                         self._data = polygon
-                        print("Wyprodukowane dane: ",self._data)
                         break
 
                 else:
