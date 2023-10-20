@@ -366,9 +366,7 @@ class UldkGugik:
         # show the dialog
         self.dlg.show()
         self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
-        
-        
-        print("aktywne są działki")
+
         self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
@@ -1040,6 +1038,7 @@ class UldkGugik:
             requestPoint.transform(tr)
 
         pid = str(requestPoint.x()) + "," + str(requestPoint.y())
+
         if objectType == 1:# działka
             resp = uldk_xy.getParcelByXY(xy=pid, srid=2180,objectType=1)
 
@@ -1110,7 +1109,6 @@ class UldkGugik:
 
         elif objectType == 5:
             resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid=2180,objectType=5)
-            print("Odpowiedź: ",resp)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,

@@ -295,15 +295,15 @@
        <rect>
         <x>50</x>
         <y>37</y>
-        <width>101</width>
-        <height>21</height>
+        <width>131</width>
+        <height>22</height>
        </rect>
       </property>
       <property name="buttonSymbols">
        <enum>QAbstractSpinBox::NoButtons</enum>
       </property>
       <property name="decimals">
-       <number>2</number>
+       <number>6</number>
       </property>
       <property name="maximum">
        <double>1000000000.000000000000000</double>
@@ -314,15 +314,15 @@
        <rect>
         <x>50</x>
         <y>70</y>
-        <width>101</width>
-        <height>21</height>
+        <width>131</width>
+        <height>22</height>
        </rect>
       </property>
       <property name="buttonSymbols">
        <enum>QAbstractSpinBox::NoButtons</enum>
       </property>
       <property name="decimals">
-       <number>2</number>
+       <number>6</number>
       </property>
       <property name="maximum">
        <double>1000000000.000000000000000</double>
