@@ -357,10 +357,10 @@ class UldkGugik:
             if Qgis.QGIS_VERSION_INT >= 30000:
                 # skrot klawiszowy
                 self.shortcut = QShortcut(self.iface.mainWindow())
-                self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_D))
+                self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_F))
                 self.shortcut.activated.connect(self.shortcut_activated)
             else:
-                self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_D), self.iface.mainWindow())
+                self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_F), self.iface.mainWindow())
                 self.shortcut.setContext(Qt.ApplicationShortcut)
                 self.shortcut.activated.connect(self.shortcut_activated) 
         # show the dialog
