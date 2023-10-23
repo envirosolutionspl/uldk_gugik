@@ -27,7 +27,7 @@
  
  * Zakładka druga - <b>Wybór przez współrzędne</b><br> 
     Drugim sposobem można wyszukać interesujący nas obiekt na podstawie określenia jego współrzędnych oraz układu, w którym się one znajdują lub wybraniu go bezpośrednio na mapie (skrót ALT+F).
-    Po wciśnięciu kombinacji ALT+F kursor zmieni się w krzyżyk, w tym momencie możemy wybrać obszar do pobrania.
+    Po wciśnięciu kombinacji ALT+F kursor zmieni się w krzyżyk, w tym momencie możemy wybrać obszar do pobrania.</br>
     <b>Pamiętaj: Pobierany jest obszar zaznaczony w oknie wtyczki.</b>
 
  * Zakładka trzecia - <b>Wybór obiektu przez nazwę obrębu i numer działki</b><br>
