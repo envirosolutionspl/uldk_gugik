@@ -462,49 +462,48 @@ class UldkGugik:
                     else:
                         result_obreb.remove(obreb)
 
-                self.region_name = result_obreb[0].split("|")[0]
-                name = self.region_name + '.' + objParcel
+                try:
+                    self.region_name = result_obreb[0].split("|")[0]
+                    name = self.region_name + '.' + objParcel
 
-                result = uldk_parcel.getParcelById2(name, srid=str(2180))
+                    result = uldk_parcel.getParcelById2(name, srid=str(2180))
 
-                for rezultat in result:
-                    if rezultat.find("-1 brak wyników") >= 1 or rezultat.find("usługa nie zwróciła odpowiedzi") >= 1 or rezultat.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź") >= 1 or rezultat.find("XML") >= 1 or rezultat.find("błędny format") >= 1:
-                        response = False
-                    else:
-                        response = True
+                    for rezultat in result:
+                        if rezultat.find("-1 brak wyników") >= 1 or rezultat.find("usługa nie zwróciła odpowiedzi") >= 1 or rezultat.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź") >= 1 or rezultat.find("XML") >= 1 or rezultat.find("błędny format") >= 1:
+                            response = False
+                        else:
+                            response = True
 
-                if response == True:
-                    for i in result:
-                        if len(i) < 3:
-                            pass
-                        elif ";" in i:
-                            try:
+                    if response == True:
+                        for i in result:
+                            if len(i) < 3:
+                                pass
+                            elif ";" in i:
                                 if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
                                     arkusze_numery.add(i.split(";")[1].split("|")[1].split(".")[-2].strip())
                                 else:
                                     pass
-                            except IndexError:
-                                pass
-                        else:
-                            try:
+                            else:
                                 if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
                                     arkusze_numery.add(i.split("|")[1].split(".")[-2].strip())
                                 else:
                                     pass
-                            except IndexError:
-                                pass
 
-                    if len(arkusze_numery) >= 1:
-                        for arkusz in arkusze_numery:
-                            self.dlg.arkcomboBox.addItem(arkusz)
-                    else:
-                        pass
-                    self.successDownload(arkusze_numery)
-                elif response == False:
-                    self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                        'Nie zwrócono żadnej działki dla podanych parametrów',
-                                                        level=Qgis.Warning, duration=10)
-                    self.dlg.btn_download_tab3.setEnabled(False)
+                        if len(arkusze_numery) >= 1:
+                            for arkusz in sorted(list(arkusze_numery)):
+
+                                self.dlg.arkcomboBox.addItem(arkusz)
+                        else:
+                            pass
+                        self.successDownload(arkusze_numery)
+                    elif response == False:
+                        self.iface.messageBar().pushMessage("Ostrzeżenie:",
+                                                            'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                                 level=Qgis.Warning, duration=10)
+                        self.dlg.btn_download_tab3.setEnabled(False)
+
+                except IndexError:
+                    pass
 
     def successDownload(self,arkusze_numery):
         if len(arkusze_numery) >= 1:
@@ -889,7 +888,7 @@ class UldkGugik:
 
             if teryt != res[1] and "AR" in res[1]:
                 self.iface.messageBar().pushMessage("Informacja:",
-                                                    'Znaleziono w wybranym obrębie więcej działek o identyfikatorze TERYT: %s. \r\nDodaj numer arkusza w celu odnalezienia właściwej działki' % teryt,
+                                                    'W wybranym obrębie znaleziono więcej działek o identyfikatorze TERYT: %s. \r\nDodaj numer arkusza w celu odnalezienia właściwej działki' % teryt,
                                                     level=Qgis.Info, duration=10)
             wkt = res[0]
             teryt = res[1]
