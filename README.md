@@ -62,7 +62,7 @@ A QGIS plugin that allows you to download the geometry of cadastral parcels, lan
 ### Choosing the Method of Searching and Downloading Boundaries:
 The plugin offers 3 methods for searching and downloading boundaries.
 
-* Tab 1 - **Selection by ID**<br>
+* Tab 1 - **Wybór przez ID**<br>
    In the first method, you can download the object or area of interest by providing its TERYT number, e.g., for a land parcel: **WWPPGG_R.XXXX.NDZ** or **WWPPGG_R.XXXX.AR_NR.NDZ**, where:
    - "WW" is the voivodeship code.
    - "PP" is the county code.
@@ -79,7 +79,7 @@ The plugin offers 3 methods for searching and downloading boundaries.
 * Tab 3 - **Selection of an Object by Cadastral Area Name and Parcel Number**<br>
    To search for a parcel, select the voivodeship, county, municipality, and registration area from the list, and then enter the parcel number. If the object is located on more than one of the sheets, you will need to choose which one to download.
 
-In the side panel, there are options to select the area of interest (parcel, registration area, municipality, county, voivodeship). If you want to download the voivodeship layer where your parcel is located, select "Voivodeship" in the side panel. Once you enter the parcel identifier, the plugin will automatically download the associated voivodeship or another selected area. If the parcel number appears more than once in the same registration area, a message will appear at the top of QGIS, and the plugin will download the first parcel returned by the ULDK service.
+In the side panel, there are options to select the area of interest (parcel, registration area, municipality, county, voivodeship). If you want to download the voivodeship layer where your parcel is located, select "Województwo" in the side panel. Once you enter the parcel identifier, the plugin will automatically download the associated voivodeship or another selected area. If the parcel number appears more than once in the same registration area, a message will appear at the top of QGIS, and the plugin will download the first parcel returned by the ULDK service.
 
 ### Note
 A necessary condition for the plugin to work correctly is having QGIS version 3.16.16 or higher."
