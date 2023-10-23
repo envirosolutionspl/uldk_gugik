@@ -72,11 +72,11 @@ The plugin offers 3 methods for searching and downloading boundaries.
    - "NDZ" is the registration number of the parcel.
    - "AR_NR" is the number of the cadastral map sheet, where "NR" is the sequential number of that sheet.
 
-* Tab 2 - **Selection by Coordinates**<br>
+* Tab 2 - **Wybór przez współrzędne**<br>
    The second method allows you to search for an object of interest based on its coordinates and the coordinate system in which they are located, or select it directly on the map (shortcut ALT+F). After pressing ALT+F, the cursor will change to a crosshair, and at this    point, you can select the area to download.
    <b>Remember: The area selected in the plugin window will be downloaded.</b>
 
-* Tab 3 - **Selection of an Object by Cadastral Area Name and Parcel Number**<br>
+* Tab 3 - **Wybór obiektu przez nazwę obrębu i numer działki**<br>
    To search for a parcel, select the voivodeship, county, municipality, and registration area from the list, and then enter the parcel number. If the object is located on more than one of the sheets, you will need to choose which one to download.
 
 In the side panel, there are options to select the area of interest (parcel, registration area, municipality, county, voivodeship). If you want to download the voivodeship layer where your parcel is located, select "Województwo" in the side panel. Once you enter the parcel identifier, the plugin will automatically download the associated voivodeship or another selected area. If the parcel number appears more than once in the same registration area, a message will appear at the top of QGIS, and the plugin will download the first parcel returned by the ULDK service.
