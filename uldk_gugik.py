@@ -504,7 +504,7 @@ class UldkGugik:
 
                 except IndexError:
                     self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                        'Usługa znalazła działkę dla innego rejonu.',
+                                                        'Nie zwrócono żadnej działki dla podanych parametrów',
                                                         level=Qgis.Warning, duration=10)
                     self.dlg.btn_download_tab3.setEnabled(False)
 
