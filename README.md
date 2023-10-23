@@ -3,7 +3,7 @@
 
 ## PL
 
- Wtyczka QGIS, która pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii.
+ Wtyczka QGIS, która pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw wraz z atrybutami. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii.
 
 ## Instrukcja pobrania
 1. Wtyczkę należy zainstalować w QGISie jako ZIP bądź wgrać pliki wtyczki do lokalizacji C:\Users\User\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins.
@@ -16,7 +16,7 @@
  Wtyczka posiada 3 sposoby wyszukiwania i pobierania obrysu.
 
  * Zakładka pierwsza - <b>Wybór przez ID</b><br>
-    Sposobem pierwszym możemy pobrać interesujący nas obiekt lub obszar przez podanie jego numeru TERYT np. dla działki: <b>WWPPGG_R.XXXX.NDZ</b>, gdzie:
+    Sposobem pierwszym możemy pobrać interesujący nas obiekt lub obszar przez podanie jego numeru TERYT np. dla działki: <b>WWPPGG_R.XXXX.NDZ</b> lub <b>WWPPGG_R.XXXX.AR_NR.NDZ</b> gdzie:
    - "WW" to kod województwa
    - "PP" to kod powiatu
    - "GG" to kod gminy
@@ -24,21 +24,20 @@
    - "XXXX" to numer ewidencyjny obrębu ewidencyjnego, z zakresem od 0001 do 9999
    - "NDZ"  to  numer ewidencyjny działki 
    - "AR_NR" to numer arkusza mapy ewidencyjnej, gdzie "NR" to numer porządkowy tego arkusza
+ 
+ * Zakładka druga - <b>Wybór przez współrzędne</b><br> 
+    Drugim sposobem można wyszukać interesujący nas obiekt na podstawie określenia jego współrzędnych oraz układu, w którym się one znajdują lub wybraniu go bezpośrednio na mapie (skrót ALT+F).
+    Po wciśnięciu kombinacji ALT+F kursor zmieni się w krzyżyk, w tym momencie możemy wybrać obszar do pobrania.
+    <b>Pamiętaj: Pobierany jest obszar zaznaczony w oknie wtyczki.<\b>
 
+ * Zakładka trzecia - <b>Wybór obiektu przez nazwę obrębu i numer działki</b><br>
+   W celu wyszukania działki ewidencyjnej należy wybrać z listy kolejno województwo, powiat, gminę oraz obręb, a następnie wprowadzić nr działki.
+   Jeżeli obiekt znajduje się na więcej niż jednym z arkuszy, konieczy będzie wybór tego, z którego chcemy pobrać.
 
    W bocznym panelu znajdują się pola wyboru obszaru, który nas interesuje (działka, obręb, gmina, powiat, województwo).
    Jeżeli chcemy pobrać warstwę województwa, w którym przykładowo znajduje się nasza działka należy zaznaczyć w bocznym panelu "Województwo". 
    Mając wpisany identyfikator działki wtyczka automatycznie pobierze przypisane do niej województwo lub inny wybrany obszar.
    Jeśli numer działki występuje więcej niż jeden raz w danym obrębie, w górnej części QGIS’a pojawi się komunikat i zostanie pobrana pierwsza z działek zwrócona przez usługę ULDK.
- 
- * Zakładka druga - <b>Wybór przez współrzędne</b><br> 
-    Drugim sposobem można wyszukać interesujący nas obiekt na podstawie określenia jego współrzędnych oraz układu, w którym się one znajdują lub wybraniu go bezpośrednio na mapie (skrót ALT+f).
-    Po wciśnięciu kombinacji ALT+F kursor zmieni się w krzyżyk, w tym momencie możemy wybrać obszar do pobrania.
-    Pamiętaj: Pobierany jest obszar zaznaczony w oknie wtyczki.
-
- * Zakładka trzecia - <b>Wybór obiektu przez nazwę obrębu i numer działki</b><br>
-   W celu wyszukania działki ewidencyjnej należy wybrać z listy kolejno województwo, powiat, gminę oraz obręb, a następnie wprowadzić nr działki.
-   Jeżeli obiekt znajduje się na więcej niż jednym z arkuszy, konieczy będzie wybór tego, z którego chcemy pobrać.
 
 ### Uwaga
 
@@ -64,7 +63,7 @@ A QGIS plugin that allows you to download the geometry of cadastral parcels, lan
 The plugin offers 3 methods for searching and downloading boundaries.
 
 * Tab 1 - **Selection by ID**<br>
-   In the first method, you can download the object or area of interest by providing its TERYT number, e.g., for a land parcel: **WWPPGG_R.XXXX.NDZ**, where:
+   In the first method, you can download the object or area of interest by providing its TERYT number, e.g., for a land parcel: **WWPPGG_R.XXXX.NDZ** or **WWPPGG_R.XXXX.AR_NR.NDZ**, where:
    - "WW" is the voivodeship code.
    - "PP" is the county code.
    - "GG" is the municipality code.
@@ -73,13 +72,14 @@ The plugin offers 3 methods for searching and downloading boundaries.
    - "NDZ" is the registration number of the parcel.
    - "AR_NR" is the number of the cadastral map sheet, where "NR" is the sequential number of that sheet.
 
-   In the side panel, there are options to select the area of interest (parcel, registration area, municipality, county, voivodeship). If you want to download the voivodeship layer where your parcel is located, select "Voivodeship" in the side panel. Once you enter the parcel identifier, the plugin will automatically download the associated voivodeship or another selected area. If the parcel number appears more than once in the same registration area, a message will appear at the top of QGIS, and the plugin will download the first parcel returned by the ULDK service.
-
 * Tab 2 - **Selection by Coordinates**<br>
-   The second method allows you to search for an object of interest based on its coordinates and the coordinate system in which they are located, or select it directly on the map (shortcut ALT+F). After pressing ALT+F, the cursor will change to a crosshair, and at this point, you can select the area to download. Remember: The area selected in the plugin window will be downloaded.
+   The second method allows you to search for an object of interest based on its coordinates and the coordinate system in which they are located, or select it directly on the map (shortcut ALT+F). After pressing ALT+F, the cursor will change to a crosshair, and at this    point, you can select the area to download.
+   <b>Remember: The area selected in the plugin window will be downloaded.<\b>
 
 * Tab 3 - **Selection of an Object by Cadastral Area Name and Parcel Number**<br>
    To search for a parcel, select the voivodeship, county, municipality, and registration area from the list, and then enter the parcel number. If the object is located on more than one of the sheets, you will need to choose which one to download.
+
+In the side panel, there are options to select the area of interest (parcel, registration area, municipality, county, voivodeship). If you want to download the voivodeship layer where your parcel is located, select "Voivodeship" in the side panel. Once you enter the parcel identifier, the plugin will automatically download the associated voivodeship or another selected area. If the parcel number appears more than once in the same registration area, a message will appear at the top of QGIS, and the plugin will download the first parcel returned by the ULDK service.
 
 ### Note
 A necessary condition for the plugin to work correctly is having QGIS version 3.16.16 or higher."
