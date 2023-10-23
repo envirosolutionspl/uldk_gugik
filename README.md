@@ -28,7 +28,7 @@
  * Zakładka druga - <b>Wybór przez współrzędne</b><br> 
     Drugim sposobem można wyszukać interesujący nas obiekt na podstawie określenia jego współrzędnych oraz układu, w którym się one znajdują lub wybraniu go bezpośrednio na mapie (skrót ALT+F).
     Po wciśnięciu kombinacji ALT+F kursor zmieni się w krzyżyk, w tym momencie możemy wybrać obszar do pobrania.
-    <b>Pamiętaj: Pobierany jest obszar zaznaczony w oknie wtyczki.<\b>
+    <b>Pamiętaj: Pobierany jest obszar zaznaczony w oknie wtyczki.</b>
 
  * Zakładka trzecia - <b>Wybór obiektu przez nazwę obrębu i numer działki</b><br>
    W celu wyszukania działki ewidencyjnej należy wybrać z listy kolejno województwo, powiat, gminę oraz obręb, a następnie wprowadzić nr działki.
@@ -74,7 +74,7 @@ The plugin offers 3 methods for searching and downloading boundaries.
 
 * Tab 2 - **Selection by Coordinates**<br>
    The second method allows you to search for an object of interest based on its coordinates and the coordinate system in which they are located, or select it directly on the map (shortcut ALT+F). After pressing ALT+F, the cursor will change to a crosshair, and at this    point, you can select the area to download.
-   <b>Remember: The area selected in the plugin window will be downloaded.<\b>
+   <b>Remember: The area selected in the plugin window will be downloaded.</b>
 
 * Tab 3 - **Selection of an Object by Cadastral Area Name and Parcel Number**<br>
    To search for a parcel, select the voivodeship, county, municipality, and registration area from the list, and then enter the parcel number. If the object is located on more than one of the sheets, you will need to choose which one to download.
