@@ -503,7 +503,10 @@ class UldkGugik:
                         self.dlg.btn_download_tab3.setEnabled(False)
 
                 except IndexError:
-                    pass
+                    self.iface.messageBar().pushMessage("Ostrzeżenie:",
+                                                        'Usługa znalazła działkę dla innego rejonu.',
+                                                        level=Qgis.Warning, duration=10)
+                    self.dlg.btn_download_tab3.setEnabled(False)
 
     def successDownload(self,arkusze_numery):
         if len(arkusze_numery) >= 1:
