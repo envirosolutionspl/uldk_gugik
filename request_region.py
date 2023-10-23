@@ -5,20 +5,15 @@ from .uldk_gugik_dialog import UldkGugikDialog
 
 
 class Request:
-
     def __init__(self, params):
         self.params = params
         self._data = set()
         self.url = "http://uldk.gugik.gov.pl/"
         self.manager = QNetworkAccessManager()
 
-        
         self.getRequest()
         self.loop = QEventLoop()
         self.loop.exec_()
-
-
-
     def getRequest(self):
         """Wysłanie zapytania z odpowiednimi parametrami"""
         finalUrl = self.url + "?" + urlencode(self.params)

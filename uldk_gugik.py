@@ -430,9 +430,11 @@ class UldkGugik:
 
             elif utils.isInternetConnected():
                 self.dlg.arkcomboBox.clear()
-                
-                obreb_name = str(self.dlg.obrcomboBox.currentText().strip())
-                result_obreb = uldk_parcel.GetRegionById(obreb_name, srid=str(2180))
+
+                obr_idx = self.dlg.obrcomboBox.currentIndex()
+                teryt = self.dlg.obrcomboBox.itemData(obr_idx)
+
+                result_obreb = uldk_parcel.GetRegionById(id=teryt, srid=str(2180))
                 result_obreb = list(result_obreb)
                 
                 #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
@@ -468,6 +470,7 @@ class UldkGugik:
                     name = self.region_name + '.' + objParcel
 
                     result = uldk_parcel.getParcelById2(name, srid=str(2180))
+                    result = list(result)
 
                     for rezultat in result:
                         if rezultat.find("-1 brak wyników") >= 1 or rezultat.find("usługa nie zwróciła odpowiedzi") >= 1 or rezultat.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź") >= 1 or rezultat.find("XML") >= 1 or rezultat.find("błędny format") >= 1:
@@ -476,20 +479,21 @@ class UldkGugik:
                             response = True
 
                     if response == True:
-                        for i in result:
-                            if len(i) < 3:
+                        for i in range(len(result)):
+                            if len(result[i]) < 3:
                                 pass
-                            elif ";" in i:
-                                if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
-                                    arkusze_numery.add(i.split(";")[1].split("|")[1].split(".")[-2].strip())
+                            elif result[i].find(";") > -1:
+                                if result[i].split(";")[1].split("|")[1].split(".")[-2].find("AR") > -1:
+                                    arkusze_numery.add(result[i].split(";")[1].split("|")[1].split(".")[-2].strip())
                                 else:
                                     pass
                             else:
-                                if "AR" in i.split(";")[1].split("|")[1].split(".")[-2]:
-                                    arkusze_numery.add(i.split("|")[1].split(".")[-2].strip())
+                                if result[i].split("|")[1].split(".")[-2].find("AR") > -1:
+                                    arkusze_numery.add(result[i].split("|")[1].split(".")[-2].strip())
                                 else:
                                     pass
 
+                        arkusze_numery = list(arkusze_numery)
                         if len(arkusze_numery) >= 1:
                             for arkusz in arkusze_numery:
                                 arkusze_numery_posortowane.add(arkusz.split("AR_")[-1])
@@ -554,7 +558,7 @@ class UldkGugik:
             return
         elif objectType == 2:  # obręb
             obr_idx = self.dlg.obrcomboBox.currentIndex()
-            teryt = self.dlg.obrcomboBox.itemData(obr_idx)     
+            teryt = self.dlg.obrcomboBox.itemData(obr_idx)
             
             resp = uldk_api.getRegionById(teryt, srid, objectType=2, obreb=True)
             if not resp:

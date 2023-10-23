@@ -4,7 +4,6 @@ from qgis.PyQt.QtCore import QUrl, QEventLoop
 
 
 class Request:
-
     def __init__(self, params,objectType, **kwargs):
         self.params = params
         self._data = None
@@ -29,7 +28,6 @@ class Request:
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
             returnedData = reply.readAll().data().decode('utf-8')
-
 
             for line in returnedData.split('\n'):
                 if len(line) < 3 or line == "-1 brak wyników" or line.find("XML")>-1 or line.find("błęd")>-1:

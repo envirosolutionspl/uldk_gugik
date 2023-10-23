@@ -17,9 +17,9 @@ def getParcelById2(name, srid, **kwargs):
     res = RS(params, **kwargs)
     return res.data
 
-def GetRegionById(obreb_name, srid, **kwargs):
+def GetRegionById(id, srid, **kwargs):
     request = "GetRegionById"
     result = "teryt,region,commune,county,voivodeship"
-    params = {'request': request, 'id': obreb_name, 'result': result, 'srid': srid}
+    params = {'request': request, 'id': id, 'result': result, 'srid': srid}
     res = RR(params, **kwargs)
     return res.data
