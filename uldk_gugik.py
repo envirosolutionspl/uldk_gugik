@@ -403,6 +403,7 @@ class UldkGugik:
 
     def btn_search_tab3_clicked(self):
         arkusze_numery = set()
+        arkusze_numery_posortowane = set()
         if str(self.dlg.obrcomboBox.currentText().strip()):
             objRegion = str(self.dlg.obrcomboBox.currentText().strip())
             objectType = self.checkedFeatureType()
@@ -490,9 +491,10 @@ class UldkGugik:
                                     pass
 
                         if len(arkusze_numery) >= 1:
-                            for arkusz in sorted(list(arkusze_numery)):
-
-                                self.dlg.arkcomboBox.addItem(arkusz)
+                            for arkusz in arkusze_numery:
+                                arkusze_numery_posortowane.add(arkusz.split("AR_")[-1])
+                            for sort_ark in sorted(arkusze_numery_posortowane,key=int):
+                                self.dlg.arkcomboBox.addItem(f"AR_{sort_ark}")
                         else:
                             pass
                         self.successDownload(arkusze_numery)
