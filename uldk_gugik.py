@@ -36,7 +36,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.3.0'
+plugin_version = '1.3.1'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -399,7 +399,7 @@ class UldkGugik:
     def btn_download_tab2_clicked(self):
         """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
-        self.downloadByXY(srid, type="form",zoomToFeature=True)
+        self.downloadByXY(srid, type="form",zoomToFeature=False)
 
     def btn_search_tab3_clicked(self):
         arkusze_numery = set()
@@ -681,7 +681,7 @@ class UldkGugik:
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def downloadByXY(self, srid, type, zoomToFeature=True):
+    def downloadByXY(self, srid, type, zoomToFeature=False):
         """pobranie według X i Y i SRID"""
 
         objX = self.dlg.doubleSpinBoxX.text().strip()
@@ -733,7 +733,7 @@ class UldkGugik:
         coords = "{}, {}".format(point.x(), point.y())
         QgsMessageLog.logMessage(str(coords), 'ULDK')
         srid = QgsProject.instance().crs().authid().split(":")[1]
-        self.downloadByXY(srid, type="click", zoomToFeature=True)
+        self.downloadByXY(srid, type="click", zoomToFeature=False)
 
     def performRequestParcel(self, region, parcel, teryt=None, zoomToFeature=True):
         objectType = self.checkedFeatureType()
