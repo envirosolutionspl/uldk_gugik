@@ -10,7 +10,7 @@
 name=Usługa Lokalizacji Działek Katastralnych
 qgisMinimumVersion=3.0
 description=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. ENG: The plugin made for dowloading parcells geometry from The Central Office of Geodesy and Cartography of Poland "ULDK API".
-version=1.3.0
+version=1.3.1
 author=Envirosolutions Sp. z o.o.
 email=office@envirosolutions.pl
 
@@ -30,21 +30,23 @@ changelog=
   * Poprawa wydajności funkcjonowania wtyczki
   * Zmiana funkcjonowania interfejsu
   * Modyfikacja wiadomości o nowościach GIS
-  Wersja 1.2.5
-  * Dodanie funkcjonalności pobierania obiektu (działki) przez wybór obrębu z listy
-  Wersja 1.2.4
-  * Poprawa błędu powodującego wyłaczenie QGISa po otwarciu zapisanego projektu z warstwą tymczasową
-  Wersja 1.2.3
-  * Poprawa błędów dla wersji poniżej 3.10
-  Wersja 1.2.2
-  * Dodanie wiadomości o nowościach GIS
-  Wersja 1.2.1
-  * Poprawa drobnych błędów
-  Wersja 1.2.0
-  * Dodanie skrótu klawiszowego ALT + D do pobierania obiektu poprzez kliknięcie z mapy
-  * Poprawa wydajności i drobnych błędów
-  * Dostosowanie do QGIS 3.0
-  * Wtyczka nie przybliża już widoku do obiektu po pobraniu przez wskazanie na mapie
+  * Zmiana skrótu klawiszowego do pobrania przez kliknięcie z mapy na ALT + F
+
+#Wersja 1.2.5
+#* Dodanie funkcjonalności pobierania obiektu (działki) przez wybór obrębu z listy
+#Wersja 1.2.4
+#* Poprawa błędu powodującego wyłaczenie QGISa po otwarciu zapisanego projektu z warstwą tymczasową
+#Wersja 1.2.3
+#* Poprawa błędów dla wersji poniżej 3.10
+#Wersja 1.2.2
+#* Dodanie wiadomości o nowościach GIS
+#Wersja 1.2.1
+#* Poprawa drobnych błędów
+#Wersja 1.2.0
+#* Dodanie skrótu klawiszowego ALT + D do pobierania obiektu poprzez kliknięcie z mapy
+#* Poprawa wydajności i drobnych błędów
+#* Dostosowanie do QGIS 3.0
+#* Wtyczka nie przybliża już widoku do obiektu po pobraniu przez wskazanie na mapie
 
 # Tags are comma separated with spaces allowed
 tags=python, uldk, działki, dzialki, ewidencja, gugik, kataster
