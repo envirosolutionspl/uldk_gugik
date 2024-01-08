@@ -1035,6 +1035,9 @@ class UldkGugik:
         if "," in x or "," in y:
             x = float(x.replace(",", "."))
             y = float(y.replace(",", "."))
+        else:
+            x = float(x)
+            y = float(y)
 
         requestPoint = QgsPoint(x, y)
         QgsMessageLog.logMessage(str(srid), 'ULDK')
