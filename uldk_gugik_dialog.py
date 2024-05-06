@@ -110,24 +110,42 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def handleResponseObjects(self, reg, param):
         if reg == "wojewodztwo":
+            if param is True:
+                self.wojcomboBox.setStyleSheet("QComboBox { color: black }")
+                self.powcomboBox.setStyleSheet("QComboBox { color: black }")
+                self.gmicomboBox.setStyleSheet("QComboBox { color: black }")
+            else:
+                self.wojcomboBox.setStyleSheet("QComboBox { color: gray }")
+                self.powcomboBox.setStyleSheet("QComboBox { color: gray }")
+                self.gmicomboBox.setStyleSheet("QComboBox { color: gray }")
+
             self.wojcomboBox.setEnabled(param)
             self.powcomboBox.setEnabled(param)
             self.gmicomboBox.setEnabled(param)
-            self.obrcomboBox.setEnabled(param)
-            self.arkcomboBox.setEnabled(param)
+
 
         elif reg == "powiat":
+            if param is True:
+                self.powcomboBox.setStyleSheet("QComboBox { color: black }")
+                self.gmicomboBox.setStyleSheet("QComboBox { color: black }")
+            else:
+                self.powcomboBox.setStyleSheet("QComboBox { color: gray }")
+                self.gmicomboBox.setStyleSheet("QComboBox { color: gray }")
+
             self.powcomboBox.setEnabled(param)
             self.gmicomboBox.setEnabled(param)
-            self.obrcomboBox.setEnabled(param)
-            self.arkcomboBox.setEnabled(param)
 
         elif reg == "gmina":
-            self.gmicomboBox.setEnabled(param)
-            self.obrcomboBox.setEnabled(param)
-            self.arkcomboBox.setEnabled(param)
+            if param is True:
+                self.gmicomboBox.setStyleSheet("QComboBox { color: black }")
+            else:
+                self.gmicomboBox.setStyleSheet("QComboBox { color: gray }")
 
-        else:
-            self.obrcomboBox.setEnabled(param)
-            self.arkcomboBox.setEnabled(param)
+            self.gmicomboBox.setEnabled(param)
+
+        if self.rdb_dz.isChecked():
+            self.btn_search_tab3_2.setEnabled(param)
+
+        self.obrcomboBox.setEnabled(param)
+        self.arkcomboBox.setEnabled(param)
 
