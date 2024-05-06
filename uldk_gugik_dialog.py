@@ -53,19 +53,19 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         # ULDK
 
         self.powiatDictionary = {}
-        self.gminaDictionary={}
+        self.gminaDictionary = {}
         self.obrebDictionary = {}
         self.regionFetch = RegionFetch()
 
         self.wojcomboBox.currentTextChanged.connect(self.wojcomboBox_currentTextChanged)
         self.powcomboBox.currentTextChanged.connect(self.powcomboBox_currentTextChanged)
         self.gmicomboBox.currentTextChanged.connect(self.gmicomboBox_currentTextChanged)
+
         wojewodztwa = self.regionFetch.wojewodztwoDict
         self.wojcomboBox.addItems(wojewodztwa.keys())
         data = {k: v for k, v in wojewodztwa.items()}
         for idx, po in enumerate(data.keys()):
             self.wojcomboBox.setItemData(idx, data[po])
-
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
@@ -73,23 +73,79 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def wojcomboBox_currentTextChanged(self, text):
         self.powcomboBox.clear()
+        self.handleResponseObjects("wojewodztwo", False)
+
         self.powiatDictionary = self.regionFetch.getPowiatDictByWojewodztwoName(text)
         data = {k: v[0] for k, v in self.powiatDictionary.items()}
         self.powcomboBox.addItems(list(self.powiatDictionary.keys()))
+
         for idx, po in enumerate(data.keys()):
             self.powcomboBox.setItemData(idx, data[po])
 
+        self.handleResponseObjects("wojewodztwo", True)
+
     def powcomboBox_currentTextChanged(self, text):
         self.gmicomboBox.clear()
+        self.handleResponseObjects("powiat", False)
+
         self.gminaDictionary = self.regionFetch.getGminaDictByPowiatName(text)
         self.gmicomboBox.addItems(list(self.gminaDictionary.keys()))
+
+        self.handleResponseObjects("powiat", True)
         
 
     def gmicomboBox_currentTextChanged(self, text):
         self.obrcomboBox.clear()
+        self.handleResponseObjects("gmina", False)
+
         self.obrebDictionary = self.regionFetch.getObrebDictByGminaName(text)
         data = {k: v for k, v in self.obrebDictionary.items()}
         self.obrcomboBox.addItems(list(self.obrebDictionary.keys()))
+
         for idx, ob in enumerate(data.keys()):
             self.gmicomboBox.setItemData(idx, data[ob])
             self.obrcomboBox.setItemData(idx, data[ob])
+
+        self.handleResponseObjects("gmina", True)
+
+    def handleResponseObjects(self, reg, param):
+        if reg == "wojewodztwo":
+            if param is True:
+                self.wojcomboBox.setStyleSheet("QComboBox { color: black }")
+                self.powcomboBox.setStyleSheet("QComboBox { color: black }")
+                self.gmicomboBox.setStyleSheet("QComboBox { color: black }")
+            else:
+                self.wojcomboBox.setStyleSheet("QComboBox { color: gray }")
+                self.powcomboBox.setStyleSheet("QComboBox { color: gray }")
+                self.gmicomboBox.setStyleSheet("QComboBox { color: gray }")
+
+            self.wojcomboBox.setEnabled(param)
+            self.powcomboBox.setEnabled(param)
+            self.gmicomboBox.setEnabled(param)
+
+
+        elif reg == "powiat":
+            if param is True:
+                self.powcomboBox.setStyleSheet("QComboBox { color: black }")
+                self.gmicomboBox.setStyleSheet("QComboBox { color: black }")
+            else:
+                self.powcomboBox.setStyleSheet("QComboBox { color: gray }")
+                self.gmicomboBox.setStyleSheet("QComboBox { color: gray }")
+
+            self.powcomboBox.setEnabled(param)
+            self.gmicomboBox.setEnabled(param)
+
+        elif reg == "gmina":
+            if param is True:
+                self.gmicomboBox.setStyleSheet("QComboBox { color: black }")
+            else:
+                self.gmicomboBox.setStyleSheet("QComboBox { color: gray }")
+
+            self.gmicomboBox.setEnabled(param)
+
+        if self.rdb_dz.isChecked():
+            self.btn_search_tab3_2.setEnabled(param)
+
+        self.obrcomboBox.setEnabled(param)
+        self.arkcomboBox.setEnabled(param)
+
