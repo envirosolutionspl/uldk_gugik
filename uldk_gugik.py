@@ -27,6 +27,9 @@ from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField, \
     QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog
+
+import requests
+
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
@@ -362,11 +365,18 @@ class UldkGugik:
             else:
                 self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_F), self.iface.mainWindow())
                 self.shortcut.setContext(Qt.ApplicationShortcut)
-                self.shortcut.activated.connect(self.shortcut_activated) 
-        # show the dialog
-        self.dlg.show()
-        self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
+                self.shortcut.activated.connect(self.shortcut_activated)
+        try:
+            with requests.get('https://uldk.gugik.gov.pl'):
+                self.setup_dialog()
+        except requests.exceptions.ConnectionError:
+            self.iface.messageBar().pushWarning("Ostrzeżenie:", 'Brak połączenia z internetem')
+        self.dlg.projectionWidget.setCrs(
+            QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
 
+
+    def setup_dialog(self):
+        self.dlg.show()
         self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
