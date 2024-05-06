@@ -802,7 +802,7 @@
     <item>
      <widget class="QLabel" name="lbl_copyrights">
       <property name="text">
-       <string>© 2023 &lt;a href=&quot;http://www.envirosolutions.pl/&quot;&gt;EnviroSolutions Sp. z o.o.&lt;/a&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;© 2024 &lt;a href=&quot;http://www.envirosolutions.pl/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;EnviroSolutions Sp. z o.o.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="textFormat">
        <enum>Qt::RichText</enum>
