@@ -102,7 +102,7 @@ class UldkGugik:
         self.clickTool = QgsMapToolEmitPoint(self.canvas)
         self.clickTool.canvasClicked.connect(self.canvasClicked)
 
-        self.dlg = UldkGugikDialog()   
+        self.dlg = UldkGugikDialog()
         self.region_name = None  
         
 
@@ -376,12 +376,13 @@ class UldkGugik:
 
 
     def setup_dialog(self):
-        self.dlg.show()
         self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
+        self.dlg.fill_dialog()
+        self.dlg.show()
 
     def btn_download_tab1_clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""

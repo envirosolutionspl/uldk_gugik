@@ -49,23 +49,25 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         #self.folder_fileWidget.setStorageMode(QgsFileWidget.GetDirectory)
 
-
         # ULDK
-
+        self.setup_signals()
         self.powiatDictionary = {}
-        self.gminaDictionary={}
+        self.gminaDictionary = {}
         self.obrebDictionary = {}
-        self.regionFetch = RegionFetch()
 
+
+    def setup_signals(self):
         self.wojcomboBox.currentTextChanged.connect(self.wojcomboBox_currentTextChanged)
         self.powcomboBox.currentTextChanged.connect(self.powcomboBox_currentTextChanged)
         self.gmicomboBox.currentTextChanged.connect(self.gmicomboBox_currentTextChanged)
+
+    def fill_dialog(self):
+        self.regionFetch = RegionFetch()
         wojewodztwa = self.regionFetch.wojewodztwoDict
         self.wojcomboBox.addItems(wojewodztwa.keys())
         data = {k: v for k, v in wojewodztwa.items()}
         for idx, po in enumerate(data.keys()):
             self.wojcomboBox.setItemData(idx, data[po])
-
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
@@ -83,7 +85,6 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.gmicomboBox.clear()
         self.gminaDictionary = self.regionFetch.getGminaDictByPowiatName(text)
         self.gmicomboBox.addItems(list(self.gminaDictionary.keys()))
-        
 
     def gmicomboBox_currentTextChanged(self, text):
         self.obrcomboBox.clear()
