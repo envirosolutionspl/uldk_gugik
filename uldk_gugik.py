@@ -237,7 +237,7 @@ class UldkGugik:
         self.dlg.btn_search_tab3_2.clicked.connect(self.btn_search_tab3_clicked)
         
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
-        self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
+        self.dlg.btn_frommap.setToolTip("skrót: ALT + F")
 
     def ctrl_ark(self):
         self.dlg.arkcomboBox.clear()
