@@ -383,8 +383,8 @@ class UldkGugik:
         self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
-        self.dlg.fill_dialog()
         self.dlg.show()
+        self.dlg.fill_dialog()
 
     def btn_download_tab1_clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
