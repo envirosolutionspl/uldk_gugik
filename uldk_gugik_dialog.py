@@ -60,6 +60,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.obrcomboBox.currentTextChanged.connect(self.obrcomboBox_currentTextChanged)
 
     def fill_dialog(self):
+        self.wojcomboBox.clear()
         self.regionFetch = RegionFetch()
         wojewodztwa = self.regionFetch.wojewodztwoDict
         self.wojcomboBox.addItems(wojewodztwa.keys())
