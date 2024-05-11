@@ -370,7 +370,9 @@ class UldkGugik:
             with requests.get('https://uldk.gugik.gov.pl'):
                 self.setup_dialog()
         except requests.exceptions.ConnectionError:
-            self.iface.messageBar().pushWarning("Ostrzeżenie:", 'Brak połączenia z internetem')
+            self.iface.messageBar().pushMessage("Ostrzeżenie:", 
+                                                'Brak połączenia z internetem',
+                                                level=Qgis.Warning, duration=10)
         self.dlg.projectionWidget.setCrs(
             QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
 
