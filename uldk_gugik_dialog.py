@@ -57,7 +57,6 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.wojcomboBox.currentTextChanged.connect(self.wojcomboBox_currentTextChanged)
         self.powcomboBox.currentTextChanged.connect(self.powcomboBox_currentTextChanged)
         self.gmicomboBox.currentTextChanged.connect(self.gmicomboBox_currentTextChanged)
-        self.obrcomboBox.currentTextChanged.connect(self.obrcomboBox_currentTextChanged)
 
     def fill_dialog(self):
         self.wojcomboBox.clear()
@@ -112,20 +111,16 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
             self.obrcomboBox.setItemData(idx, data[ob])
 
         self.handleResponseMunicip(True)
-        self.ctrl_rest_obj(True)  
-
-    def obrcomboBox_currentTextChanged(self):
-        self.handleResponsePrec(False)
-        self.ctrl_rest_obj(False)
-        self.handleResponsePrec(True)
         self.ctrl_rest_obj(True)
 
+
     def handleResponseVoivode(self, param):
-        self.wojcomboBox.setEnabled(param)
-        if param is True:
-            self.wojcomboBox.setStyleSheet("QComboBox { color: black }")
-        else:
-            self.wojcomboBox.setStyleSheet("QComboBox { color: gray }")
+        if not self.rdb_wo.isChecked():
+            self.wojcomboBox.setEnabled(param)
+            if param is True:
+                self.wojcomboBox.setStyleSheet("QComboBox { color: black }")
+            else:
+                self.wojcomboBox.setStyleSheet("QComboBox { color: gray }")
 
 
     def handleResponseCounty(self, param):
@@ -156,7 +151,8 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
     def ctrl_rest_obj(self, param):
-        self.btn_download_tab3.setEnabled(param)  
+        if not self.rdb_wo.isChecked():
+            self.btn_download_tab3.setEnabled(param)
         if self.rdb_dz.isChecked():
             self.arkcomboBox.setEnabled(param)
             self.btn_search_tab3_2.setEnabled(param)
