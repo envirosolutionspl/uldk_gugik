@@ -58,6 +58,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.powcomboBox.currentTextChanged.connect(self.powcomboBox_currentTextChanged)
         self.gmicomboBox.currentTextChanged.connect(self.gmicomboBox_currentTextChanged)
 
+
     def fill_dialog(self):
         self.wojcomboBox.clear()
         self.regionFetch = RegionFetch()
@@ -73,8 +74,9 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def wojcomboBox_currentTextChanged(self, text):
         self.powcomboBox.clear()
-        self.handleResponseVoivode(False)
-        self.ctrl_rest_obj(False)
+        if not self.rdb_pw.isChecked():
+            self.handleResponseVoivode(False)
+            self.ctrl_rest_obj(False)
 
         self.powiatDictionary = self.regionFetch.getPowiatDictByWojewodztwoName(text)
         data = {k: v[0] for k, v in self.powiatDictionary.items()}
@@ -88,26 +90,32 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def powcomboBox_currentTextChanged(self, text):
         self.gmicomboBox.clear()
-        self.handleResponseCounty(False)
-        self.ctrl_rest_obj(False)
+        if not self.rdb_pw.isChecked():
+            self.handleResponseCounty(False)
+            self.ctrl_rest_obj(False)
 
         self.gminaDictionary = self.regionFetch.getGminaDictByPowiatName(text)
+        data = {k: v[0] for k, v in self.gminaDictionary.items()}
         self.gmicomboBox.addItems(list(self.gminaDictionary.keys()))
+
+        for idx, po in enumerate(data.keys()):
+            self.gmicomboBox.setItemData(idx, data[po])
 
         self.handleResponseCounty(True)
         self.ctrl_rest_obj(True)
 
     def gmicomboBox_currentTextChanged(self, text):
         self.obrcomboBox.clear()
-        self.handleResponseMunicip(False)
-        self.ctrl_rest_obj(False)  
+        if self.wojcomboBox.currentTextChanged or self.powcomboBox.currentTextChanged:
+            self.handleResponseMunicip(False)
+            self.ctrl_rest_obj(False) 
+
 
         self.obrebDictionary = self.regionFetch.getObrebDictByGminaName(text)
         data = {k: v for k, v in self.obrebDictionary.items()}
         self.obrcomboBox.addItems(list(self.obrebDictionary.keys()))
 
         for idx, ob in enumerate(data.keys()):
-            self.gmicomboBox.setItemData(idx, data[ob])
             self.obrcomboBox.setItemData(idx, data[ob])
 
         self.handleResponseMunicip(True)
@@ -130,6 +138,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.powcomboBox.setStyleSheet("QComboBox { color: black }")   
             else:
                 self.powcomboBox.setStyleSheet("QComboBox { color: gray }")
+            return True
 
 
     def handleResponseMunicip(self, param):
@@ -156,4 +165,10 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.rdb_dz.isChecked():
             self.arkcomboBox.setEnabled(param)
             self.btn_search_tab3_2.setEnabled(param)
+
+
+    # def final(self):
+    #     self.wojcomboBox.currentTextChanged.disconnect()
+    #     self.powcomboBox.currentTextChanged.disconnect()
+    #     self.gmicomboBox.currentTextChanged.disconnect()
 
