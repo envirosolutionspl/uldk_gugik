@@ -107,8 +107,9 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
     def gmicomboBox_currentTextChanged(self, text):
         self.obrcomboBox.clear()
         if self.wojcomboBox.currentTextChanged or self.powcomboBox.currentTextChanged:
-            self.handleResponseMunicip(False)
-            self.ctrl_rest_obj(False) 
+            if self.rdb_gm.isChecked() or self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
+                self.handleResponseMunicip(False)
+                self.ctrl_rest_obj(False)
 
 
         self.obrebDictionary = self.regionFetch.getObrebDictByGminaName(text)
