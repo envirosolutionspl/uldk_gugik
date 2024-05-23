@@ -60,6 +60,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
     def fill_dialog(self):
+        self.img_main.setMargin(9)
         self.wojcomboBox.clear()
         self.regionFetch = RegionFetch()
         wojewodztwa = self.regionFetch.wojewodztwoDict
