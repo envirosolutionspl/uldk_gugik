@@ -8,7 +8,7 @@
                               -------------------
         begin                : 2019-05-31
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by Envirosolutions Sp. z o.o. - Michał Włoga & Alicja Konkol
+        copyright            : (C) 2019 by EnviroSolutions Sp. z o.o.
         email                : office@envirosolutions.pl
  ***************************************************************************/
 
@@ -27,6 +27,9 @@ from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField, \
     QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog
+
+import requests
+
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
@@ -36,7 +39,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.3.2'
+plugin_version = '1.3.3'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -99,7 +102,7 @@ class UldkGugik:
         self.clickTool = QgsMapToolEmitPoint(self.canvas)
         self.clickTool.canvasClicked.connect(self.canvasClicked)
 
-        self.dlg = UldkGugikDialog()   
+        self.dlg = UldkGugikDialog()
         self.region_name = None  
         
 
@@ -234,7 +237,7 @@ class UldkGugik:
         self.dlg.btn_search_tab3_2.clicked.connect(self.btn_search_tab3_clicked)
         
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
-        self.dlg.btn_frommap.setToolTip("skrót: ALT + D")
+        self.dlg.btn_frommap.setToolTip("skrót: ALT + F")
 
     def ctrl_ark(self):
         self.dlg.arkcomboBox.clear()
@@ -362,16 +365,26 @@ class UldkGugik:
             else:
                 self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_F), self.iface.mainWindow())
                 self.shortcut.setContext(Qt.ApplicationShortcut)
-                self.shortcut.activated.connect(self.shortcut_activated) 
-        # show the dialog
-        self.dlg.show()
-        self.dlg.projectionWidget.setCrs(QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
+                self.shortcut.activated.connect(self.shortcut_activated)
+        try:
+            with requests.get('https://uldk.gugik.gov.pl'):
+                self.setup_dialog()
+        except requests.exceptions.ConnectionError:
+            self.iface.messageBar().pushMessage("Ostrzeżenie:", 
+                                                'Brak połączenia z internetem',
+                                                level=Qgis.Warning, duration=10)
+        self.dlg.projectionWidget.setCrs(
+            QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
 
+
+    def setup_dialog(self):
         self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
         self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
+        self.dlg.show()
+        self.dlg.fill_dialog()
 
     def btn_download_tab1_clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
