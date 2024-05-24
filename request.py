@@ -27,6 +27,7 @@ class Request:
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
+
             returnedData = reply.readAll().data().decode('utf-8')
 
             for line in returnedData.split('\n'):
@@ -76,8 +77,9 @@ class Request:
                     if teryt[:-4] == self.teryt[:-4]:
                         self._data = line
                         break
-            else:  # brak zgodności - nie ma takiego nr działki
-                self._data = None
+
+        else:  # brak zgodności - nie ma takiego nr działki
+            self._data = None
 
         self.loop.quit()
 

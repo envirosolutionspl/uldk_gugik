@@ -8,7 +8,6 @@ def isInternetConnected():
         shutDownConnection(s)
         return True
     except:
-        shutDownConnection(s)
         return False
     
 def shutDownConnection(socket):
