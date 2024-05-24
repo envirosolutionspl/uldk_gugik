@@ -8,7 +8,7 @@
                              -------------------
         begin                : 2019-05-31
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by EnviroSolutions Sp. z o.o.
+        copyright            : (C) 2019 by Michał Włoga - Envirosolutions Sp. z o.o.
         email                : office@envirosolutions.pl
  ***************************************************************************/
 
@@ -49,25 +49,23 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         #self.folder_fileWidget.setStorageMode(QgsFileWidget.GetDirectory)
 
+
         # ULDK
+
         self.powiatDictionary = {}
-        self.gminaDictionary = {}
+        self.gminaDictionary={}
         self.obrebDictionary = {}
+        self.regionFetch = RegionFetch()
 
         self.wojcomboBox.currentTextChanged.connect(self.wojcomboBox_currentTextChanged)
         self.powcomboBox.currentTextChanged.connect(self.powcomboBox_currentTextChanged)
         self.gmicomboBox.currentTextChanged.connect(self.gmicomboBox_currentTextChanged)
-
-
-    def fill_dialog(self):
-        self.img_main.setMargin(9)
-        self.wojcomboBox.clear()
-        self.regionFetch = RegionFetch()
         wojewodztwa = self.regionFetch.wojewodztwoDict
         self.wojcomboBox.addItems(wojewodztwa.keys())
         data = {k: v for k, v in wojewodztwa.items()}
         for idx, po in enumerate(data.keys()):
             self.wojcomboBox.setItemData(idx, data[po])
+
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
@@ -75,102 +73,23 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def wojcomboBox_currentTextChanged(self, text):
         self.powcomboBox.clear()
-        if not self.rdb_pw.isChecked():
-            self.handleResponseVoivode(False)
-            self.ctrl_rest_obj(False)
-
         self.powiatDictionary = self.regionFetch.getPowiatDictByWojewodztwoName(text)
         data = {k: v[0] for k, v in self.powiatDictionary.items()}
         self.powcomboBox.addItems(list(self.powiatDictionary.keys()))
-
         for idx, po in enumerate(data.keys()):
             self.powcomboBox.setItemData(idx, data[po])
 
-        self.handleResponseVoivode(True)
-        self.ctrl_rest_obj(True)        
-
     def powcomboBox_currentTextChanged(self, text):
         self.gmicomboBox.clear()
-        if not self.rdb_pw.isChecked():
-            self.handleResponseCounty(False)
-            self.ctrl_rest_obj(False)
-
         self.gminaDictionary = self.regionFetch.getGminaDictByPowiatName(text)
-        data = {k: v[0] for k, v in self.gminaDictionary.items()}
         self.gmicomboBox.addItems(list(self.gminaDictionary.keys()))
-
-        for idx, po in enumerate(data.keys()):
-            self.gmicomboBox.setItemData(idx, data[po])
-
-        self.handleResponseCounty(True)
-        self.ctrl_rest_obj(True)
+        
 
     def gmicomboBox_currentTextChanged(self, text):
         self.obrcomboBox.clear()
-        if self.wojcomboBox.currentTextChanged or self.powcomboBox.currentTextChanged:
-            if self.rdb_gm.isChecked() or self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
-                self.handleResponseMunicip(False)
-                self.ctrl_rest_obj(False)
-
-
         self.obrebDictionary = self.regionFetch.getObrebDictByGminaName(text)
         data = {k: v for k, v in self.obrebDictionary.items()}
         self.obrcomboBox.addItems(list(self.obrebDictionary.keys()))
-
         for idx, ob in enumerate(data.keys()):
+            self.gmicomboBox.setItemData(idx, data[ob])
             self.obrcomboBox.setItemData(idx, data[ob])
-
-        self.handleResponseMunicip(True)
-        self.ctrl_rest_obj(True)
-
-
-    def handleResponseVoivode(self, param):
-        if not self.rdb_wo.isChecked():
-            self.wojcomboBox.setEnabled(param)
-            if param is True:
-                self.wojcomboBox.setStyleSheet("QComboBox { color: black }")
-            else:
-                self.wojcomboBox.setStyleSheet("QComboBox { color: gray }")
-
-
-    def handleResponseCounty(self, param):
-        if self.rdb_pw.isChecked() or self.rdb_gm.isChecked() or self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
-            self.powcomboBox.setEnabled(param)
-            if param is True:
-                self.powcomboBox.setStyleSheet("QComboBox { color: black }")   
-            else:
-                self.powcomboBox.setStyleSheet("QComboBox { color: gray }")
-            return True
-
-
-    def handleResponseMunicip(self, param):
-        if self.rdb_gm.isChecked() or self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
-            self.gmicomboBox.setEnabled(param)
-            if param is True:
-                self.gmicomboBox.setStyleSheet("QComboBox { color: black }")   
-            else:
-                self.gmicomboBox.setStyleSheet("QComboBox { color: gray }")
-
-
-    def handleResponsePrec(self, param):
-        if self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
-            self.obrcomboBox.setEnabled(param)
-            if param is True:
-                self.obrcomboBox.setStyleSheet("QComboBox { color: black }")   
-            else:
-                self.obrcomboBox.setStyleSheet("QComboBox { color: gray }")
-
-
-    def ctrl_rest_obj(self, param):
-        if not self.rdb_wo.isChecked():
-            self.btn_download_tab3.setEnabled(param)
-        if self.rdb_dz.isChecked():
-            self.arkcomboBox.setEnabled(param)
-            self.btn_search_tab3_2.setEnabled(param)
-
-
-    # def final(self):
-    #     self.wojcomboBox.currentTextChanged.disconnect()
-    #     self.powcomboBox.currentTextChanged.disconnect()
-    #     self.gmicomboBox.currentTextChanged.disconnect()
-
