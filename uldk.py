@@ -40,7 +40,7 @@ class RegionFetch:
         self.loop.exec_()
         
     def __fetchObreb(self, gmina_name):
-        teryt = self.gminaDict[gmina_name][1]
+        teryt = self.gminaDict[gmina_name][0]
         manager = QNetworkAccessManager()
         resp = QNetworkRequest(QUrl(f'https://uldk.gugik.gov.pl/service.php?obiekt=obreb&wynik=nazwa%2Cteryt&teryt={teryt}&'))
         manager.get(resp)
@@ -80,7 +80,7 @@ class RegionFetch:
                 for el in data:
                     split = el.split('|')
                     # self.gminaDict[split[2]] = split[0], split[1], split[3]
-                    self.gminaDict[split[0]] = split[1], split[2], split[3]
+                    self.gminaDict[split[0]] = split[2], split[1], split[3]
         self.loop.exit(0)
 
     def getObreb(self, reply):
