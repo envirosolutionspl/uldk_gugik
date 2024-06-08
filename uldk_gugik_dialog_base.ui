@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>858</width>
+    <width>828</width>
     <height>514</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>:/plugins/uldk_gugik/images/icon.png</normaloff>:/plugins/uldk_gugik/images/icon.png</iconset>
+    <normaloff>images/uldk.svg</normaloff>images/uldk.svg</iconset>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="enabled">
@@ -832,7 +832,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>images/icon_uldk2.png</pixmap>
+         <pixmap>images/uldk.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -959,7 +959,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>images/logo.png</pixmap>
+         <pixmap>images/es_logo.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>

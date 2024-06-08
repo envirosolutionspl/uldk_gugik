@@ -200,7 +200,7 @@ class UldkGugik:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
 
-        icon_path = ':/plugins/uldk_gugik/images/icon.png'
+        icon_path = ':/plugins/uldk_gugik/images/uldk.svg'
         self.add_action(
             icon_path,
             text=self.tr(u'Usługa Lokalizacji Działek Katastralnych (ULDK)'),
@@ -214,7 +214,6 @@ class UldkGugik:
 
 
         # Inicjacja grafik
-        self.dlg.img_main.setPixmap(QPixmap(':/plugins/uldk_gugik/images/icon_uldk2.png'))
         self.dlg.img_tab2.setPixmap(QPixmap(':/plugins/uldk_gugik/images/coords.png'))
 
         # rozmiar okna

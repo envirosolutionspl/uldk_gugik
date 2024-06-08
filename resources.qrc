@@ -1,8 +1,7 @@
 <RCC>
   <qresource prefix="/plugins/uldk_gugik">
-    <file>images/icon_uldk2.png</file>
-    <file>images/icon.png</file>
+    <file>images/es_logo.svg</file>
+    <file>images/uldk.svg</file>
     <file>images/coords.png</file>
-    <file>images/logo.png</file>
   </qresource>
 </RCC>
