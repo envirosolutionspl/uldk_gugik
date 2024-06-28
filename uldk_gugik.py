@@ -365,10 +365,12 @@ class UldkGugik:
                 self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_F), self.iface.mainWindow())
                 self.shortcut.setContext(Qt.ApplicationShortcut)
                 self.shortcut.activated.connect(self.shortcut_activated)
-        try:
-            with requests.get('https://uldk.gugik.gov.pl'):
-                self.setup_dialog()
-        except requests.exceptions.ConnectionError:
+        
+        odpowiedz = requests.get('https://uldk.gugik.gov.pl', verify=False)
+
+        if odpowiedz.status_code == 200:
+            self.setup_dialog()
+        else:
             self.iface.messageBar().pushMessage("Ostrzeżenie:", 
                                                 'Brak połączenia z internetem',
                                                 level=Qgis.Warning, duration=10)
