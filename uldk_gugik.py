@@ -39,7 +39,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 
 """Wersja wtyczki"""
-plugin_version = '1.3.3'
+plugin_version = '1.3.5'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
@@ -365,9 +365,17 @@ class UldkGugik:
                 self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_F), self.iface.mainWindow())
                 self.shortcut.setContext(Qt.ApplicationShortcut)
                 self.shortcut.activated.connect(self.shortcut_activated)
+        
         try:
-            with requests.get('https://uldk.gugik.gov.pl'):
+            odpowiedz = requests.get('https://uldk.gugik.gov.pl', verify=False)
+
+            if odpowiedz.status_code == 200:
                 self.setup_dialog()
+            else:
+                self.iface.messageBar().pushMessage("Ostrzeżenie:", 
+                                                'Serwer ULDK nie odpowiada. Spróbuj ponownie później',
+                                                level=Qgis.Warning, duration=10)
+
         except requests.exceptions.ConnectionError:
             self.iface.messageBar().pushMessage("Ostrzeżenie:", 
                                                 'Brak połączenia z internetem',
