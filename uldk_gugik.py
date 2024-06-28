@@ -366,11 +366,17 @@ class UldkGugik:
                 self.shortcut.setContext(Qt.ApplicationShortcut)
                 self.shortcut.activated.connect(self.shortcut_activated)
         
-        odpowiedz = requests.get('https://uldk.gugik.gov.pl', verify=False)
+        try:
+            odpowiedz = requests.get('https://uldk.gugik.gov.pl', verify=False)
 
-        if odpowiedz.status_code == 200:
-            self.setup_dialog()
-        else:
+            if odpowiedz.status_code == 200:
+                self.setup_dialog()
+            else:
+                self.iface.messageBar().pushMessage("Ostrzeżenie:", 
+                                                'Serwer ULDK nie odpowiada. Spróbuj ponownie później',
+                                                level=Qgis.Warning, duration=10)
+
+        except requests.exceptions.ConnectionError:
             self.iface.messageBar().pushMessage("Ostrzeżenie:", 
                                                 'Brak połączenia z internetem',
                                                 level=Qgis.Warning, duration=10)
