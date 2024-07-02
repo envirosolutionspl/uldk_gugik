@@ -788,18 +788,7 @@ class UldkGugik:
             nazwa = self.nazwy_warstw[objectType]
 
             layers = QgsProject.instance().mapLayersByName(nazwa)
-            geom = QgsGeometry().fromWkt(wkt)
-            feat = QgsFeature()
 
-            projectCrs = str(2180)
-            if str(projectCrs) != '2180':
-                sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
-                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
-                geometry = geom.transform(tr)
-                feat.setGeometry(geometry)
-            else:
-                feat.setGeometry(geom)
 
             if layers:
                 # jezeli istnieje to dodaj obiekt do warstwy
@@ -809,18 +798,11 @@ class UldkGugik:
                 epsg = "Polygon?crs=EPSG:2180"
                 layer = QgsVectorLayer(epsg, nazwa, "memory")
                 QgsProject.instance().addMapLayer(layer)
-
             
             provider = layer.dataProvider()
-            provider.addFeature(feat)
             layer.updateExtents()
 
-            counter = layer.featureCount()
-            # add attributes
             if not layers:
-                identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
-                provider.addAttributes([identyfikatorField])
-
                 voivField = QgsField('województwo', QVariant.String, len=30)
                 provider.addAttributes([voivField])
 
@@ -839,34 +821,25 @@ class UldkGugik:
                 layer.updateFields()
 
                 layer.updateFields()
-                counter = 1
 
-            idx = layer.fields().indexFromName('identyfikator')
-            attrMap = {counter: {idx: teryt}}
-            provider.changeAttributeValues(attrMap)
+            feat = QgsFeature(provider.fields())
+            geom = QgsGeometry().fromWkt(wkt)
+            projectCrs = str(2180)
+            if str(projectCrs) != '2180':
+                sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
+                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                geometry = geom.transform(tr)
+                feat.setGeometry(geometry)
+            else:
+                feat.setGeometry(geom)
 
-            voiv = layer.fields().indexFromName('województwo')
-            attrMap = {counter: {voiv: voivodeship.rstrip()}}
-            provider.changeAttributeValues(attrMap)
-
-            if parcel is not None:
-                par = layer.fields().indexFromName('numer')
-                attrMap = {counter: {par: parcel}}
-                provider.changeAttributeValues(attrMap)
-
-            if region is not None:
-                reg = layer.fields().indexFromName('obręb')
-                attrMap = {counter: {reg: region}}
-                provider.changeAttributeValues(attrMap)
-            if commune is not None:
-                com = layer.fields().indexFromName('gmina')
-                attrMap = {counter: {com: commune}}
-                provider.changeAttributeValues(attrMap)
-
-            if county is not None:
-                con = layer.fields().indexFromName('powiat')
-                attrMap = {counter: {con: county}}
-                provider.changeAttributeValues(attrMap)
+            feat.setAttribute('województwo', voivodeship)
+            feat.setAttribute('numer', parcel or None)
+            feat.setAttribute('obręb', region or None)
+            feat.setAttribute('gmina', commune or None)
+            feat.setAttribute('powiat', county or None)
+            provider.addFeature(feat)
 
             self.iface.messageBar().pushMessage("Sukces:",
                                                 'Pobrano działkę dla obiektu: %s' % (name),
@@ -1183,9 +1156,6 @@ class UldkGugik:
     def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
-        feat = QgsFeature()
-        feat.setGeometry(QgsGeometry().fromWkt(wkt))
-
         # layer
         nazwa = self.nazwy_warstw[objectType]
         layers = QgsProject.instance().mapLayersByName(nazwa)
@@ -1201,8 +1171,6 @@ class UldkGugik:
             # jezeli istnieje to dodaj obiekt do warstwy
             layer = layers[0]
             provider = layer.dataProvider()
-            featId = provider.featureCount()+1
-            provider.addFeature(feat)
 
         else:
             # jezeli nie istnieje to stworz warstwe
@@ -1210,10 +1178,6 @@ class UldkGugik:
             QgsProject.instance().addMapLayer(layer)
 
             provider = layer.dataProvider()
-            provider.addFeature(feat)
-
-            identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
-            provider.addAttributes([identyfikatorField])
 
             voivField = QgsField('województwo', QVariant.String, len=30)
             provider.addAttributes([voivField])
@@ -1235,35 +1199,15 @@ class UldkGugik:
                 provider.addAttributes([parField])
 
             layer.updateFields()
-            featId = 1
+        feat = QgsFeature(provider.fields())
+        feat.setGeometry(QgsGeometry().fromWkt(wkt))
 
-
-        idx = layer.fields().indexFromName('identyfikator')
-        voiv = layer.fields().indexFromName('województwo')
-        attrMap = {featId: {idx: teryt, voiv: voivodeship}}
-        provider.changeAttributeValues(attrMap)
-
-        if parcel:
-            par = layer.fields().indexFromName('numer')
-            attrMap = {featId: {par: parcel}}
-            provider.changeAttributeValues(attrMap)
-
-        if region:
-            reg = layer.fields().indexFromName('obręb')
-            attrMap = {featId: {reg: region}}
-
-            provider.changeAttributeValues(attrMap)
-        if commune:
-            com = layer.fields().indexFromName('gmina')
-            attrMap = {featId: {com: commune}}
-
-            provider.changeAttributeValues(attrMap)
-
-        if county:
-            con = layer.fields().indexFromName('powiat')
-            attrMap = {featId: {con: county}}
-
-            provider.changeAttributeValues(attrMap)
+        feat.setAttribute('województwo', voivodeship)
+        feat.setAttribute('numer', parcel or None)
+        feat.setAttribute('obręb', region or None)
+        feat.setAttribute('gmina', commune or None)
+        feat.setAttribute('powiat', county or None)
+        provider.addFeature(feat)
 
         if zoomToFeature:
             projectCrs = QgsProject.instance().crs().authid().split(":")[1]
