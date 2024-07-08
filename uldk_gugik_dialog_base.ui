@@ -79,7 +79,7 @@
       <string>Wybór obiektu przez pełny identyfikator</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="id_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -134,7 +134,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="description_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -570,7 +570,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QLineEdit" name="edit_id_3">
+       <widget class="QLineEdit" name="parcel_lineedit">
         <property name="minimumSize">
          <size>
           <width>310</width>
@@ -660,7 +660,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_search_tab3_2">
+       <widget class="QPushButton" name="btn_search_tab3">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -711,6 +711,22 @@
        </property>
        <property name="checked">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rdb_bu">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Budynek</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -1015,8 +1031,8 @@
   <tabstop>gmicomboBox</tabstop>
   <tabstop>obrcomboBox</tabstop>
   <tabstop>arkcomboBox</tabstop>
-  <tabstop>edit_id_3</tabstop>
-  <tabstop>btn_search_tab3_2</tabstop>
+  <tabstop>parcel_lineedit</tabstop>
+  <tabstop>btn_search_tab3</tabstop>
   <tabstop>btn_download_tab3</tabstop>
  </tabstops>
  <resources/>

@@ -223,116 +223,13 @@ class UldkGugik:
         self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
         self.dlg.lbl_pluginVersion.setText('%s %s' % (plugin_name, plugin_version))
 
-        #eventy
-        self.dlg.rdb_dz.toggled.connect(self.active_par)   # działka
-        self.dlg.rdb_ob.toggled.connect(self.active_ob)    # obręb       label_18
-        self.dlg.rdb_gm.toggled.connect(self.active_gm)    # gmina       label_17
-        self.dlg.rdb_pw.toggled.connect(self.active_pw)    # powiat      label_16
-        self.dlg.rdb_wo.toggled.connect(self.active_wo)    # województwo label_15
-        
         self.dlg.btn_download_tab1.clicked.connect(self.btn_download_tab1_clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
         self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
-        self.dlg.btn_search_tab3_2.clicked.connect(self.btn_search_tab3_clicked)
+        self.dlg.btn_search_tab3.clicked.connect(self.btn_search_tab3_clicked)
         
         self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + F")
-
-    def ctrl_ark(self):
-        self.dlg.arkcomboBox.clear()
-        if self.dlg.rdb_dz.isChecked():
-            self.dlg.btn_download_tab3.setEnabled(False)
-
-    def active_par(self):
-        tab_text = "Wybór obiektu przez nazwę obrębu i numer działki"
-        self.active_all()
-        self.dlg.btn_search_tab3_2.setEnabled(True)
-        self.dlg.btn_download_tab3.setEnabled(False)
-        self.dlg.tab3.findChild(QWidget).setText(tab_text)
-        self.dlg.label_3.setText(" - dla działki: WWPPGG_R.OOOO.[AR_NR].NR_DZ, WWPPGG_R.OOOO.NR_DZ")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1.0001.1395)")
-        self.dlg.tabWidget.setTabText(2, tab_text)
-        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
-
-    def active_ob(self):
-        tab_text = "Wybór obiektu przez nazwę obrębu"
-        self.active_all()
-        self.control_ark()
-        self.dlg.btn_search_tab3_2.setEnabled(False)
-        self.dlg.edit_id_3.setText('')
-        self.dlg.edit_id_3.setEnabled(False)
-        self.dlg.btn_download_tab3.setEnabled(True)
-        self.dlg.tab3.findChild(QWidget).setText(tab_text)
-        self.dlg.label_3.setText(" - dla obrębu: WWPPGG_R.OOOO")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1.0001)")
-        self.dlg.tabWidget.setTabText(2, tab_text)
-        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
-
-    def active_gm(self):
-        tab_text = "Wybór obiektu przez nazwę gminy"
-        self.active_ob()
-        self.control_ark()
-        self.dlg.btn_search_tab3_2.setEnabled(False)
-        self.dlg.edit_id_3.setText('')
-        self.dlg.edit_id_3.setEnabled(False)
-        self.dlg.btn_download_tab3.setEnabled(True)
-        self.dlg.obrcomboBox.setEnabled(False)
-        self.dlg.obrcomboBox.setStyleSheet("QComboBox { color: transparent }")
-        self.dlg.tab3.findChild(QWidget).setText(tab_text)
-        self.dlg.label_3.setText(" - dla gminy: WWPPGG_R")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 040101_1)")
-        self.dlg.tabWidget.setTabText(2, tab_text)
-        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
-
-    def active_pw(self):
-        tab_text = "Wybór obiektu przez nazwę powiatu"
-        self.active_gm()
-        self.control_ark()
-        self.dlg.btn_search_tab3_2.setEnabled(False)
-        self.dlg.edit_id_3.setText('')
-        self.dlg.edit_id_3.setEnabled(False)
-        self.dlg.btn_download_tab3.setEnabled(True)
-        self.dlg.gmicomboBox.setEnabled(False)
-        self.dlg.gmicomboBox.setStyleSheet("QComboBox { color: transparent }")
-        self.dlg.tab3.findChild(QWidget).setText(tab_text)
-        self.dlg.label_3.setText(" - dla powiatu: WWPP")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 0401)")
-        self.dlg.tabWidget.setTabText(2, tab_text)
-        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
-
-    def active_wo(self):
-        tab_text = "Wybór obiektu przez nazwę województwa"
-        self.active_pw()
-        self.control_ark()
-        self.dlg.btn_search_tab3_2.setEnabled(False)
-        self.dlg.edit_id_3.setText('')
-        self.dlg.edit_id_3.setEnabled(False)
-        self.dlg.btn_download_tab3.setEnabled(True)
-        self.dlg.powcomboBox.setEnabled(False)
-        self.dlg.powcomboBox.setStyleSheet("QComboBox { color: transparent }")
-        self.dlg.tab3.findChild(QWidget).setText(tab_text)
-        self.dlg.label_3.setText(" - dla województwa: WW")
-        self.dlg.label.setText("Wprowadź identyfikator obiektu (np. 04)")
-        self.dlg.tabWidget.setTabText(2,tab_text)
-        self.dlg.label_13.setText("Wprowadź numer działki (np. 6509):")
-
-    def control_ark(self):
-        self.dlg.arkcomboBox.clear()
-        self.dlg.arkcomboBox.setEnabled(False)
-        self.dlg.arkcomboBox.setStyleSheet("QComboBox { color: transparent }")
-
-    def active_all(self):
-        self.dlg.edit_id_3.setEnabled(True)
-        self.dlg.arkcomboBox.setEnabled(True)
-        self.dlg.arkcomboBox.setStyleSheet("QComboBox { color: black }")
-        self.dlg.obrcomboBox.setEnabled(True)
-        self.dlg.obrcomboBox.setStyleSheet("QComboBox { color: black }")
-        self.dlg.gmicomboBox.setEnabled(True)
-        self.dlg.gmicomboBox.setStyleSheet("QComboBox { color: black }")
-        self.dlg.powcomboBox.setEnabled(True)
-        self.dlg.powcomboBox.setStyleSheet("QComboBox { color: black }")
-        self.dlg.wojcomboBox.setEnabled(True)
-        self.dlg.wojcomboBox.setStyleSheet("QComboBox { color: black }")
 
 
     def unload(self):
@@ -385,13 +282,8 @@ class UldkGugik:
 
 
     def setup_dialog(self):
-        self.dlg.wojcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
-        self.dlg.powcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
-        self.dlg.gmicomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
-        self.dlg.obrcomboBox.currentTextChanged.connect(self.ctrl_ark)  # Kontrola wyświetlania numeru arkusza
-        self.dlg.edit_id_3.textChanged.connect(self.ctrl_ark)
         self.dlg.show()
-        self.dlg.fill_dialog()
+        # self.dlg.fill_dialog()
 
     def btn_download_tab1_clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
@@ -432,121 +324,125 @@ class UldkGugik:
             objRegion = str(self.dlg.gmicomboBox.currentText().strip())
             objectType = self.checkedFeatureType()
             srid = str(2180)
-        
-        if objectType == 1:
-            current_idx = self.dlg.gmicomboBox.currentIndex()
-            teryt = self.dlg.gmicomboBox.itemData(current_idx)
-            objParcel = self.dlg.edit_id_3.text().strip() # nr działki
+        if objectType != 1:
+            return
+        self.dlg.parcel_lineedit.setReadOnly(True)
+        current_idx = self.dlg.gmicomboBox.currentIndex()
+        teryt = self.dlg.gmicomboBox.itemData(current_idx)
+        objParcel = self.dlg.parcel_lineedit.text().strip() # nr działki
 
-            if not objRegion:
-                self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                    'musisz wpisać obręb',
-                                                    level=Qgis.Warning, duration=10)
+        if not objRegion:
+            self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                'musisz wpisać obręb',
+                                                level=Qgis.Warning, duration=10)
 
-            if not objParcel:
-                self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                    'musisz wpisać numer działki',
-                                                    level=Qgis.Warning, duration=10)
+        if not objParcel:
+            self.iface.messageBar().pushMessage("Błąd formularza:",
+                                                'musisz wpisać numer działki',
+                                                level=Qgis.Warning, duration=10)
 
-            elif utils.isInternetConnected():
-                self.dlg.arkcomboBox.clear()
+        elif utils.isInternetConnected():
+            self.dlg.arkcomboBox.clear()
 
-                obr_idx = self.dlg.obrcomboBox.currentIndex()
-                teryt = self.dlg.obrcomboBox.itemData(obr_idx)
+            obr_idx = self.dlg.obrcomboBox.currentIndex()
+            teryt = self.dlg.obrcomboBox.itemData(obr_idx)
 
-                result_obreb = uldk_parcel.GetRegionById(id=teryt, srid=str(2180))
-                result_obreb = list(result_obreb)
-                
-                #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
-                for obreb in result_obreb:
-                    if len(obreb) < 3:
-                        result_obreb.remove(obreb)
+            result_obreb = uldk_parcel.GetRegionById(id=teryt, srid=str(2180))
+            result_obreb = list(result_obreb)
+
+            #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
+            for obreb in result_obreb:
+                if len(obreb) < 3:
+                    result_obreb.remove(obreb)
+                else:
+                    pass
+
+            #sprawdzanie czy obręb leży w tym województwie, w którym powinien
+            for obreb in result_obreb:
+                if obreb.split("|")[-1].rstrip() == self.dlg.wojcomboBox.currentText():
+                    pass
+                else:
+                    result_obreb.remove(obreb)
+
+            #sprawdzanie czy obręb leży w tym powiecie, w którym powinien
+            for obreb in result_obreb:
+                if obreb.split("|")[-2] == self.dlg.powcomboBox.currentText():
+                    pass
+                else:
+                    result_obreb.remove(obreb)
+
+            #sprawdzanie czy obręb leży w tej gminie, w której powinien
+            for obreb in result_obreb:
+                if obreb.split("|")[-3] == self.dlg.gmicomboBox.currentText():
+                    pass
+                else:
+                    result_obreb.remove(obreb)
+
+            try:
+                self.region_name = result_obreb[0].split("|")[0]
+                name = self.region_name + '.' + objParcel
+
+                result = uldk_parcel.getParcelById2(name, srid=str(2180))
+                result = list(result)
+
+                for rezultat in result:
+                    if rezultat.find("-1 brak wyników") >= 1 or rezultat.find("usługa nie zwróciła odpowiedzi") >= 1 or rezultat.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź") >= 1 or rezultat.find("XML") >= 1 or rezultat.find("błędny format") >= 1:
+                        response = False
                     else:
-                        pass
+                        response = True
 
-                #sprawdzanie czy obręb leży w tym województwie, w którym powinien
-                for obreb in result_obreb:
-                    if obreb.split("|")[-1].rstrip() == self.dlg.wojcomboBox.currentText():
-                        pass
-                    else:
-                        result_obreb.remove(obreb)
-                    
-                #sprawdzanie czy obręb leży w tym powiecie, w którym powinien
-                for obreb in result_obreb:
-                    if obreb.split("|")[-2] == self.dlg.powcomboBox.currentText():
-                        pass
-                    else:
-                        result_obreb.remove(obreb)
-                
-                #sprawdzanie czy obręb leży w tej gminie, w której powinien
-                for obreb in result_obreb:
-                    if obreb.split("|")[-3] == self.dlg.gmicomboBox.currentText():
-                        pass
-                    else:
-                        result_obreb.remove(obreb)
-
-                try:
-                    self.region_name = result_obreb[0].split("|")[0]
-                    name = self.region_name + '.' + objParcel
-
-                    result = uldk_parcel.getParcelById2(name, srid=str(2180))
-                    result = list(result)
-
-                    for rezultat in result:
-                        if rezultat.find("-1 brak wyników") >= 1 or rezultat.find("usługa nie zwróciła odpowiedzi") >= 1 or rezultat.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź") >= 1 or rezultat.find("XML") >= 1 or rezultat.find("błędny format") >= 1:
-                            response = False
-                        else:
-                            response = True
-
-                    if response == True:
-                        for i in range(len(result)):
-                            if len(result[i]) < 3:
-                                pass
-                            elif result[i].find(";") > -1:
-                                if result[i].split(";")[1].split("|")[1].split(".")[-2].find("AR") > -1:
-                                    arkusze_numery.add(result[i].split(";")[1].split("|")[1].split(".")[-2].strip())
-                                else:
-                                    pass
-                            else:
-                                if result[i].split("|")[1].split(".")[-2].find("AR") > -1:
-                                    arkusze_numery.add(result[i].split("|")[1].split(".")[-2].strip())
-                                else:
-                                    pass
-
-                        arkusze_numery = list(arkusze_numery)
-                        if len(arkusze_numery) >= 1:
-                            for arkusz in arkusze_numery:
-                                arkusze_numery_posortowane.add(arkusz.split("AR_")[-1])
-                            for sort_ark in sorted(arkusze_numery_posortowane,key=int):
-                                self.dlg.arkcomboBox.addItem(f"AR_{sort_ark}")
-                        else:
+                if response == True:
+                    for i in range(len(result)):
+                        if len(result[i]) < 3:
                             pass
-                        self.successDownload(arkusze_numery)
-                    elif response == False:
-                        self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                            'Nie zwrócono żadnej działki dla podanych parametrów',
-                                                                 level=Qgis.Warning, duration=10)
-                        self.dlg.btn_download_tab3.setEnabled(False)
+                        elif result[i].find(";") > -1:
+                            if result[i].split(";")[1].split("|")[1].split(".")[-2].find("AR") > -1:
+                                arkusze_numery.add(result[i].split(";")[1].split("|")[1].split(".")[-2].strip())
+                            else:
+                                pass
+                        else:
+                            if result[i].split("|")[1].split(".")[-2].find("AR") > -1:
+                                arkusze_numery.add(result[i].split("|")[1].split(".")[-2].strip())
+                            else:
+                                pass
 
-                except IndexError:
+                    arkusze_numery = list(arkusze_numery)
+                    if len(arkusze_numery) >= 1:
+                        for arkusz in arkusze_numery:
+                            arkusze_numery_posortowane.add(arkusz.split("AR_")[-1])
+                        for sort_ark in sorted(arkusze_numery_posortowane,key=int):
+                            self.dlg.arkcomboBox.addItem(f"AR_{sort_ark}")
+                    else:
+                        pass
+                    self.successDownload(arkusze_numery)
+                elif response == False:
                     self.iface.messageBar().pushMessage("Ostrzeżenie:",
                                                         'Nie zwrócono żadnej działki dla podanych parametrów',
-                                                        level=Qgis.Warning, duration=10)
-                    self.dlg.btn_download_tab3.setEnabled(False)
+                                                             level=Qgis.Warning, duration=10)
+            except IndexError:
+                self.iface.messageBar().pushMessage("Ostrzeżenie:",
+                                                    'Nie zwrócono żadnej działki dla podanych parametrów',
+                                                    level=Qgis.Warning, duration=10)
+        self.dlg.parcel_lineedit.setReadOnly(False)
 
-    def successDownload(self,arkusze_numery):
+    def successDownload(self, arkusze_numery):
         if len(arkusze_numery) >= 1:
-            self.iface.messageBar().pushMessage("Informacja:",
-                                                'Znaleziono działkę/i dla podanych parametrów, wybierz numer arkusza.',
-                                                level=Qgis.Info, duration=10)
+            self.iface.messageBar().pushMessage(
+                'Informacja:',
+                'Znaleziono działkę/i dla podanych parametrów, wybierz numer arkusza.',
+                level=Qgis.Info,
+                duration=10
+            )
         else:
-            self.iface.messageBar().pushMessage("Informacja:",
-                                                'Znaleziono działkę dla podanych parametrów. Aby pobrać działkę, kliknij przycisk Pobierz.',
-                                                level=Qgis.Info, duration=10)
+            self.iface.messageBar().pushMessage(
+                'Informacja:',
+                'Znaleziono działkę dla podanych parametrów. Aby pobrać działkę, kliknij przycisk Pobierz.',
+                level=Qgis.Info,
+                duration=10
+            )
         self.dlg.btn_download_tab3.setEnabled(True)
 
     def btn_download_tab3_clicked(self):
-
         if self.region_name:
             objRegion = self.region_name
         else:
@@ -557,7 +453,7 @@ class UldkGugik:
         if objectType == 1:
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
-            objParcel = self.dlg.edit_id_3.text().strip() # nr działki
+            objParcel = self.dlg.parcel_lineedit.text().strip() # nr działki
             if not objRegion:
                 self.iface.messageBar().pushMessage("Błąd formularza:",
                                                     'musisz wpisać obręb',
@@ -692,7 +588,8 @@ class UldkGugik:
             2: "obręb ewidencyjny",
             3: "gminę",
             4: "powiat",
-            5: "województwo"
+            5: "województwo",
+            6: "budynek",
         }
         
         success_message = f"Pobrano {object[objectType]}"  % teryt if objectType == 1 else f"Pobrano {object[objectType]}"
@@ -887,13 +784,13 @@ class UldkGugik:
                 self.canvas.refresh()
             else:
                 layer.triggerRepaint()
-
         except IndexError:
-            self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                'Nie pobrano żadnej działki dla podanych parametrów',
-                                                level=Qgis.Warning, duration=10)
-            self.dlg.btn_download_tab3.setEnabled(False)
-            pass
+            self.iface.messageBar().pushMessage(
+                'Ostrzeżenie:',
+                'Nie pobrano żadnej działki dla podanych parametrów',
+                level=Qgis.Warning,
+                duration=10
+            )
 
     def performRequestTeryt(self, teryt, zoomToFeature=True):
         """wykonanie zapytania pobierającego obiekt na podstawie kodu TERYT"""
