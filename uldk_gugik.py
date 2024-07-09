@@ -37,6 +37,7 @@ from .uldk_gugik_dialog import UldkGugikDialog
 from .uldk_gugik_dialog_parcel import UldkGugikDialogParcel
 import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
+from .constants import DEFAULT_SRID
 
 """Wersja wtyczki"""
 plugin_version = '1.3.5'
@@ -381,7 +382,7 @@ class UldkGugik:
                                                 'Brak połączenia z internetem',
                                                 level=Qgis.Warning, duration=10)
         self.dlg.projectionWidget.setCrs(
-            QgsCoordinateReferenceSystem(int(srid), QgsCoordinateReferenceSystem.EpsgCrsId))
+            QgsCoordinateReferenceSystem(srid, QgsCoordinateReferenceSystem.EpsgCrsId))
 
 
     def setup_dialog(self):
@@ -427,15 +428,11 @@ class UldkGugik:
         if str(self.dlg.obrcomboBox.currentText().strip()):
             objRegion = str(self.dlg.obrcomboBox.currentText().strip())
             objectType = self.checkedFeatureType()
-            srid = str(2180)
         else:
             objRegion = str(self.dlg.gmicomboBox.currentText().strip())
             objectType = self.checkedFeatureType()
-            srid = str(2180)
         
         if objectType == 1:
-            current_idx = self.dlg.gmicomboBox.currentIndex()
-            teryt = self.dlg.gmicomboBox.itemData(current_idx)
             objParcel = self.dlg.edit_id_3.text().strip() # nr działki
 
             if not objRegion:
@@ -454,7 +451,7 @@ class UldkGugik:
                 obr_idx = self.dlg.obrcomboBox.currentIndex()
                 teryt = self.dlg.obrcomboBox.itemData(obr_idx)
 
-                result_obreb = uldk_parcel.GetRegionById(id=teryt, srid=str(2180))
+                result_obreb = uldk_parcel.GetRegionById(id=teryt)
                 result_obreb = list(result_obreb)
                 
                 #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
@@ -489,7 +486,7 @@ class UldkGugik:
                     self.region_name = result_obreb[0].split("|")[0]
                     name = self.region_name + '.' + objParcel
 
-                    result = uldk_parcel.getParcelById2(name, srid=str(2180))
+                    result = uldk_parcel.getParcelById2(name)
                     result = list(result)
 
                     for rezultat in result:
@@ -553,7 +550,6 @@ class UldkGugik:
             objRegion = str(self.dlg.gmicomboBox.currentText().strip())
 
         objectType = self.checkedFeatureType()
-        srid = str(2180)
         if objectType == 1:
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
@@ -580,7 +576,7 @@ class UldkGugik:
             obr_idx = self.dlg.obrcomboBox.currentIndex()
             teryt = self.dlg.obrcomboBox.itemData(obr_idx)
             
-            resp = uldk_api.getRegionById(teryt, srid, objectType=2, obreb=True)
+            resp = uldk_api.getRegionById(teryt, objectType=2, obreb=True)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obrębu:",
                                                     'API nie zwróciło obrębu dla id %s' % teryt,
@@ -604,7 +600,7 @@ class UldkGugik:
         elif objectType == 3:  # gmina
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
-            resp = uldk_api.getCommuneById(teryt, srid, objectType=3)
+            resp = uldk_api.getCommuneById(teryt, objectType=3)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać gminy:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -629,7 +625,7 @@ class UldkGugik:
         elif objectType == 4:
             current_idx = self.dlg.powcomboBox.currentIndex()
             teryt = self.dlg.powcomboBox.itemData(current_idx)
-            resp = uldk_api.getCountyById(teryt, srid, objectType=4)
+            resp = uldk_api.getCountyById(teryt, objectType=4)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać powiatu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -654,7 +650,7 @@ class UldkGugik:
         elif objectType == 5: # województwo
             current_idx = self.dlg.wojcomboBox.currentIndex()
             teryt = self.dlg.wojcomboBox.itemData(current_idx)
-            resp = uldk_api.getVoivodeshipById(teryt, srid, objectType=5)
+            resp = uldk_api.getVoivodeshipById(teryt, objectType=5)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać województwa:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -762,7 +758,7 @@ class UldkGugik:
                 name = region + '.' + self.dlg.arkcomboBox.currentText() + '.' + parcel
             else:
                 name = region + '.' + parcel
-            result = uldk_parcel.getParcelById(name, srid=str(2180),objectType=1)
+            result = uldk_parcel.getParcelById(name, objectType=1)
 
             if result is None:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -795,7 +791,7 @@ class UldkGugik:
                 layer = layers[0]
             else:
                 # jezeli nie istnieje to stworz warstwe
-                epsg = "Polygon?crs=EPSG:2180"
+                epsg = f"Polygon?crs=EPSG:{DEFAULT_SRID}"
                 layer = QgsVectorLayer(epsg, nazwa, "memory")
                 self.project.addMapLayer(layer)
             
@@ -845,8 +841,8 @@ class UldkGugik:
 
             if zoomToFeature:
                 project_crs = self.project.crs().postgisSrid()
-                if project_crs != 2180:
-                    source_crs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+                if project_crs != DEFAULT_SRID:
+                    source_crs = QgsCoordinateReferenceSystem.fromEpsgId(DEFAULT_SRID)
                     dest_crs = QgsCoordinateReferenceSystem.fromEpsgId(project_crs)
                     tr = QgsCoordinateTransform(source_crs, dest_crs, self.project)
                     box = tr.transform(feat.geometry().boundingBox())
@@ -868,10 +864,9 @@ class UldkGugik:
     def performRequestTeryt(self, teryt, zoomToFeature=True):
         """wykonanie zapytania pobierającego obiekt na podstawie kodu TERYT"""
         object_type = self.checkedFeatureType()
-        srid = 2180
 
         if object_type == 1:
-            resp = uldk_api.getParcelById(teryt, srid=2180, objectType=2)
+            resp = uldk_api.getParcelById(teryt, objectType=2)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -899,7 +894,7 @@ class UldkGugik:
 
 
         elif object_type == 2:
-            resp = uldk_api.getRegionById(teryt, srid, objectType=2)
+            resp = uldk_api.getRegionById(teryt, objectType=2)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -923,7 +918,7 @@ class UldkGugik:
 
 
         elif object_type == 3:
-            resp = uldk_api.getCommuneById(teryt, srid, objectType=3)
+            resp = uldk_api.getCommuneById(teryt, objectType=3)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -947,7 +942,7 @@ class UldkGugik:
 
 
         elif object_type == 4:
-            resp = uldk_api.getCountyById(teryt, srid, objectType=4)
+            resp = uldk_api.getCountyById(teryt, objectType=4)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -970,7 +965,7 @@ class UldkGugik:
             voivodeship = res[3]
 
         elif object_type == 5:
-            resp = uldk_api.getVoivodeshipById(teryt, 2180, objectType=5)
+            resp = uldk_api.getVoivodeshipById(teryt, objectType=5)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,
@@ -1031,17 +1026,15 @@ class UldkGugik:
 
         requestPoint = QgsPoint(x, y)
         QgsMessageLog.logMessage(str(srid), 'ULDK')
-
-        if srid != '2180':
+        if str(srid) != DEFAULT_SRID:
             sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
-            destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+            destCrs = QgsCoordinateReferenceSystem.fromEpsgId(DEFAULT_SRID)
             tr = QgsCoordinateTransform(sourceCrs, destCrs, self.project)
             requestPoint.transform(tr)
-
         pid = str(requestPoint.x()) + "," + str(requestPoint.y())
 
         if objectType == 1:# działka
-            resp = uldk_xy.getParcelByXY(xy=pid, srid=2180,objectType=1)
+            resp = uldk_xy.getParcelByXY(xy=pid, objectType=1)
 
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -1058,7 +1051,7 @@ class UldkGugik:
             voivodeship = res[6]
             
         elif objectType == 2:
-            resp = uldk_xy.getRegionByXY(xy=pid, srid=2180,objectType=2)
+            resp = uldk_xy.getRegionByXY(xy=pid, objectType=2)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -1075,7 +1068,7 @@ class UldkGugik:
 
 
         elif objectType == 3:
-            resp = uldk_xy.getCommuneByXY(xy=pid, srid=2180,objectType=3)
+            resp = uldk_xy.getCommuneByXY(xy=pid, objectType=3)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -1092,7 +1085,7 @@ class UldkGugik:
 
 
         elif objectType == 4:
-            resp = uldk_xy.getCountyByXY(xy=pid, srid=2180,objectType=4)
+            resp = uldk_xy.getCountyByXY(xy=pid, objectType=4)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -1109,7 +1102,7 @@ class UldkGugik:
 
 
         elif objectType == 5:
-            resp = uldk_xy.getVoivodeshipByXY(xy=pid, srid=2180,objectType=5)
+            resp = uldk_xy.getVoivodeshipByXY(xy=pid, objectType=5)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla współrzędnych %s' % pid,
@@ -1171,7 +1164,7 @@ class UldkGugik:
 
         else:
             # jezeli nie istnieje to stworz warstwe
-            layer = QgsVectorLayer("Polygon?crs=EPSG:2180", nazwa, "memory")
+            layer = QgsVectorLayer(f"Polygon?crs=EPSG:{DEFAULT_SRID}", nazwa, "memory")
             self.project.addMapLayer(layer)
 
             provider = layer.dataProvider()
@@ -1214,8 +1207,9 @@ class UldkGugik:
 
         if zoomToFeature:
             project_crs = self.project.crs().postgisSrid()
-            if project_crs != 2180:
-                source_crs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+            
+            if project_crs != DEFAULT_SRID:
+                source_crs = QgsCoordinateReferenceSystem.fromEpsgId(DEFAULT_SRID)
                 dest_crs = QgsCoordinateReferenceSystem.fromEpsgId(project_crs)
                 tr = QgsCoordinateTransform(source_crs, dest_crs, self.project)
                 box = tr.transform(feat.geometry().boundingBox())
