@@ -103,7 +103,8 @@ class UldkGugik:
         self.clickTool.canvasClicked.connect(self.canvasClicked)
 
         self.dlg = UldkGugikDialog()
-        self.region_name = None  
+        self.region_name = None
+        self.project = QgsProject.instance()
         
 
     # noinspection PyMethodMayBeStatic
@@ -347,8 +348,7 @@ class UldkGugik:
     def run(self):
         """Otwarcie okna wtyczki"""
         try:
-            srid = QgsProject.instance().crs().authid().split(":")[1]
-            self.crs = QgsProject.instance().crs().authid().split(":")[1]
+            srid = self.project.crs().postgisSrid()
         except IndexError:
             self.iface.messageBar().pushMessage("Projekt QGIS nie posiada zdefiniowanego układu współrzędnych.", 
                                                 "W celu dalszej pracy zdefiniuj układ współrzędnych dla projektu",
@@ -419,7 +419,7 @@ class UldkGugik:
     def btn_download_tab2_clicked(self):
         """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
-        self.downloadByXY(srid, type="form",zoomToFeature=False)
+        self.downloadByXY(srid, type="form", zoomToFeature=False)
 
     def btn_search_tab3_clicked(self):
         arkusze_numery = set()
@@ -707,7 +707,7 @@ class UldkGugik:
         objX = self.dlg.doubleSpinBoxX.text().strip()
         objY = self.dlg.doubleSpinBoxY.text().strip()
 
-        if type == "form" and srid in ['2180', '4326', '3857','2176', '2177', '2178', '2179']:
+        if type == "form" and srid in ['2180', '4326', '3857', '2176', '2177', '2178', '2179']:
             objX = self.dlg.doubleSpinBoxY.text().strip()
             objY = self.dlg.doubleSpinBoxX.text().strip()
 
@@ -752,7 +752,7 @@ class UldkGugik:
         self.dlg.doubleSpinBoxY.setValue(point.y())
         coords = "{}, {}".format(point.x(), point.y())
         QgsMessageLog.logMessage(str(coords), 'ULDK')
-        srid = QgsProject.instance().crs().authid().split(":")[1]
+        srid = self.project.crs().postgisSrid()
         self.downloadByXY(srid, type="click", zoomToFeature=False)
 
     def performRequestParcel(self, region, parcel, teryt=None, zoomToFeature=True):
@@ -787,19 +787,8 @@ class UldkGugik:
             # layer
             nazwa = self.nazwy_warstw[objectType]
 
-            layers = QgsProject.instance().mapLayersByName(nazwa)
-            geom = QgsGeometry().fromWkt(wkt)
-            feat = QgsFeature()
+            layers = self.project.mapLayersByName(nazwa)
 
-            projectCrs = str(2180)
-            if str(projectCrs) != '2180':
-                sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
-                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
-                geometry = geom.transform(tr)
-                feat.setGeometry(geometry)
-            else:
-                feat.setGeometry(geom)
 
             if layers:
                 # jezeli istnieje to dodaj obiekt do warstwy
@@ -808,19 +797,12 @@ class UldkGugik:
                 # jezeli nie istnieje to stworz warstwe
                 epsg = "Polygon?crs=EPSG:2180"
                 layer = QgsVectorLayer(epsg, nazwa, "memory")
-                QgsProject.instance().addMapLayer(layer)
-
+                self.project.addMapLayer(layer)
             
             provider = layer.dataProvider()
-            provider.addFeature(feat)
             layer.updateExtents()
 
-            counter = layer.featureCount()
-            # add attributes
             if not layers:
-                identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
-                provider.addAttributes([identyfikatorField])
-
                 voivField = QgsField('województwo', QVariant.String, len=30)
                 provider.addAttributes([voivField])
 
@@ -839,46 +821,34 @@ class UldkGugik:
                 layer.updateFields()
 
                 layer.updateFields()
-                counter = 1
 
-            idx = layer.fields().indexFromName('identyfikator')
-            attrMap = {counter: {idx: teryt}}
-            provider.changeAttributeValues(attrMap)
+            feat = QgsFeature(provider.fields())
+            feat.setGeometry(QgsGeometry().fromWkt(wkt))
 
-            voiv = layer.fields().indexFromName('województwo')
-            attrMap = {counter: {voiv: voivodeship.rstrip()}}
-            provider.changeAttributeValues(attrMap)
+            fields_mapping = {
+                'numer': parcel,
+                'obręb': region,
+                'gmina': commune,
+                'powiat': county,
+            }
 
-            if parcel is not None:
-                par = layer.fields().indexFromName('numer')
-                attrMap = {counter: {par: parcel}}
-                provider.changeAttributeValues(attrMap)
+            feat.setAttribute('województwo', voivodeship)
+            for field_name, attr in fields_mapping.items():
+                if field_name in feat.fields().names():
+                    feat.setAttribute(field_name, attr or None)
 
-            if region is not None:
-                reg = layer.fields().indexFromName('obręb')
-                attrMap = {counter: {reg: region}}
-                provider.changeAttributeValues(attrMap)
-            if commune is not None:
-                com = layer.fields().indexFromName('gmina')
-                attrMap = {counter: {com: commune}}
-                provider.changeAttributeValues(attrMap)
-
-            if county is not None:
-                con = layer.fields().indexFromName('powiat')
-                attrMap = {counter: {con: county}}
-                provider.changeAttributeValues(attrMap)
+            provider.addFeature(feat)
 
             self.iface.messageBar().pushMessage("Sukces:",
                                                 'Pobrano działkę dla obiektu: %s' % (name),
                                                 level=Qgis.Success, duration=10)
 
             if zoomToFeature:
-                projectCrs = QgsProject.instance().crs().authid().split(":")[1]
-
-                if projectCrs != '2180':
-                    sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-                    destCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
-                    tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+                project_crs = self.project.crs().postgisSrid()
+                if project_crs != 2180:
+                    source_crs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+                    dest_crs = QgsCoordinateReferenceSystem.fromEpsgId(project_crs)
+                    tr = QgsCoordinateTransform(source_crs, dest_crs, self.project)
                     box = tr.transform(feat.geometry().boundingBox())
                 else:
                     box = feat.geometry().boundingBox()
@@ -1065,7 +1035,7 @@ class UldkGugik:
         if srid != '2180':
             sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
             destCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-            tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+            tr = QgsCoordinateTransform(sourceCrs, destCrs, self.project)
             requestPoint.transform(tr)
 
         pid = str(requestPoint.x()) + "," + str(requestPoint.y())
@@ -1183,17 +1153,14 @@ class UldkGugik:
     def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
-        feat = QgsFeature()
-        feat.setGeometry(QgsGeometry().fromWkt(wkt))
-
         # layer
         nazwa = self.nazwy_warstw[objectType]
-        layers = QgsProject.instance().mapLayersByName(nazwa)
+        layers = self.project.mapLayersByName(nazwa)
 
         # usuwanie pustych warstw z projektu
         for layer in layers:
             if layer.featureCount() == 0:
-                QgsProject.instance().removeMapLayer(layer)
+                self.project.removeMapLayer(layer)
                 layers.remove(layer)
 
 
@@ -1201,19 +1168,13 @@ class UldkGugik:
             # jezeli istnieje to dodaj obiekt do warstwy
             layer = layers[0]
             provider = layer.dataProvider()
-            featId = provider.featureCount()+1
-            provider.addFeature(feat)
 
         else:
             # jezeli nie istnieje to stworz warstwe
             layer = QgsVectorLayer("Polygon?crs=EPSG:2180", nazwa, "memory")
-            QgsProject.instance().addMapLayer(layer)
+            self.project.addMapLayer(layer)
 
             provider = layer.dataProvider()
-            provider.addFeature(feat)
-
-            identyfikatorField = QgsField('identyfikator', QVariant.String, len=30)
-            provider.addAttributes([identyfikatorField])
 
             voivField = QgsField('województwo', QVariant.String, len=30)
             provider.addAttributes([voivField])
@@ -1235,43 +1196,28 @@ class UldkGugik:
                 provider.addAttributes([parField])
 
             layer.updateFields()
-            featId = 1
+        feat = QgsFeature(provider.fields())
+        feat.setGeometry(QgsGeometry().fromWkt(wkt))
 
+        fields_mapping = {
+            'numer': parcel,
+            'obręb': region,
+            'gmina': commune,
+            'powiat': county,
+        }
 
-        idx = layer.fields().indexFromName('identyfikator')
-        voiv = layer.fields().indexFromName('województwo')
-        attrMap = {featId: {idx: teryt, voiv: voivodeship}}
-        provider.changeAttributeValues(attrMap)
-
-        if parcel:
-            par = layer.fields().indexFromName('numer')
-            attrMap = {featId: {par: parcel}}
-            provider.changeAttributeValues(attrMap)
-
-        if region:
-            reg = layer.fields().indexFromName('obręb')
-            attrMap = {featId: {reg: region}}
-
-            provider.changeAttributeValues(attrMap)
-        if commune:
-            com = layer.fields().indexFromName('gmina')
-            attrMap = {featId: {com: commune}}
-
-            provider.changeAttributeValues(attrMap)
-
-        if county:
-            con = layer.fields().indexFromName('powiat')
-            attrMap = {featId: {con: county}}
-
-            provider.changeAttributeValues(attrMap)
+        feat.setAttribute('województwo', voivodeship)
+        for field_name, attr in fields_mapping.items():
+            if field_name in feat.fields().names():
+                feat.setAttribute(field_name, attr or None)
+        provider.addFeature(feat)
 
         if zoomToFeature:
-            projectCrs = QgsProject.instance().crs().authid().split(":")[1]
-
-            if projectCrs != '2180':
-                sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
-                destCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(projectCrs))
-                tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+            project_crs = self.project.crs().postgisSrid()
+            if project_crs != 2180:
+                source_crs = QgsCoordinateReferenceSystem.fromEpsgId(2180)
+                dest_crs = QgsCoordinateReferenceSystem.fromEpsgId(project_crs)
+                tr = QgsCoordinateTransform(source_crs, dest_crs, self.project)
                 box = tr.transform(feat.geometry().boundingBox())
             else:
                 box = feat.geometry().boundingBox()
