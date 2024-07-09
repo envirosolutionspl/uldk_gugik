@@ -1,5 +1,7 @@
 import socket
 
+default_srid = 2180
+
 
 def isInternetConnected():
     try:
@@ -9,6 +11,7 @@ def isInternetConnected():
         return True
     except:
         return False
-    
+
+
 def shutDownConnection(socket):
     socket.close()

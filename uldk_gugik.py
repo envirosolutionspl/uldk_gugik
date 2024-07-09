@@ -1207,6 +1207,7 @@ class UldkGugik:
 
         if zoomToFeature:
             project_crs = self.project.crs().postgisSrid()
+            
             if project_crs != DEFAULT_SRID:
                 source_crs = QgsCoordinateReferenceSystem.fromEpsgId(DEFAULT_SRID)
                 dest_crs = QgsCoordinateReferenceSystem.fromEpsgId(project_crs)
