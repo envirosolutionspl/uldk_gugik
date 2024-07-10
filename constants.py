@@ -6,9 +6,14 @@ ULDK_WOJEWODZTWO_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=wojewo
 
 
 DIALOG_MAPPING = {
+    'rdb_bu': {
+        'tab_title': 'Wybór obiektu prze identyfikator budynku',
+        'sample_id': '141301_1.0010.713/2.5_BUD',
+        'description_label': ' - dla budynków: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD',
+    },
     'rdb_dz': {
         'tab_title': 'Wybór obiektu przez nazwę obrębu i numer działki',
-        'sample_id': '040101_1.0001.1395',
+        'sample_id': '141301_1.0010.713/2',
         'description_label': ' - dla działki: WWPPGG_R.OOOO.[AR_NR].NR_DZ, WWPPGG_R.OOOO.NR_DZ',
     },
     'rdb_ob': {
@@ -30,11 +35,6 @@ DIALOG_MAPPING = {
         'tab_title': 'Wybór obiektu przez nazwę województwa',
         'sample_id': '04',
         'description_label': ' - dla województwa: WW',
-    },
-    'rdb_bu': {
-        'tab_title': 'Wybór obiektu prze identyfikator budynku',
-        'sample_id': '141301_1.0010.713/2.5_BUD',
-        'description_label': ' - dla budynków: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD',
     },
 }
 
