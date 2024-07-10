@@ -37,7 +37,8 @@ from .uldk_gugik_dialog import UldkGugikDialog
 from .uldk_gugik_dialog_parcel import UldkGugikDialogParcel
 import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
-from .constants import DEFAULT_SRID
+from .constants import DEFAULT_SRID, COMBOBOX_BUTTONS_CONTROL
+
 
 """Wersja wtyczki"""
 plugin_version = '1.3.5'
@@ -269,6 +270,7 @@ class UldkGugik:
 
             if odpowiedz.status_code == 200:
                 self.setup_dialog()
+                # self.disable_button_download()
             else:
                 self.iface.messageBar().pushMessage("Ostrzeżenie:", 
                                                 'Serwer ULDK nie odpowiada. Spróbuj ponownie później',
@@ -284,7 +286,6 @@ class UldkGugik:
 
     def setup_dialog(self):
         self.dlg.show()
-        # self.dlg.fill_dialog()
 
     def btn_download_tab1_clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
@@ -415,7 +416,7 @@ class UldkGugik:
                     else:
                         pass
                     self.successDownload(arkusze_numery)
-                elif response == False:
+                else:
                     self.iface.messageBar().pushMessage("Ostrzeżenie:",
                                                         'Nie zwrócono żadnej działki dla podanych parametrów',
                                                              level=Qgis.Warning, duration=10)
@@ -1123,6 +1124,15 @@ class UldkGugik:
 
         # Funkcja odświeża wszystkie elementy jakie są w warstwie
         self.iface.mapCanvas().refreshAllLayers()
+        
+    def disable_button_download(self):
+        for rdbt, comboboxes in COMBOBOX_BUTTONS_CONTROL.items():
+            if getattr(self.dlg, rdbt).toggled:
+                for combobox in comboboxes:
+                    if getattr(self.dlg, combobox).currentTextChanged:
+                        self.dlg.btn_download_tab3.setEnabled(False)
+            else:
+                self.dlg.btn_download_tab3.setEnabled(True)
 
     def checkedFeatureType(self):
         """

@@ -1,7 +1,7 @@
 DEFAULT_SRID = 2180
-ULDK_OBREB_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=obreb&wynik=nazwa,teryt'
-ULDK_GMINA_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=gmina&wynik=gmina,teryt'
-ULDK_POWIAT_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=powiat&wynik=powiat,teryt'
+ULDK_OBREB_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=obreb&wynik=nazwa,teryt&teryt='
+ULDK_GMINA_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=gmina&wynik=gmina,teryt&teryt='
+ULDK_POWIAT_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=powiat&wynik=powiat,teryt&teryt='
 ULDK_WOJEWODZTWO_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=wojewodztwo&wynik=wojewodztwo,teryt'
 
 
@@ -49,6 +49,11 @@ RADIOBUTTON_COMBOBOX_MAPPING = {
     'rdb_pw': 'powcomboBox',
     'rdb_gm': 'gmicomboBox',
     'rdb_ob': 'obrcomboBox',
+    'rdb_dz': 'arkcomboBox',
+}
+
+COMBOBOX_BUTTONS_CONTROL = {
+    'rdb_dz': ['wojcomboBox', 'powcomboBox', 'gmicomboBox', 'obrcomboBox'],
 }
 
 COMBOBOX_RADIOBUTTON_MAPPING = {v: k for k, v in RADIOBUTTON_COMBOBOX_MAPPING.items()}

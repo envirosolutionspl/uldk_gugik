@@ -27,7 +27,7 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget
 
-from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, COMBOBOX_RADIOBUTTON_MAPPING, \
+from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS,\
     RADIOBUTTON_COMBOBOX_MAPPING
 from .uldk import RegionFetch
 
@@ -60,7 +60,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
     def _setup_dialog(self):
         self.img_main.setMargin(9)
         self.tabWidget.setTabVisible(2, False)
-        self.regionFetch = RegionFetch()
+        self.regionFetch = RegionFetch(teryt='')
         self.fill_voivodeships()
 
     def fill_voivodeships(self):
@@ -83,10 +83,11 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.parcel_lineedit.setText('')
         self.btn_search_tab3.setEnabled(rdbt_name == 'rdb_dz')
         self.btn_download_tab3.setEnabled(rdbt_name != 'rdb_dz')
-        self.hide_combobxes()
+        self.hide_comboboxes()
+        self.parcel_lineedit.setEnabled(rdbt_name == 'rdb_dz')
         self.tabWidget.setTabVisible(2, rdbt_name != 'rdb_bu')
 
-    def hide_combobxes(self):
+    def hide_comboboxes(self):
         comboboxes_to_hide = []
         for rdbt, cmb in RADIOBUTTON_COMBOBOX_MAPPING.items():
             combo_obj = getattr(self, cmb)
@@ -100,7 +101,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
             combo_obj = getattr(self, combo)
             combo_obj.setStyleSheet("QComboBox { color: transparent }")
             combo_obj.setEnabled(False)
-
+            
     def setup_administrative_unit_obj(self, func, dependent_combo):
         combo_obj = getattr(self, dependent_combo)
         unit_data = self.sender().currentData()
@@ -111,7 +112,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         combo_obj.addItems(unit_dict.values())
         for idx, val in enumerate(unit_dict.keys()):
             combo_obj.setItemData(idx, val)
-        combo_obj.setCurrentIndex(-1)
+        combo_obj.setCurrentIndex(1)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
