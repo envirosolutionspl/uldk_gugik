@@ -7,6 +7,7 @@ class RegionFetch:
         self.wojewodztwo_dict = self.__fetch_wojewodztwo_dict()
         self.powiat_dict = self.__fetch_powiat_dict()
         self.gmina_dict = self.__fetch_gmina_dict()
+        self.obreb_dict = self.__fetch_obreb_dict()
 
     @staticmethod
     def fetch_unit_dict(url):
@@ -39,7 +40,7 @@ class RegionFetch:
         return {key: val for key, val in self.gmina_dict.items() if key.startswith(teryt)}
 
     def get_obreb_by_teryt(self, teryt):
-        return {key: val for key, val in self.gmina_dict.items() if key.startswith(teryt)}
+        return {key: val for key, val in self.obreb_dict.items() if key.startswith(teryt)}
 
 
 if __name__ == '__main__':
