@@ -702,9 +702,12 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="rdb_dz">
+      <widget class="QRadioButton" name="rdb_bu">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
-        <string>Działka</string>
+        <string>Budynek</string>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -715,12 +718,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="rdb_bu">
+      <widget class="QRadioButton" name="rdb_dz">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>Budynek</string>
+        <string>Działka</string>
        </property>
        <property name="checkable">
         <bool>true</bool>
