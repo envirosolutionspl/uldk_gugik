@@ -18,22 +18,22 @@ DIALOG_MAPPING = {
     },
     'rdb_ob': {
         'tab_title': 'Wybór obiektu przez nazwę obrębu',
-        'sample_id': '040101_1.0001',
+        'sample_id': '141301_1.0010',
         'description_label': ' - dla obrębu: WWPPGG_R.OOOO"',
     },
     'rdb_gm': {
         'tab_title': 'Wybór obiektu przez nazwę gminy',
-        'sample_id': '040101_1',
+        'sample_id': '141301_1',
         'description_label': ' - dla gminy: WWPPGG_R',
     },
     'rdb_pw': {
         'tab_title': 'Wybór obiektu przez nazwę powiatu',
-        'sample_id': '0401',
+        'sample_id': '1413',
         'description_label': ' - dla powiatu: WWPP',
     },
     'rdb_wo': {
         'tab_title': 'Wybór obiektu przez nazwę województwa',
-        'sample_id': '04',
+        'sample_id': '14',
         'description_label': ' - dla województwa: WW',
     },
 }
