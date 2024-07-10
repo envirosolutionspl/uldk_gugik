@@ -59,6 +59,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def _setup_dialog(self):
         self.img_main.setMargin(9)
+        self.tabWidget.setTabVisible(2, False)
         self.regionFetch = RegionFetch()
         self.fill_voivodeships()
 

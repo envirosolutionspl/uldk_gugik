@@ -89,7 +89,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Wprowadź identyfikator obiektu (np. 040101_1.0001.1395)</string>
+      <string>Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="edit_id">
@@ -144,7 +144,7 @@
       </rect>
      </property>
      <property name="text">
-      <string> - dla działki: WWPPGG_R.OOOO.[AR_NR].NR_DZ, WWPPGG_R.OOOO.NR_DZ</string>
+      <string>- dla budynków: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

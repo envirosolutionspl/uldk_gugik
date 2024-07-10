@@ -7,7 +7,7 @@ ULDK_WOJEWODZTWO_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=wojewo
 
 DIALOG_MAPPING = {
     'rdb_bu': {
-        'tab_title': 'Wybór obiektu prze identyfikator budynku',
+        'tab_title': 'Wybór obiektu przez identyfikator budynku',
         'sample_id': '141301_1.0010.713/2.5_BUD',
         'description_label': ' - dla budynków: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD',
     },
