@@ -49,7 +49,6 @@ RADIOBUTTON_COMBOBOX_MAPPING = {
     'rdb_pw': 'powcomboBox',
     'rdb_gm': 'gmicomboBox',
     'rdb_ob': 'obrcomboBox',
-    'rdb_dz': 'arkcomboBox',
 }
 
 COMBOBOX_RADIOBUTTON_MAPPING = {v: k for k, v in RADIOBUTTON_COMBOBOX_MAPPING.items()}

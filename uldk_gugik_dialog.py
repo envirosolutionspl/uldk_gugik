@@ -59,7 +59,9 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.obrcomboBox.currentTextChanged.connect(lambda: self.arkcomboBox.clear())
         for combo in COMBOBOX_RADIOBUTTON_MAPPING.keys():
             combo_obj = getattr(self, combo)
-            combo_obj.currentTextChanged.connect(self.disable_button_download)
+            combo_obj.currentTextChanged.connect(
+                lambda: self.btn_download_tab3.setEnabled(False) if self.rdb_dz.isChecked() else None
+            )
 
     def _setup_dialog(self):
         self.img_main.setMargin(9)
@@ -110,18 +112,14 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
     def setup_administrative_unit_obj(self, func, dependent_combo):
         combo_obj = getattr(self, dependent_combo)
         unit_data = self.sender().currentData()
-        if not unit_data:
-            return
+        combo_obj.blockSignals(True)
         combo_obj.clear()
         unit_dict = getattr(self.regionFetch, func)(unit_data)
         combo_obj.addItems(unit_dict.values())
         for idx, val in enumerate(unit_dict.keys()):
             combo_obj.setItemData(idx, val)
         combo_obj.setCurrentIndex(-1)
-
-    def disable_button_download(self):
-        if self.rdb_dz.isChecked():
-            self.btn_download_tab3.setEnabled(False)
+        combo_obj.blockSignals(False)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
