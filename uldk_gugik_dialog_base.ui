@@ -79,7 +79,7 @@
       <string>Wybór obiektu przez pełny identyfikator</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="id_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -89,7 +89,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Wprowadź identyfikator obiektu (np. 040101_1.0001.1395)</string>
+      <string>Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="edit_id">
@@ -134,7 +134,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="description_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -144,7 +144,7 @@
       </rect>
      </property>
      <property name="text">
-      <string> - dla działki: WWPPGG_R.OOOO.[AR_NR].NR_DZ, WWPPGG_R.OOOO.NR_DZ</string>
+      <string>- dla budynków: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -570,7 +570,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QLineEdit" name="edit_id_3">
+       <widget class="QLineEdit" name="parcel_lineedit">
         <property name="minimumSize">
          <size>
           <width>310</width>
@@ -660,7 +660,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_search_tab3_2">
+       <widget class="QPushButton" name="btn_search_tab3">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -702,7 +702,26 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
+      <widget class="QRadioButton" name="rdb_bu">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Budynek</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QRadioButton" name="rdb_dz">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string>Działka</string>
        </property>
@@ -710,7 +729,7 @@
         <bool>true</bool>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -1015,8 +1034,8 @@
   <tabstop>gmicomboBox</tabstop>
   <tabstop>obrcomboBox</tabstop>
   <tabstop>arkcomboBox</tabstop>
-  <tabstop>edit_id_3</tabstop>
-  <tabstop>btn_search_tab3_2</tabstop>
+  <tabstop>parcel_lineedit</tabstop>
+  <tabstop>btn_search_tab3</tabstop>
   <tabstop>btn_download_tab3</tabstop>
  </tabstops>
  <resources/>
