@@ -767,7 +767,7 @@ class UldkGugik:
         object_type = self.checkedFeatureType()
 
         if object_type == 1:
-            resp = uldk_api.getParcelById(teryt, objectType=2)
+            resp = uldk_api.getParcelById(teryt, objectType=1)
             if not resp:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'API nie zwróciło obiektu dla id %s' % teryt,

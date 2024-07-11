@@ -27,12 +27,10 @@ class Request:
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
-
             returnedData = reply.readAll().data().decode('utf-8')
-
             for line in returnedData.split('\n'):
                 if len(line) < 3 or line == "-1 brak wyników" or line.find("XML")>-1 or line.find("błęd")>-1:
-                    continue
+                    break
                 if ";" in line:
                     polygon = line.split(';')[1]
                     if not self.teryt:
