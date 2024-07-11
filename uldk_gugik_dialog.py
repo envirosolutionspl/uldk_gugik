@@ -27,8 +27,8 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget
 
-from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS,\
-    RADIOBUTTON_COMBOBOX_MAPPING
+from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, \
+    RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING
 from .uldk import RegionFetch
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -56,6 +56,10 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         for rdbt in DIALOG_MAPPING.keys():
             getattr(self, rdbt).toggled.connect(self.setup_tab_widget)
         self.parcel_lineedit.textChanged.connect(lambda: self.btn_download_tab3.setEnabled(False))
+        self.obrcomboBox.currentTextChanged.connect(lambda: self.arkcomboBox.clear())
+        for combo in COMBOBOX_RADIOBUTTON_MAPPING.keys():
+            combo_obj = getattr(self, combo)
+            combo_obj.currentTextChanged.connect(self.disable_button_download)
 
     def _setup_dialog(self):
         self.img_main.setMargin(9)
@@ -80,11 +84,12 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.tab3.findChild(QWidget).setText(tab_title)
         self.id_label.setText(f'''Wprowadź identyfikator obiektu (np. {rdbt_attrs.get('sample_id')})''')
         self.description_label.setText(rdbt_attrs.get('description_label'))
-        self.parcel_lineedit.setText('')
-        self.btn_search_tab3.setEnabled(rdbt_name == 'rdb_dz')
-        self.btn_download_tab3.setEnabled(rdbt_name != 'rdb_dz')
+        self.parcel_lineedit.clear()
         self.hide_comboboxes()
-        self.parcel_lineedit.setEnabled(rdbt_name == 'rdb_dz')
+        building_mode = rdbt_name == 'rdb_dz'
+        self.btn_search_tab3.setEnabled(building_mode)
+        self.parcel_lineedit.setEnabled(building_mode)
+        self.btn_download_tab3.setEnabled(not building_mode)
         self.tabWidget.setTabVisible(2, rdbt_name != 'rdb_bu')
 
     def hide_comboboxes(self):
@@ -112,7 +117,11 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         combo_obj.addItems(unit_dict.values())
         for idx, val in enumerate(unit_dict.keys()):
             combo_obj.setItemData(idx, val)
-        combo_obj.setCurrentIndex(1)
+        combo_obj.setCurrentIndex(-1)
+
+    def disable_button_download(self):
+        if self.rdb_dz.isChecked():
+            self.btn_download_tab3.setEnabled(False)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

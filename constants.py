@@ -52,9 +52,4 @@ RADIOBUTTON_COMBOBOX_MAPPING = {
     'rdb_dz': 'arkcomboBox',
 }
 
-COMBOBOX_BUTTONS_CONTROL = {
-    'rdb_dz': ['wojcomboBox', 'powcomboBox', 'gmicomboBox', 'obrcomboBox'],
-}
-
 COMBOBOX_RADIOBUTTON_MAPPING = {v: k for k, v in RADIOBUTTON_COMBOBOX_MAPPING.items()}
-

@@ -37,7 +37,7 @@ from .uldk_gugik_dialog import UldkGugikDialog
 from .uldk_gugik_dialog_parcel import UldkGugikDialogParcel
 import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
-from .constants import DEFAULT_SRID, COMBOBOX_BUTTONS_CONTROL
+from .constants import DEFAULT_SRID
 
 
 """Wersja wtyczki"""
@@ -1124,15 +1124,7 @@ class UldkGugik:
 
         # Funkcja odświeża wszystkie elementy jakie są w warstwie
         self.iface.mapCanvas().refreshAllLayers()
-        
-    def disable_button_download(self):
-        for rdbt, comboboxes in COMBOBOX_BUTTONS_CONTROL.items():
-            if getattr(self.dlg, rdbt).toggled:
-                for combobox in comboboxes:
-                    if getattr(self.dlg, combobox).currentTextChanged:
-                        self.dlg.btn_download_tab3.setEnabled(False)
-            else:
-                self.dlg.btn_download_tab3.setEnabled(True)
+
 
     def checkedFeatureType(self):
         """
