@@ -300,9 +300,12 @@ class UldkGugik:
             try:
                 self.performRequestTeryt(teryt=teryt)
             except:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło odpowiedzi dla zadanego zapytania',
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    'API nie zwróciło odpowiedzi dla żądanego zapytania',
+                    level=Qgis.Critical,
+                    duration=10
+                )
 
 
         else:
@@ -475,19 +478,25 @@ class UldkGugik:
         elif objectType == 2:  # obręb
             obr_idx = self.dlg.obrcomboBox.currentIndex()
             teryt = self.dlg.obrcomboBox.itemData(obr_idx)
-            
+
             resp = uldk_api.getRegionById(teryt, objectType=2, obreb=True)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obrębu:",
-                                                    'API nie zwróciło obrębu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obrębu:",
+                    f'API nie zwróciło obrębu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obrębu:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obrębu:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -496,22 +505,28 @@ class UldkGugik:
             region = res[2]
             commune = res[3]
             county = res[4]
-            voivodeship = res[5]  
+            voivodeship = res[5]
         elif objectType == 3:  # gmina
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
             resp = uldk_api.getCommuneById(teryt, objectType=3)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać gminy:",
-                                                    'API nie zwróciło obiektu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać gminy:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać gminy:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać gminy:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -527,16 +542,22 @@ class UldkGugik:
             teryt = self.dlg.powcomboBox.itemData(current_idx)
             resp = uldk_api.getCountyById(teryt, objectType=4)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać powiatu:",
-                                                    'API nie zwróciło obiektu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać powiatu:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać powiatu:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać powiatu:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -552,16 +573,22 @@ class UldkGugik:
             teryt = self.dlg.wojcomboBox.itemData(current_idx)
             resp = uldk_api.getVoivodeshipById(teryt, objectType=5)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać województwa:",
-                                                    'API nie zwróciło obiektu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać województwa:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać województwa:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać województwa:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -582,7 +609,7 @@ class UldkGugik:
             county=county,
             voivodeship=voivodeship,
             zoomToFeature=True)
-        
+
         object ={
             1: "działkę o nr teryt: %s",
             2: "obręb ewidencyjny",
@@ -591,7 +618,7 @@ class UldkGugik:
             5: "województwo",
             6: "budynek",
         }
-        
+
         success_message = f"Pobrano {object[objectType]}"  % teryt if objectType == 1 else f"Pobrano {object[objectType]}"
 
         self.iface.messageBar().pushMessage("Sukces:",
@@ -769,16 +796,22 @@ class UldkGugik:
         if object_type == 1:
             resp = uldk_api.getParcelById(teryt, objectType=1)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             if teryt != res[1] and "AR" in res[1]:
@@ -797,16 +830,22 @@ class UldkGugik:
         elif object_type == 2:
             resp = uldk_api.getRegionById(teryt, objectType=2)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -821,16 +860,22 @@ class UldkGugik:
         elif object_type == 3:
             resp = uldk_api.getCommuneById(teryt, objectType=3)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -845,16 +890,22 @@ class UldkGugik:
         elif object_type == 4:
             resp = uldk_api.getCountyById(teryt, objectType=4)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -868,16 +919,22 @@ class UldkGugik:
         elif object_type == 5:
             resp = uldk_api.getVoivodeshipById(teryt, objectType=5)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % teryt,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -887,6 +944,34 @@ class UldkGugik:
             commune = None
             county = None
             voivodeship = res[2]
+        elif object_type == 6:
+            resp = uldk_api.get_building_by_id(teryt, object_type=6)
+            if not resp:
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
+                return
+
+            res = resp.split("|")
+            if res[0] == '':
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło geometrii dla id {teryt}',
+                    level=Qgis.Critical,
+                    duration=10
+                )
+                return
+
+            wkt = res[0]
+            teryt = res[1]
+            parcel = None
+            region = None
+            commune = None
+            county = None
+            voivodeship = None
 
         self.addResultsToLayer(
             objectType=object_type,
@@ -904,7 +989,8 @@ class UldkGugik:
             2: "obręb ewidencyjny",
             3: "gminę",
             4: "powiat",
-            5: "województwo"
+            5: "województwo",
+            6: "budynek",
         }
         success_message = f"Pobrano {object[object_type]}"  % teryt if object_type == 1 else f"Pobrano {object[object_type]}"
 
@@ -916,7 +1002,7 @@ class UldkGugik:
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
         objectType = self.checkedFeatureType()
-        
+
         #Sprawdzenie, czy współrzędne są z przecinkiem czy kropką
         if "," in x or "," in y:
             x = float(x.replace(",", "."))
@@ -932,15 +1018,18 @@ class UldkGugik:
             destCrs = QgsCoordinateReferenceSystem.fromEpsgId(DEFAULT_SRID)
             tr = QgsCoordinateTransform(sourceCrs, destCrs, self.project)
             requestPoint.transform(tr)
-        pid = str(requestPoint.x()) + "," + str(requestPoint.y())
+        pid = f"{str(requestPoint.x())},{str(requestPoint.y())}"
 
         if objectType == 1:# działka
             resp = uldk_xy.getParcelByXY(xy=pid, objectType=1)
 
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla współrzędnych %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
             res = resp.split("|")
             wkt = res[0]
@@ -950,13 +1039,16 @@ class UldkGugik:
             commune = res[4]
             county = res[5]
             voivodeship = res[6]
-            
+
         elif objectType == 2:
             resp = uldk_xy.getRegionByXY(xy=pid, objectType=2)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla współrzędnych %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
             res = resp.split("|")
             wkt = res[0]
@@ -971,9 +1063,12 @@ class UldkGugik:
         elif objectType == 3:
             resp = uldk_xy.getCommuneByXY(xy=pid, objectType=3)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla współrzędnych %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
             res = resp.split("|")
             wkt = res[0]
@@ -988,9 +1083,12 @@ class UldkGugik:
         elif objectType == 4:
             resp = uldk_xy.getCountyByXY(xy=pid, objectType=4)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla współrzędnych %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
             res = resp.split("|")
             wkt = res[0]
@@ -1005,9 +1103,12 @@ class UldkGugik:
         elif objectType == 5:
             resp = uldk_xy.getVoivodeshipByXY(xy=pid, objectType=5)
             if not resp:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla współrzędnych %s' % pid,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = resp.split("|")
@@ -1018,6 +1119,25 @@ class UldkGugik:
             commune = None
             county = None
             voivodeship = res[2]
+
+        elif objectType == 6:
+            resp = uldk_xy.get_building_by_xy(xy=pid, object_type=6)
+            if not resp:
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    level=Qgis.Critical,
+                    duration=10,
+                )
+                return
+            res = resp.split("|")
+            wkt = res[0]
+            teryt = res[1]
+            parcel = None
+            region = None
+            commune = None
+            county = None
+            voivodeship = None
 
         self.addResultsToLayer(
             objectType=objectType,
