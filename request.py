@@ -27,9 +27,8 @@ class Request:
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
-
             returnedData = reply.readAll().data().decode('utf-8')
-
+            print(returnedData)
             for line in returnedData.split('\n'):
                 if len(line) < 3 or line == "-1 brak wyników" or line.find("XML")>-1 or line.find("błęd")>-1:
                     continue
@@ -39,7 +38,7 @@ class Request:
                         self._data = polygon
                         pass
                     
-                    if self.objectType == 1: 
+                    if self.objectType == 1:
                         teryt = polygon.split('|')[1].split('.')[0]
                         break
                     elif self.objectType ==2:
@@ -63,7 +62,10 @@ class Request:
                         pass
 
                     if self.objectType == 1:
-                        teryt = line.split('|')[1].split('.')[0]
+                        try:
+                            teryt = line.split('|')[1].split('.')[0]
+                        except IndexError:
+                            pass
                         break
 
                     elif self.objectType ==2:
