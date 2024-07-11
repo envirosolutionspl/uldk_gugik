@@ -41,3 +41,11 @@ def getVoivodeshipById(id, objectType):
     res = Request(params, objectType)
     return res.data
 
+
+def get_building_by_id(id, object_type):
+    request = "GetBuildingById"
+    result = "geom_wkt,teryt"
+    params = {'request': request, 'id': id, 'result': result, 'srid': DEFAULT_SRID}
+    res = Request(params, object_type)
+    return res.data
+
