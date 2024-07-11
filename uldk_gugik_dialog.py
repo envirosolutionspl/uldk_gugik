@@ -112,12 +112,13 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
     def setup_administrative_unit_obj(self, func, dependent_combo):
         combo_obj = getattr(self, dependent_combo)
         unit_data = self.sender().currentData()
-        combo_obj.blockSignals(True)
         combo_obj.clear()
-        unit_dict = getattr(self.regionFetch, func)(unit_data)
-        combo_obj.addItems(unit_dict.values())
-        for idx, val in enumerate(unit_dict.keys()):
-            combo_obj.setItemData(idx, val)
+        combo_obj.blockSignals(True)
+        if unit_data:
+            unit_dict = getattr(self.regionFetch, func)(unit_data)
+            combo_obj.addItems(unit_dict.values())
+            for idx, val in enumerate(unit_dict.keys()):
+                combo_obj.setItemData(idx, val)
         combo_obj.setCurrentIndex(-1)
         combo_obj.blockSignals(False)
 
