@@ -23,14 +23,14 @@
 """
 
 import os
-from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.PyQt.QtCore import pyqtSignal, QRegExp
-from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.gui import QgsFileWidget
-from qgis.core import QgsMapLayerProxyModel
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtWidgets import QWidget
+
+from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, \
+    RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING
 from .uldk import RegionFetch
 
-# This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'uldk_gugik_dialog_base.ui'))
 
@@ -38,139 +38,92 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     closingPlugin = pyqtSignal()
+
     def __init__(self, parent=None):
         """Constructor."""
         super(UldkGugikDialog, self).__init__(parent)
-        # Set up the user interface from Designer through FORM_CLASS.
-        # After self.setupUi() you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        #self.folder_fileWidget.setStorageMode(QgsFileWidget.GetDirectory)
+        self._setup_dialog()
+        self._setup_signals()
 
-        # ULDK
-        self.powiatDictionary = {}
-        self.gminaDictionary = {}
-        self.obrebDictionary = {}
+    def _setup_signals(self):
+        for base_combo, combo_items in ADMINISTRATIVE_UNITS_OBJECTS.items():
+            fetch_func, dependent_combo = combo_items
+            combo_obj = getattr(self, base_combo)
+            combo_obj.currentTextChanged.connect(
+                lambda _, func=fetch_func, combo=dependent_combo: self.setup_administrative_unit_obj(func, combo)
+            )
+        for rdbt in DIALOG_MAPPING.keys():
+            getattr(self, rdbt).toggled.connect(self.setup_tab_widget)
+        self.parcel_lineedit.textChanged.connect(lambda: self.btn_download_tab3.setEnabled(False))
+        self.obrcomboBox.currentTextChanged.connect(lambda: self.arkcomboBox.clear())
+        for combo in COMBOBOX_RADIOBUTTON_MAPPING.keys():
+            combo_obj = getattr(self, combo)
+            
+            if combo_obj.objectName() != 'arkcomboBox':
+                combo_obj.currentTextChanged.connect(
+                    lambda: self.btn_download_tab3.setEnabled(False) if self.rdb_dz.isChecked() else None
+                )
 
-        self.wojcomboBox.currentTextChanged.connect(self.wojcomboBox_currentTextChanged)
-        self.powcomboBox.currentTextChanged.connect(self.powcomboBox_currentTextChanged)
-        self.gmicomboBox.currentTextChanged.connect(self.gmicomboBox_currentTextChanged)
-
-
-    def fill_dialog(self):
+    def _setup_dialog(self):
         self.img_main.setMargin(9)
+        self.tabWidget.setTabVisible(2, False)
+        self.regionFetch = RegionFetch(teryt='')
+        self.fill_voivodeships()
+
+    def fill_voivodeships(self):
+        voivodeships_ids = self.regionFetch.wojewodztwo_dict.keys()
+        voivodeships_names = self.regionFetch.wojewodztwo_dict.values()
         self.wojcomboBox.clear()
-        self.regionFetch = RegionFetch()
-        wojewodztwa = self.regionFetch.wojewodztwoDict
-        self.wojcomboBox.addItems(wojewodztwa.keys())
-        data = {k: v for k, v in wojewodztwa.items()}
-        for idx, po in enumerate(data.keys()):
-            self.wojcomboBox.setItemData(idx, data[po])
+        self.wojcomboBox.addItems(voivodeships_names)
+        for idx, val in enumerate(voivodeships_ids):
+            self.wojcomboBox.setItemData(idx, val)
+        self.wojcomboBox.setCurrentIndex(-1)
+
+    def setup_tab_widget(self):
+        rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())
+        rdbt_attrs = DIALOG_MAPPING.get(rdbt_name)
+        tab_title = rdbt_attrs.get('tab_title')
+        self.tabWidget.setTabText(2, tab_title)
+        self.tab3.findChild(QWidget).setText(tab_title)
+        self.id_label.setText(f'''Wprowadź identyfikator obiektu (np. {rdbt_attrs.get('sample_id')})''')
+        self.description_label.setText(rdbt_attrs.get('description_label'))
+        self.parcel_lineedit.clear()
+        self.hide_comboboxes()
+        building_mode = rdbt_name == 'rdb_dz'
+        self.btn_search_tab3.setEnabled(building_mode)
+        self.parcel_lineedit.setEnabled(building_mode)
+        self.btn_download_tab3.setEnabled(not building_mode)
+        self.tabWidget.setTabVisible(2, rdbt_name != 'rdb_bu')
+
+    def hide_comboboxes(self):
+        comboboxes_to_hide = []
+        for rdbt, cmb in RADIOBUTTON_COMBOBOX_MAPPING.items():
+            combo_obj = getattr(self, cmb)
+            combo_obj.setStyleSheet("QComboBox { color: black }")
+            getattr(self, cmb).setEnabled(True)
+            if getattr(self, rdbt).isChecked():
+                combo_idx = list(RADIOBUTTON_COMBOBOX_MAPPING).index(rdbt) + 1
+                comboboxes_to_hide = list(list(RADIOBUTTON_COMBOBOX_MAPPING.values())[combo_idx:])
+                break
+        for combo in comboboxes_to_hide:
+            combo_obj = getattr(self, combo)
+            combo_obj.setStyleSheet("QComboBox { color: transparent }")
+            combo_obj.setEnabled(False)
+            
+    def setup_administrative_unit_obj(self, func, dependent_combo):
+        combo_obj = getattr(self, dependent_combo)
+        unit_data = self.sender().currentData()
+        combo_obj.clear()
+        combo_obj.blockSignals(True)
+        if unit_data:
+            unit_dict = getattr(self.regionFetch, func)(unit_data)
+            combo_obj.addItems(unit_dict.values())
+            for idx, val in enumerate(unit_dict.keys()):
+                combo_obj.setItemData(idx, val)
+        combo_obj.setCurrentIndex(-1)
+        combo_obj.blockSignals(False)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
         event.accept()
-
-    def wojcomboBox_currentTextChanged(self, text):
-        self.powcomboBox.clear()
-        if not self.rdb_pw.isChecked():
-            self.handleResponseVoivode(False)
-            self.ctrl_rest_obj(False)
-
-        self.powiatDictionary = self.regionFetch.getPowiatDictByWojewodztwoName(text)
-        data = {k: v[0] for k, v in self.powiatDictionary.items()}
-        self.powcomboBox.addItems(list(self.powiatDictionary.keys()))
-
-        for idx, po in enumerate(data.keys()):
-            self.powcomboBox.setItemData(idx, data[po])
-
-        self.handleResponseVoivode(True)
-        self.ctrl_rest_obj(True)        
-
-    def powcomboBox_currentTextChanged(self, text):
-        self.gmicomboBox.clear()
-        if not self.rdb_pw.isChecked():
-            self.handleResponseCounty(False)
-            self.ctrl_rest_obj(False)
-
-        self.gminaDictionary = self.regionFetch.getGminaDictByPowiatName(text)
-        data = {k: v[0] for k, v in self.gminaDictionary.items()}
-        self.gmicomboBox.addItems(list(self.gminaDictionary.keys()))
-
-        for idx, po in enumerate(data.keys()):
-            self.gmicomboBox.setItemData(idx, data[po])
-
-        self.handleResponseCounty(True)
-        self.ctrl_rest_obj(True)
-
-    def gmicomboBox_currentTextChanged(self, text):
-        self.obrcomboBox.clear()
-        if self.wojcomboBox.currentTextChanged or self.powcomboBox.currentTextChanged:
-            if self.rdb_gm.isChecked() or self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
-                self.handleResponseMunicip(False)
-                self.ctrl_rest_obj(False)
-
-
-        self.obrebDictionary = self.regionFetch.getObrebDictByGminaName(text)
-        data = {k: v for k, v in self.obrebDictionary.items()}
-        self.obrcomboBox.addItems(list(self.obrebDictionary.keys()))
-
-        for idx, ob in enumerate(data.keys()):
-            self.obrcomboBox.setItemData(idx, data[ob])
-
-        self.handleResponseMunicip(True)
-        self.ctrl_rest_obj(True)
-
-
-    def handleResponseVoivode(self, param):
-        if not self.rdb_wo.isChecked():
-            self.wojcomboBox.setEnabled(param)
-            if param is True:
-                self.wojcomboBox.setStyleSheet("QComboBox { color: black }")
-            else:
-                self.wojcomboBox.setStyleSheet("QComboBox { color: gray }")
-
-
-    def handleResponseCounty(self, param):
-        if self.rdb_pw.isChecked() or self.rdb_gm.isChecked() or self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
-            self.powcomboBox.setEnabled(param)
-            if param is True:
-                self.powcomboBox.setStyleSheet("QComboBox { color: black }")   
-            else:
-                self.powcomboBox.setStyleSheet("QComboBox { color: gray }")
-            return True
-
-
-    def handleResponseMunicip(self, param):
-        if self.rdb_gm.isChecked() or self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
-            self.gmicomboBox.setEnabled(param)
-            if param is True:
-                self.gmicomboBox.setStyleSheet("QComboBox { color: black }")   
-            else:
-                self.gmicomboBox.setStyleSheet("QComboBox { color: gray }")
-
-
-    def handleResponsePrec(self, param):
-        if self.rdb_ob.isChecked() or self.rdb_dz.isChecked():
-            self.obrcomboBox.setEnabled(param)
-            if param is True:
-                self.obrcomboBox.setStyleSheet("QComboBox { color: black }")   
-            else:
-                self.obrcomboBox.setStyleSheet("QComboBox { color: gray }")
-
-
-    def ctrl_rest_obj(self, param):
-        if not self.rdb_wo.isChecked():
-            self.btn_download_tab3.setEnabled(param)
-        if self.rdb_dz.isChecked():
-            self.arkcomboBox.setEnabled(param)
-            self.btn_search_tab3_2.setEnabled(param)
-
-
-    # def final(self):
-    #     self.wojcomboBox.currentTextChanged.disconnect()
-    #     self.powcomboBox.currentTextChanged.disconnect()
-    #     self.gmicomboBox.currentTextChanged.disconnect()
-

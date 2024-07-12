@@ -19,7 +19,7 @@ class Request:
 
     def getRequest(self):
         """Wysłanie zapytania z odpowiednimi parametrami"""
-        finalUrl = self.url + "?" + urlencode(self.params)
+        finalUrl = f"{self.url}?{urlencode(self.params)}"
         req = QNetworkRequest(QUrl(finalUrl))
         reply = self.manager.get(req)
         reply.finished.connect(lambda: self.handleRequest(reply))
@@ -27,7 +27,6 @@ class Request:
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
-
             returnedData = reply.readAll().data().decode('utf-8')
 
             for line in returnedData.split('\n'):
@@ -39,7 +38,7 @@ class Request:
                         self._data = polygon
                         pass
                     
-                    if self.objectType == 1: 
+                    if self.objectType in [1, 6]:
                         teryt = polygon.split('|')[1].split('.')[0]
                         break
                     elif self.objectType ==2:
@@ -62,8 +61,11 @@ class Request:
                         self._data = line
                         pass
 
-                    if self.objectType == 1:
-                        teryt = line.split('|')[1].split('.')[0]
+                    if self.objectType in [1, 6]:
+                        try:
+                            teryt = line.split('|')[1].split('.')[0]
+                        except IndexError:
+                            pass
                         break
 
                     elif self.objectType ==2:
