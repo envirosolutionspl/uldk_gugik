@@ -59,9 +59,11 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.obrcomboBox.currentTextChanged.connect(lambda: self.arkcomboBox.clear())
         for combo in COMBOBOX_RADIOBUTTON_MAPPING.keys():
             combo_obj = getattr(self, combo)
-            combo_obj.currentTextChanged.connect(
-                lambda: self.btn_download_tab3.setEnabled(False) if self.rdb_dz.isChecked() else None
-            )
+            
+            if combo_obj.objectName() != 'arkcomboBox':
+                combo_obj.currentTextChanged.connect(
+                    lambda: self.btn_download_tab3.setEnabled(False) if self.rdb_dz.isChecked() else None
+                )
 
     def _setup_dialog(self):
         self.img_main.setMargin(9)
