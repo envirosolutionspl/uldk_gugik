@@ -474,6 +474,7 @@ class UldkGugik:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
                                                     'brak połączenia z internetem',
                                                     level=Qgis.Critical, duration=10)
+
             return
         elif objectType == 2:  # obręb
             obr_idx = self.dlg.obrcomboBox.currentIndex()
@@ -506,6 +507,7 @@ class UldkGugik:
             commune = res[3]
             county = res[4]
             voivodeship = res[5]
+
         elif objectType == 3:  # gmina
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
@@ -541,6 +543,7 @@ class UldkGugik:
             current_idx = self.dlg.powcomboBox.currentIndex()
             teryt = self.dlg.powcomboBox.itemData(current_idx)
             resp = uldk_api.getCountyById(teryt, objectType=4)
+
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać powiatu:",
@@ -616,7 +619,6 @@ class UldkGugik:
             3: "gminę",
             4: "powiat",
             5: "województwo",
-            6: "budynek",
         }
 
         success_message = f"Pobrano {object[objectType]}"  % teryt if objectType == 1 else f"Pobrano {object[objectType]}"
@@ -679,7 +681,7 @@ class UldkGugik:
         srid = self.project.crs().postgisSrid()
         self.downloadByXY(srid, type="click", zoomToFeature=False)
 
-    def performRequestParcel(self, region, parcel, teryt=None, zoomToFeature=True):
+    def performRequestParcel(self, region, parcel, teryt, zoomToFeature=True):
         objectType = self.checkedFeatureType()
         try:
             if self.dlg.arkcomboBox.currentText() != '':
@@ -700,19 +702,21 @@ class UldkGugik:
                                                     'API nie zwróciło geometrii dla id %s' % name,
                                                     level=Qgis.Critical, duration=10)
                 return
-            wkt = res [0]
-            teryt = res [1]
-            parcel = res [2]
-            region = res [3]
-            commune = res [4]
-            county = res [5]
-            voivodeship = res [6]
+            
+            print("Odpowiedź dla działek: ",res)
+
+            wkt = res[0]
+            teryt = res[1]
+            parcel = res[2]
+            region = res[3]
+            commune = res[4]
+            county = res[5]
+            voivodeship = res[6]
 
             # layer
             nazwa = self.nazwy_warstw[objectType]
 
             layers = self.project.mapLayersByName(nazwa)
-
 
             if layers:
                 # jezeli istnieje to dodaj obiekt do warstwy
@@ -738,11 +742,12 @@ class UldkGugik:
 
                 regField = QgsField('obręb', QVariant.String, len=30)
                 provider.addAttributes([regField])
-                layer.updateFields()
 
                 parField = QgsField('numer', QVariant.String, len=30)
                 provider.addAttributes([parField])
-                layer.updateFields()
+                
+                idField = QgsField('teryt', QVariant.String, len=30)
+                provider.addAttributes([idField])
 
                 layer.updateFields()
 
@@ -750,6 +755,7 @@ class UldkGugik:
             feat.setGeometry(QgsGeometry().fromWkt(wkt))
 
             fields_mapping = {
+                'teryt': teryt,
                 'numer': parcel,
                 'obręb': region,
                 'gmina': commune,
@@ -781,6 +787,7 @@ class UldkGugik:
                 self.canvas.refresh()
             else:
                 layer.triggerRepaint()
+
         except IndexError:
             self.iface.messageBar().pushMessage(
                 'Ostrzeżenie:',
@@ -1121,7 +1128,7 @@ class UldkGugik:
             voivodeship = res[2]
 
         elif objectType == 6:
-            resp = uldk_xy.get_building_by_xy(xy=pid, object_type=6)
+            resp = uldk_xy.GetBuildingByXY(xy=pid, object_type=6)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -1190,37 +1197,44 @@ class UldkGugik:
 
             provider = layer.dataProvider()
 
-            voivField = QgsField('województwo', QVariant.String, len=30)
-            provider.addAttributes([voivField])
+            if objectType != 6:
+                voivField = QgsField('województwo', QVariant.String, len=30)
+                provider.addAttributes([voivField])
 
-            if objectType == 4 or objectType == 3 or objectType == 2 or objectType == 1:
-                conField = QgsField('powiat', QVariant.String, len=30)
-                provider.addAttributes([conField])
+                if objectType == 4 or objectType == 3 or objectType == 2 or objectType == 1:
+                    conField = QgsField('powiat', QVariant.String, len=30)
+                    provider.addAttributes([conField])
 
-            if objectType == 3 or objectType == 2 or objectType == 1:
-                comField = QgsField('gmina', QVariant.String, len=30)
-                provider.addAttributes([comField])
+                if objectType == 3 or objectType == 2 or objectType == 1:
+                    comField = QgsField('gmina', QVariant.String, len=30)
+                    provider.addAttributes([comField])
 
-            if objectType == 2 or objectType == 1:
-                regField = QgsField('obręb', QVariant.String, len=30)
-                provider.addAttributes([regField])
+                if objectType == 2 or objectType == 1:
+                    regField = QgsField('obręb', QVariant.String, len=30)
+                    provider.addAttributes([regField])
 
-            if objectType == 1:
-                parField = QgsField('numer', QVariant.String, len=30)
-                provider.addAttributes([parField])
+                if objectType == 1:
+                    parField = QgsField('numer', QVariant.String, len=30)
+                    provider.addAttributes([parField])
+
+            idField = QgsField('teryt', QVariant.String, len=30)
+            provider.addAttributes([idField])
 
             layer.updateFields()
         feat = QgsFeature(provider.fields())
         feat.setGeometry(QgsGeometry().fromWkt(wkt))
 
         fields_mapping = {
+            'teryt': teryt,
             'numer': parcel,
             'obręb': region,
             'gmina': commune,
             'powiat': county,
         }
 
-        feat.setAttribute('województwo', voivodeship)
+        if voivodeship != None:
+            feat.setAttribute('województwo', voivodeship)
+
         for field_name, attr in fields_mapping.items():
             if field_name in feat.fields().names():
                 feat.setAttribute(field_name, attr or None)
