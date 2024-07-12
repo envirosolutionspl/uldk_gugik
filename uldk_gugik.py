@@ -744,7 +744,7 @@ class UldkGugik:
                 parField = QgsField('numer', QVariant.String, len=30)
                 provider.addAttributes([parField])
                 
-                idField = QgsField('teryt', QVariant.String, len=30)
+                idField = QgsField('teryt', QVariant.String, len=40)
                 provider.addAttributes([idField])
 
                 layer.updateFields()
@@ -1216,7 +1216,7 @@ class UldkGugik:
                 parField = QgsField('numer', QVariant.String, len=30)
                 provider.addAttributes([parField])
 
-            idField = QgsField('teryt', QVariant.String, len=30)
+            idField = QgsField('teryt', QVariant.String, len=40)
             provider.addAttributes([idField])
 
             layer.updateFields()
