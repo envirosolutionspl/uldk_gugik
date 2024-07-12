@@ -702,8 +702,6 @@ class UldkGugik:
                                                     'API nie zwróciło geometrii dla id %s' % name,
                                                     level=Qgis.Critical, duration=10)
                 return
-            
-            print("Odpowiedź dla działek: ",res)
 
             wkt = res[0]
             teryt = res[1]
