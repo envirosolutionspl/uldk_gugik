@@ -42,7 +42,7 @@ def getVoivodeshipByXY(xy, objectType):
     return res.data
 
 
-def get_building_by_xy(xy, object_type):
+def GetBuildingByXY(xy, object_type):
     request = "GetBuildingByXY"
     result = "geom_wkt,teryt"
     params = {'request': request, 'xy': xy, 'result': result, 'srid': DEFAULT_SRID}

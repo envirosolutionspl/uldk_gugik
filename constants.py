@@ -19,7 +19,7 @@ DIALOG_MAPPING = {
     'rdb_ob': {
         'tab_title': 'Wybór obiektu przez nazwę obrębu',
         'sample_id': '141301_1.0010',
-        'description_label': ' - dla obrębu: WWPPGG_R.OOOO"',
+        'description_label': ' - dla obrębu: WWPPGG_R.OOOO',
     },
     'rdb_gm': {
         'tab_title': 'Wybór obiektu przez nazwę gminy',
