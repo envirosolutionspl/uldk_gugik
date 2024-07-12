@@ -951,6 +951,7 @@ class UldkGugik:
             commune = None
             county = None
             voivodeship = res[2]
+
         elif object_type == 6:
             resp = uldk_api.get_building_by_id(teryt, object_type=6)
             if not resp:
@@ -999,6 +1000,7 @@ class UldkGugik:
             5: "województwo",
             6: "budynek",
         }
+
         success_message = f"Pobrano {object[object_type]}"  % teryt if object_type == 1 else f"Pobrano {object[object_type]}"
 
         self.iface.messageBar().pushMessage("Sukces:",
@@ -1141,10 +1143,10 @@ class UldkGugik:
             wkt = res[0]
             teryt = res[1]
             parcel = None
-            region = None
-            commune = None
-            county = None
-            voivodeship = None
+            region = res[2]
+            commune = res[3]
+            county = res[4]
+            voivodeship = res[5]
 
         self.addResultsToLayer(
             objectType=objectType,
@@ -1197,30 +1199,30 @@ class UldkGugik:
 
             provider = layer.dataProvider()
 
-            if objectType != 6:
-                voivField = QgsField('województwo', QVariant.String, len=30)
-                provider.addAttributes([voivField])
+            voivField = QgsField('województwo', QVariant.String, len=30)
+            provider.addAttributes([voivField])
 
-                if objectType == 4 or objectType == 3 or objectType == 2 or objectType == 1:
-                    conField = QgsField('powiat', QVariant.String, len=30)
-                    provider.addAttributes([conField])
+            if objectType==6 or objectType == 4 or objectType == 3 or objectType == 2 or objectType == 1:
+                conField = QgsField('powiat', QVariant.String, len=30)
+                provider.addAttributes([conField])
 
-                if objectType == 3 or objectType == 2 or objectType == 1:
-                    comField = QgsField('gmina', QVariant.String, len=30)
-                    provider.addAttributes([comField])
+            if objectType==6 or objectType == 3 or objectType == 2 or objectType == 1:
+                comField = QgsField('gmina', QVariant.String, len=30)
+                provider.addAttributes([comField])
 
-                if objectType == 2 or objectType == 1:
-                    regField = QgsField('obręb', QVariant.String, len=30)
-                    provider.addAttributes([regField])
+            if objectType==6 or objectType == 2 or objectType == 1:
+                regField = QgsField('obręb', QVariant.String, len=30)
+                provider.addAttributes([regField])
 
-                if objectType == 1:
-                    parField = QgsField('numer', QVariant.String, len=30)
-                    provider.addAttributes([parField])
+            if objectType == 1:
+                parField = QgsField('numer', QVariant.String, len=30)
+                provider.addAttributes([parField])
 
             idField = QgsField('teryt', QVariant.String, len=30)
             provider.addAttributes([idField])
 
             layer.updateFields()
+
         feat = QgsFeature(provider.fields())
         feat.setGeometry(QgsGeometry().fromWkt(wkt))
 
