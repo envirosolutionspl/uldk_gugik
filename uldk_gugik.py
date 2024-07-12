@@ -41,7 +41,7 @@ from .constants import DEFAULT_SRID
 
 
 """Wersja wtyczki"""
-plugin_version = '1.3.5'
+plugin_version = '1.4.0'
 plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
