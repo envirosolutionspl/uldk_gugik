@@ -953,7 +953,7 @@ class UldkGugik:
             voivodeship = res[2]
 
         elif object_type == 6:
-            resp = uldk_api.get_building_by_id(teryt, object_type=6)
+            resp = uldk_api.getBuildingById(teryt, object_type=6)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -976,10 +976,10 @@ class UldkGugik:
             wkt = res[0]
             teryt = res[1]
             parcel = None
-            region = None
-            commune = None
-            county = None
-            voivodeship = None
+            region = res[2]
+            commune = res[3]
+            county = res[4]
+            voivodeship = res[5]
 
         self.addResultsToLayer(
             objectType=object_type,
