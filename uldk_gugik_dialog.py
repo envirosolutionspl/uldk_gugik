@@ -32,7 +32,7 @@ from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, \
 from .uldk import RegionFetch
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'uldk_gugik_dialog_base.ui'))
+    os.path.dirname(__file__),'ui','uldk_gugik_dialog_base.ui'))
 
 
 class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
