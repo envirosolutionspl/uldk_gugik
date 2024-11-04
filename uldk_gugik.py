@@ -44,7 +44,7 @@ from .constants import DEFAULT_SRID
 
 """Wersja wtyczki"""
 plugin_version = '1.4.1'
-plugin_name = 'ULDK GUGiK'
+plugin_name = 'ULDK GUGiK'  
 
 class UldkGugik:
     """QGIS Plugin Implementation."""
@@ -62,8 +62,6 @@ class UldkGugik:
 
         if Qgis.QGIS_VERSION_INT >= 31000:
             from .qgis_feed import QgisFeed
-
-            # self.feed_db = QgisFeedDB()
 
             #qgis feed
             self.selected_industry = self.settings.value("selected_industry", None)
@@ -84,7 +82,7 @@ class UldkGugik:
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value('locale/userLocale')
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
