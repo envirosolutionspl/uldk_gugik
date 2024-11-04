@@ -55,7 +55,7 @@ class QgisFeed:
         """
         Function registers QGIS Feed
         """
-        print("New url: ",self.industry_url_short)
+        
         QgsMessageLog.logMessage('Registering feed')
         for key in self.s.allKeys():
             if self.envirosolutionsFeedPattern_old.match(key) or self.envirosolutionsFeedPattern_new.match(key):
@@ -65,9 +65,10 @@ class QgisFeed:
             # ponizszy fragment odpowiada za mozliwosc ciaglego wyswietlania wiadomosci
             # przy wlaczeniu qgis za kazdym razem
 
-            check_fetch = self.checkIsFetchTime()
-            if check_fetch is True: self.s.remove(key)
-
+            #check_fetch = self.checkIsFetchTime()
+            #if check_fetch is True: self.s.remove(key)
+        self.s.sync()
+    
     def removeDismissed(self):
         """
         Function checks whether there was already initialized QGIS Feed
@@ -78,7 +79,7 @@ class QgisFeed:
                 # sprawdz czy jest odpowiadajacy w qgis
                 if self.s.contains(re.sub(r'(\d+)', r'9999\1', key.replace(self.industry_url_short, 'httpsfeedqgisorg'))):
                     self.s.remove(key)
-                self.s.remove(key)
+                #self.s.remove(key)
 
     def checkIsFetchTime(self):
         """
