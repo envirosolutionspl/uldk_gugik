@@ -19,7 +19,7 @@ class QgisFeed:
         self.industry_decoded = [key for key, val in self.industries_dict.items() if val == selected_industry]
         self.plugin_name_slug = self.create_slug(plugin_name)
 
-        self.es_url = "http://127.0.0.1:8000/" if len(self.industry_decoded) == 0 else f"http://127.0.0.1:8000/?industry={self.industry_decoded[0]}&plugin={self.plugin_name_slug}"
+        self.es_url = "https://qgisfeed.envirosolutions.pl/" if len(self.industry_decoded) == 0 else f"https://qgisfeed.envirosolutions.pl/?industry={self.industry_decoded[0]}&plugin={self.plugin_name_slug}"
         self.parser = QgsNewsFeedParser(
             feedUrl= QUrl(self.es_url)
         )
