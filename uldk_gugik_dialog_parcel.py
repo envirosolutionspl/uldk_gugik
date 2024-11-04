@@ -29,7 +29,7 @@ from PyQt5 import QtWidgets
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'uldk_gugik_dialog_base_parcel.ui'))
+    os.path.dirname(__file__),'ui','uldk_gugik_dialog_base_parcel.ui'))
 
 
 class UldkGugikDialogParcel(QtWidgets.QDialog, FORM_CLASS):
