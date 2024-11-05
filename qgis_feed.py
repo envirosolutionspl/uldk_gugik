@@ -19,7 +19,7 @@ class QgisFeed:
         self.industry_decoded = [key for key, val in self.industries_dict.items() if val == selected_industry]
         self.plugin_name_slug = self.create_slug(plugin_name)
 
-        self.es_url = "https://qgisfeed.envirosolutions.pl/" if len(self.industry_decoded) == 0 else f"https://qgisfeed.envirosolutions.pl/?industry={self.industry_decoded[0]}&plugin={self.plugin_name_slug}"
+        self.es_url = "http://109.199.119.187:8005/" if len(self.industry_decoded) == 0 else f"http://109.199.119.187:8005/?industry={self.industry_decoded[0]}&plugin={self.plugin_name_slug}"
         self.parser = QgsNewsFeedParser(
             feedUrl= QUrl(self.es_url)
         )
@@ -34,8 +34,8 @@ class QgisFeed:
         Funkcja przetwarza zapisany adres qgisfeed'a 
         na forme zapisana w qgis settingsach
         """
-        
-        return re.sub(r'://|\.|:|/\?|=|&|-', '', url)
+    
+        return re.sub(r'://|\.|:|/\?|=|&|-|:', '', url)
 
     def create_slug(self, text):
         """
@@ -65,9 +65,14 @@ class QgisFeed:
             # ponizszy fragment odpowiada za mozliwosc ciaglego wyswietlania wiadomosci
             # przy wlaczeniu qgis za kazdym razem
 
-            #check_fetch = self.checkIsFetchTime()
-            #if check_fetch is True: self.s.remove(key)
+            if 'cache' in key:
+                check_fetch = self.checkIsFetchTime()
+                if check_fetch is True: self.s.remove(key)
+        
         self.s.sync()
+        self.s.beginGroup(f"app/news-feed/items/{self.industry_url_short}")
+        self.s.setValue("last-fetch-time", 0)
+        
     
     def removeDismissed(self):
         """
