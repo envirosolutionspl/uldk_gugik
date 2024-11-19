@@ -73,7 +73,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.regionFetch = RegionFetch(teryt='')
         except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
-            print("Brak połączenia z internetem")
+            QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
             self.regionFetch = None
         self.fill_voivodeships()
 
@@ -87,7 +87,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.wojcomboBox.setItemData(idx, val)
             self.wojcomboBox.setCurrentIndex(-1)
         else:
-            print('Brak danych województw do wypełnienia (tryb offline).')
+            QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
 
     def setup_tab_widget(self):
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())
