@@ -26,6 +26,7 @@ import os
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget
+from qgis.core import QgsMessageLog, Qgis
 
 import requests
 
