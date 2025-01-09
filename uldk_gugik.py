@@ -8,7 +8,7 @@
                               -------------------
         begin                : 2019-05-31
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by EnviroSolutions Sp. z o.o.
+        copyright            : (C) 2025 by EnviroSolutions Sp. z o.o.
         email                : office@envirosolutions.pl
  ***************************************************************************/
 
@@ -43,7 +43,7 @@ from .constants import DEFAULT_SRID
 
 
 """Wersja wtyczki"""
-plugin_version = '1.4.1'
+plugin_version = '1.4.2'
 plugin_name = 'ULDK GUGiK'  
 
 class UldkGugik:

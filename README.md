@@ -41,9 +41,9 @@
 
 ### Uwaga
 
-Warunkiem koniecznym do prawidłowego działania wtyczki jest posiadanie wersji QGIS 3.16.16 lub wyższej.
+Warunkiem koniecznym do prawidłowego działania wtyczki jest posiadanie wersji QGIS QGIS 3.28.0 lub wyższej.
 
-
+Rekomendowane wersje QGIS: 3.34.5.
 
 # ULDK
 
@@ -82,4 +82,6 @@ The plugin offers 3 methods for searching and downloading boundaries.
 In the side panel, there are options to select the area of interest (parcel, registration area, municipality, county, voivodeship). If you want to download the voivodeship layer where your parcel is located, select "Województwo" in the side panel. Once you enter the parcel identifier, the plugin will automatically download the associated voivodeship or another selected area. If the parcel number appears more than once in the same registration area, a message will appear at the top of QGIS, and the plugin will download the first parcel returned by the ULDK service.
 
 ### Note
-A necessary condition for the plugin to work correctly is having QGIS version 3.16.16 or higher."
+A necessary condition for the plugin to work correctly is having QGIS version 3.28.0 or higher."
+
+Recomended version of QGIS: 3.45.5. 
