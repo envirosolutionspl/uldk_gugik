@@ -3,20 +3,22 @@ ULDK_OBREB_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=obreb&wynik=
 ULDK_GMINA_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=gmina&wynik=gmina,teryt&teryt='
 ULDK_POWIAT_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=powiat&wynik=powiat,teryt&teryt='
 ULDK_WOJEWODZTWO_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=wojewodztwo&wynik=wojewodztwo,teryt'
+FEED_URL = 'https://qgisfeed.envirosolutions.pl/'
+
 INDUSTRIES = {
-    "999":"Nie wybrano",
-    "e":"Energetyka/OZE",
-    "u":"Urząd",
-    "td":"Transport/Drogi",
-    "pg":"Planowanie/Geodezja",
-    "wk":"WodKan",
-    "s":"Środowisko",
-    "rl":"Rolnictwo/Leśnictwo",
-    "tk":"Telkom",
-    "edu":"Edukacja",
-    "i":"Inne",
-    "it":"IT",
-    "n":"Nieruchomości"
+    "999": "Nie wybrano",
+    "e": "Energetyka/OZE",
+    "u": "Urząd",
+    "td": "Transport/Drogi",
+    "pg": "Planowanie/Geodezja",
+    "wk": "WodKan",
+    "s": "Środowisko",
+    "rl": "Rolnictwo/Leśnictwo",
+    "tk": "Telkom",
+    "edu": "Edukacja",
+    "i": "Inne",
+    "it": "IT",
+    "n": "Nieruchomości"
 }
 
 DIALOG_MAPPING = {
