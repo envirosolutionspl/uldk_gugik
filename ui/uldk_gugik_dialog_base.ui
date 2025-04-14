@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>828</width>
+    <width>836</width>
     <height>514</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../images/uldk.svg</normaloff>../images/uldk.svg</iconset>
+    <normaloff>images/uldk.svg</normaloff>images/uldk.svg</iconset>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="enabled">
@@ -55,7 +55,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>../images/icon_uldk2.png</pixmap>
+      <pixmap>../AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/uldk-master/images/icon_uldk2.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -195,7 +195,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>../images/coords.png</pixmap>
+      <pixmap>images/coords.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -296,7 +296,7 @@
         <x>50</x>
         <y>37</y>
         <width>131</width>
-        <height>22</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="buttonSymbols">
@@ -315,7 +315,7 @@
         <x>50</x>
         <y>70</y>
         <width>131</width>
-        <height>22</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="buttonSymbols">
@@ -711,8 +711,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>112</width>
-      <height>161</height>
+      <width>124</width>
+      <height>176</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -872,7 +872,7 @@
          <bool>true</bool>
         </property>
         <property name="margin">
-         <number>9</number>
+         <number>14</number>
         </property>
        </widget>
       </item>
@@ -884,7 +884,7 @@
         <property name="verticalSpacing">
          <number>0</number>
         </property>
-        <item row="1" column="0">
+        <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="lbl_copyrights">
           <property name="maximumSize">
            <size>
@@ -898,7 +898,7 @@
            </font>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;© 2024 &lt;a href=&quot;http://www.envirosolutions.pl/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;EnviroSolutions Sp. z o.o.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;© 2025 EnviroSolutions Sp. z o.o.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
@@ -914,7 +914,7 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
+        <item row="0" column="0" colspan="2">
          <widget class="QLabel" name="lbl_pluginVersion">
           <property name="maximumSize">
            <size>
@@ -935,7 +935,31 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="2" column="1" alignment="Qt::AlignLeft|Qt::AlignVCenter">
+         <widget class="QLabel" name="lbl_szkolenia">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://envirosolutions.pl/oferta-szkoleniowa/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;SZKOLENIA GIS&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::RichText</enum>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::TextBrowserInteraction</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" alignment="Qt::AlignRight">
          <widget class="QLabel" name="lbl_email">
           <property name="maximumSize">
            <size>
@@ -949,7 +973,7 @@
            </font>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;mailto:office@envirosolutions.pl&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;ZAPRASZAMY DO WSPÓŁPRACY&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://envirosolutions.pl/systemy-opensource-gis/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;SYSTEMY GIS&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
