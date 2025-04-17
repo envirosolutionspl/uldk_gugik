@@ -307,6 +307,8 @@ class UldkGugik:
             self.settings.setValue("showDialog", False) 
 
     def setup_dialog(self):
+        if self.dlg.regionFetch is None:
+            self.dlg = UldkGugikDialog()
         self.dlg.show()
 
     def btn_download_tab1_clicked(self):
