@@ -25,7 +25,7 @@ repository=https://github.com/envirosolutionspl/uldk_gugik
 # Uncomment the following line and add your changelog:
 changelog=
   Wersja 1.4.2
-    * Poprawa działania wtyczki przy włączeniu QGIS bez internetu
+    * Aktualizacja stopki wtyczki
 #  Wersja 1.4.1
 #    * Dodanie branż do QGIS-feed
 #    * Zmiana lokalizacji UI wtyczki
