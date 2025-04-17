@@ -26,6 +26,9 @@ import os
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget
+from qgis.core import QgsMessageLog, Qgis
+
+import requests
 
 from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, \
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING
@@ -68,17 +71,24 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
     def _setup_dialog(self):
         self.img_main.setMargin(9)
         self.tabWidget.setTabVisible(2, False)
-        self.regionFetch = RegionFetch(teryt='')
+        try:
+            self.regionFetch = RegionFetch(teryt='')
+        except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
+            QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
+            self.regionFetch = None
         self.fill_voivodeships()
 
     def fill_voivodeships(self):
-        voivodeships_ids = self.regionFetch.wojewodztwo_dict.keys()
-        voivodeships_names = self.regionFetch.wojewodztwo_dict.values()
-        self.wojcomboBox.clear()
-        self.wojcomboBox.addItems(voivodeships_names)
-        for idx, val in enumerate(voivodeships_ids):
-            self.wojcomboBox.setItemData(idx, val)
-        self.wojcomboBox.setCurrentIndex(-1)
+        if self.regionFetch:
+            voivodeships_ids = self.regionFetch.wojewodztwo_dict.keys()
+            voivodeships_names = self.regionFetch.wojewodztwo_dict.values()
+            self.wojcomboBox.clear()
+            self.wojcomboBox.addItems(voivodeships_names)
+            for idx, val in enumerate(voivodeships_ids):
+                self.wojcomboBox.setItemData(idx, val)
+            self.wojcomboBox.setCurrentIndex(-1)
+        else:
+            QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
 
     def setup_tab_widget(self):
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())

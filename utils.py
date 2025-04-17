@@ -9,7 +9,8 @@ def isInternetConnected():
         s = socket.create_connection((host, 80), 2)
         shutDownConnection(s)
         return True
-    except:
+    except Exception as ex :
+        print(f"Błąd połączenia: {ex}")
         return False
 
 

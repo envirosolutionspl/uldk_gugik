@@ -43,7 +43,7 @@ from .constants import DEFAULT_SRID
 
 
 """Wersja wtyczki"""
-plugin_version = '1.4.1'
+plugin_version = '1.4.2'
 plugin_name = 'ULDK GUGiK'  
 
 class UldkGugik:
@@ -307,6 +307,8 @@ class UldkGugik:
             self.settings.setValue("showDialog", False) 
 
     def setup_dialog(self):
+        if self.dlg.regionFetch is None:
+            self.dlg = UldkGugikDialog()
         self.dlg.show()
 
     def btn_download_tab1_clicked(self):
