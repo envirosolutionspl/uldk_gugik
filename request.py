@@ -4,14 +4,14 @@ from qgis.PyQt.QtCore import QUrl, QEventLoop
 
 
 class Request:
-    def __init__(self, params,objectType, **kwargs):
+    def __init__(self, params,object_type, **kwargs):
         self.params = params
         self._data = None
         self.url = "http://uldk.gugik.gov.pl/"
         self.manager = QNetworkAccessManager()
 
         self.teryt = kwargs.get('teryt', None)
-        self.objectType = objectType
+        self.object_type = object_type
 
         self.getRequest()
         self.loop = QEventLoop()
@@ -19,17 +19,17 @@ class Request:
 
     def getRequest(self):
         """Wysłanie zapytania z odpowiednimi parametrami"""
-        finalUrl = f"{self.url}?{urlencode(self.params)}"
-        req = QNetworkRequest(QUrl(finalUrl))
+        final_url = f"{self.url}?{urlencode(self.params)}"
+        req = QNetworkRequest(QUrl(final_url))
         reply = self.manager.get(req)
         reply.finished.connect(lambda: self.handleRequest(reply))
 
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
-            returnedData = reply.readAll().data().decode('utf-8')
+            returned_data = reply.readAll().data().decode('utf-8')
 
-            for line in returnedData.split('\n'):
+            for line in returned_data.split('\n'):
                 if len(line) < 3 or line == "-1 brak wyników" or line.find("XML")>-1 or line.find("błęd")>-1:
                     continue
                 if ";" in line:
@@ -38,10 +38,10 @@ class Request:
                         self._data = polygon
                         pass
                     
-                    if self.objectType in [1, 6]:
+                    if self.object_type in [1, 6]:
                         teryt = polygon.split('|')[1].split('.')[0]
                         break
-                    elif self.objectType ==2:
+                    elif self.object_type ==2:
                         if polygon.split('|')[1].find(".") >-1:
                             teryt = polygon.split('|')[1].split('.')[0]
                             break
@@ -61,14 +61,14 @@ class Request:
                         self._data = line
                         pass
 
-                    if self.objectType in [1, 6]:
+                    if self.object_type in [1, 6]:
                         try:
                             teryt = line.split('|')[1].split('.')[0]
                         except IndexError:
                             pass
                         break
 
-                    elif self.objectType ==2:
+                    elif self.object_type ==2:
                         if line.split('|')[1].find(".") >-1:
                             teryt = line.split('|')[1].split('.')[0]
                             break

@@ -113,8 +113,8 @@ class UldkGugik:
         self.canvas = self.iface.mapCanvas()
         
         # out click tool will emit a QgsPoint on every click
-        self.clickTool = QgsMapToolEmitPoint(self.canvas)
-        self.clickTool.canvasClicked.connect(self.canvasClicked)
+        self.click_tool = QgsMapToolEmitPoint(self.canvas)
+        self.click_tool.canvasClicked.connect(self.canvasClicked)
 
         self.dlg = UldkGugikDialog()
         self.region_name = None
@@ -136,7 +136,7 @@ class UldkGugik:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('UldkGugik', message)
 
-    def add_action(
+    def addAction(
         self,
         icon_path,
         text,
@@ -216,7 +216,7 @@ class UldkGugik:
 
 
         icon_path = ':/plugins/uldk_gugik/images/uldk.svg'
-        self.add_action(
+        self.addAction(
             icon_path,
             text=self.tr(u'Usługa Lokalizacji Działek Katastralnych (ULDK)'),
             callback=self.run,
@@ -238,12 +238,12 @@ class UldkGugik:
         self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
         self.dlg.lbl_pluginVersion.setText('%s %s' % (plugin_name, plugin_version))
 
-        self.dlg.btn_download_tab1.clicked.connect(self.btn_download_tab1_clicked)
-        self.dlg.btn_download_tab2.clicked.connect(self.btn_download_tab2_clicked)
-        self.dlg.btn_download_tab3.clicked.connect(self.btn_download_tab3_clicked)
-        self.dlg.btn_search_tab3.clicked.connect(self.btn_search_tab3_clicked)
+        self.dlg.btn_download_tab1.clicked.connect(self.btnDownloadTab1Clicked)
+        self.dlg.btn_download_tab2.clicked.connect(self.btnDownloadTab2Clicked)
+        self.dlg.btn_download_tab3.clicked.connect(self.btnDownloadTab3Clicked)
+        self.dlg.btn_search_tab3.clicked.connect(self.btnSearchTab3Clicked)
         
-        self.dlg.btn_frommap.clicked.connect(self.btn_frommap_clicked)
+        self.dlg.btn_frommap.clicked.connect(self.btnFrommapClicked)
         self.dlg.btn_frommap.setToolTip("skrót: ALT + F")
 
 
@@ -271,17 +271,17 @@ class UldkGugik:
                 # skrot klawiszowy
                 self.shortcut = QShortcut(self.iface.mainWindow())
                 self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_F))
-                self.shortcut.activated.connect(self.shortcut_activated)
+                self.shortcut.activated.connect(self.shortcutActivated)
             else:
                 self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_F), self.iface.mainWindow())
                 self.shortcut.setContext(Qt.ApplicationShortcut)
-                self.shortcut.activated.connect(self.shortcut_activated)
+                self.shortcut.activated.connect(self.shortcutActivated)
         
         try:
             odpowiedz = requests.get('https://uldk.gugik.gov.pl', verify=False)
 
             if odpowiedz.status_code == 200:
-                self.setup_dialog()
+                self.setupDialog()
                 # self.disable_button_download()
             else:
                 self.iface.messageBar().pushMessage("Ostrzeżenie:", 
@@ -306,12 +306,12 @@ class UldkGugik:
             self.settings.setValue("selected_industry", self.selected_branch)  
             self.settings.setValue("showDialog", False) 
 
-    def setup_dialog(self):
-        if self.dlg.regionFetch is None:
+    def setupDialog(self):
+        if self.dlg.region_fetch is None:
             self.dlg = UldkGugikDialog()
         self.dlg.show()
 
-    def btn_download_tab1_clicked(self):
+    def btnDownloadTab1Clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
 
         teryt = self.dlg.edit_id.text().strip()
@@ -337,34 +337,34 @@ class UldkGugik:
                                                 'brak połączenia z internetem',
                                                 level=Qgis.Critical, duration=10)
 
-    def btn_download_tab2_clicked(self):
+    def btnDownloadTab2Clicked(self):
         """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
         srid = self.dlg.projectionWidget.crs().authid().split(":")[1]
         self.downloadByXY(srid, type="form", zoomToFeature=False)
 
-    def btn_search_tab3_clicked(self):
+    def btnSearchTab3Clicked(self):
         arkusze_numery = set()
         arkusze_numery_posortowane = set()
         if str(self.dlg.obrcomboBox.currentText().strip()):
-            objRegion = str(self.dlg.obrcomboBox.currentText().strip())
-            objectType = self.checkedFeatureType()
+            obj_region = str(self.dlg.obrcomboBox.currentText().strip())
+            object_type = self.checkedFeatureType()
         else:
-            objRegion = str(self.dlg.gmicomboBox.currentText().strip())
-            objectType = self.checkedFeatureType()
+            obj_region = str(self.dlg.gmicomboBox.currentText().strip())
+            object_type = self.checkedFeatureType()
 
-        if objectType != 1:
+        if object_type != 1:
             return
         self.dlg.parcel_lineedit.setReadOnly(True)
         current_idx = self.dlg.gmicomboBox.currentIndex()
         teryt = self.dlg.gmicomboBox.itemData(current_idx)
-        objParcel = self.dlg.parcel_lineedit.text().strip() # nr działki
+        obj_parcel = self.dlg.parcel_lineedit.text().strip() # nr działki
 
-        if not objRegion:
+        if not obj_region:
             self.iface.messageBar().pushMessage("Błąd formularza:",
                                                 'musisz wpisać obręb',
                                                 level=Qgis.Warning, duration=10)
 
-        if not objParcel:
+        if not obj_parcel:
             self.iface.messageBar().pushMessage("Błąd formularza:",
                                                 'musisz wpisać numer działki',
                                                 level=Qgis.Warning, duration=10)
@@ -375,7 +375,7 @@ class UldkGugik:
             obr_idx = self.dlg.obrcomboBox.currentIndex()
             teryt = self.dlg.obrcomboBox.itemData(obr_idx)
 
-            result_obreb = uldk_parcel.GetRegionById(id=teryt)
+            result_obreb = uldk_parcel.getRegionById(id=teryt)
             result_obreb = list(result_obreb)
 
             #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
@@ -408,7 +408,7 @@ class UldkGugik:
 
             try:
                 self.region_name = result_obreb[0].split("|")[0]
-                name = self.region_name + '.' + objParcel
+                name = self.region_name + '.' + obj_parcel
 
                 result = uldk_parcel.getParcelById2(name)
                 result = list(result)
@@ -470,29 +470,29 @@ class UldkGugik:
             )
         self.dlg.btn_download_tab3.setEnabled(True)
 
-    def btn_download_tab3_clicked(self):
+    def btnDownloadTab3Clicked(self):
         if self.region_name:
-            objRegion = self.region_name
+            obj_region = self.region_name
         else:
-            objRegion = str(self.dlg.gmicomboBox.currentText().strip())
+            obj_region = str(self.dlg.gmicomboBox.currentText().strip())
 
-        objectType = self.checkedFeatureType()
-        if objectType == 1:
+        object_type = self.checkedFeatureType()
+        if object_type == 1:
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
-            objParcel = self.dlg.parcel_lineedit.text().strip() # nr działki
-            if not objRegion:
+            obj_parcel = self.dlg.parcel_lineedit.text().strip() # nr działki
+            if not obj_region:
                 self.iface.messageBar().pushMessage("Błąd formularza:",
                                                     'musisz wpisać obręb',
                                                     level=Qgis.Warning, duration=10)
 
-            if not objParcel:
+            if not obj_parcel:
                 self.iface.messageBar().pushMessage("Błąd formularza:",
                                                     'musisz wpisać numer działki',
                                                     level=Qgis.Warning, duration=10)
 
             elif utils.isInternetConnected():
-                self.performRequestParcel(region=objRegion, parcel=objParcel, teryt=None, zoomToFeature=True)
+                self.performRequestParcel(region=obj_region, parcel=obj_parcel, teryt=None, zoomToFeature=True)
 
             else:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -500,11 +500,11 @@ class UldkGugik:
                                                     level=Qgis.Critical, duration=10)
 
             return
-        elif objectType == 2:  # obręb
+        elif object_type == 2:  # obręb
             obr_idx = self.dlg.obrcomboBox.currentIndex()
             teryt = self.dlg.obrcomboBox.itemData(obr_idx)
 
-            resp = uldk_api.getRegionById(teryt, objectType=2, obreb=True)
+            resp = uldk_api.getRegionById(teryt, object_type=2, obreb=True)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obrębu:",
@@ -532,10 +532,10 @@ class UldkGugik:
             county = res[4]
             voivodeship = res[5]
 
-        elif objectType == 3:  # gmina
+        elif object_type == 3:  # gmina
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
-            resp = uldk_api.getCommuneById(teryt, objectType=3)
+            resp = uldk_api.getCommuneById(teryt, object_type=3)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać gminy:",
@@ -563,10 +563,10 @@ class UldkGugik:
             county = res[3]
             voivodeship = res[4]
 
-        elif objectType == 4:
+        elif object_type == 4:
             current_idx = self.dlg.powcomboBox.currentIndex()
             teryt = self.dlg.powcomboBox.itemData(current_idx)
-            resp = uldk_api.getCountyById(teryt, objectType=4)
+            resp = uldk_api.getCountyById(teryt, object_type=4)
 
             if not resp:
                 self.iface.messageBar().pushMessage(
@@ -595,10 +595,10 @@ class UldkGugik:
             county = res[2]
             voivodeship = res[3]
 
-        elif objectType == 5: # województwo
+        elif object_type == 5: # województwo
             current_idx = self.dlg.wojcomboBox.currentIndex()
             teryt = self.dlg.wojcomboBox.itemData(current_idx)
-            resp = uldk_api.getVoivodeshipById(teryt, objectType=5)
+            resp = uldk_api.getVoivodeshipById(teryt, object_type=5)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać województwa:",
@@ -627,7 +627,7 @@ class UldkGugik:
             voivodeship = res[2]
 
         self.addResultsToLayer(
-            objectType=objectType,
+            object_type=object_type,
             wkt=wkt,
             teryt=teryt,
             parcel=parcel,
@@ -645,7 +645,7 @@ class UldkGugik:
             5: "województwo",
         }
 
-        success_message = f"Pobrano {object[objectType]}"  % teryt if objectType == 1 else f"Pobrano {object[objectType]}"
+        success_message = f"Pobrano {object[object_type]}"  % teryt if object_type == 1 else f"Pobrano {object[object_type]}"
 
         self.iface.messageBar().pushMessage("Sukces:",
                                             success_message,
@@ -686,18 +686,18 @@ class UldkGugik:
                                                 'brak połączenia z internetem',
                                                 level=Qgis.Critical, duration=10)
 
-    def shortcut_activated(self):
+    def shortcutActivated(self):
         """zdarzenie aktywowania klawisza skrótu wskazania działki na mapie"""
-        self.canvas.setMapTool(self.clickTool)
+        self.canvas.setMapTool(self.click_tool)
 
-    def btn_frommap_clicked(self):
+    def btnFrommapClicked(self):
         """zdarzenie wciśnięcia w oknie wtyczki klawisza wskazania działki na mapie"""
-        self.canvas.setMapTool(self.clickTool)
+        self.canvas.setMapTool(self.click_tool)
         self.dlg.hide()
 
     def canvasClicked(self, point):
         """kliknięcie na mapie"""
-        self.canvas.unsetMapTool(self.clickTool)
+        self.canvas.unsetMapTool(self.click_tool)
         self.dlg.doubleSpinBoxX.setValue(point.x())
         self.dlg.doubleSpinBoxY.setValue(point.y())
         coords = "{}, {}".format(point.x(), point.y())
@@ -706,13 +706,13 @@ class UldkGugik:
         self.downloadByXY(srid, type="click", zoomToFeature=False)
 
     def performRequestParcel(self, region, parcel, teryt, zoomToFeature=True):
-        objectType = self.checkedFeatureType()
+        object_type = self.checkedFeatureType()
         try:
             if self.dlg.arkcomboBox.currentText() != '':
                 name = region + '.' + self.dlg.arkcomboBox.currentText() + '.' + parcel
             else:
                 name = region + '.' + parcel
-            result = uldk_parcel.getParcelById(name, objectType=1)
+            result = uldk_parcel.getParcelById(name, object_type=1)
 
             if result is None:
                 self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
@@ -736,7 +736,7 @@ class UldkGugik:
             voivodeship = res[6]
 
             # layer
-            nazwa = self.nazwy_warstw[objectType]
+            nazwa = self.nazwy_warstw[object_type]
 
             layers = self.project.mapLayersByName(nazwa)
 
@@ -753,23 +753,23 @@ class UldkGugik:
             layer.updateExtents()
 
             if not layers:
-                voivField = QgsField('województwo', QVariant.String, len=30)
-                provider.addAttributes([voivField])
+                voiv_field = QgsField('województwo', QVariant.String, len=30)
+                provider.addAttributes([voiv_field])
 
-                conField = QgsField('powiat', QVariant.String, len=30)
-                provider.addAttributes([conField])
+                con_field = QgsField('powiat', QVariant.String, len=30)
+                provider.addAttributes([con_field])
 
-                comField = QgsField('gmina', QVariant.String, len=30)
-                provider.addAttributes([comField])
+                com_field = QgsField('gmina', QVariant.String, len=30)
+                provider.addAttributes([com_field])
 
-                regField = QgsField('obręb', QVariant.String, len=30)
-                provider.addAttributes([regField])
+                reg_field = QgsField('obręb', QVariant.String, len=30)
+                provider.addAttributes([reg_field])
 
-                parField = QgsField('numer', QVariant.String, len=30)
-                provider.addAttributes([parField])
+                par_field = QgsField('numer', QVariant.String, len=30)
+                provider.addAttributes([par_field])
                 
-                idField = QgsField('teryt', QVariant.String, len=40)
-                provider.addAttributes([idField])
+                id_field = QgsField('teryt', QVariant.String, len=40)
+                provider.addAttributes([id_field])
 
                 layer.updateFields()
 
@@ -823,7 +823,7 @@ class UldkGugik:
         object_type = self.checkedFeatureType()
 
         if object_type == 1:
-            resp = uldk_api.getParcelById(teryt, objectType=1)
+            resp = uldk_api.getParcelById(teryt, object_type=1)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -857,7 +857,7 @@ class UldkGugik:
 
 
         elif object_type == 2:
-            resp = uldk_api.getRegionById(teryt, objectType=2)
+            resp = uldk_api.getRegionById(teryt, object_type=2)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -887,7 +887,7 @@ class UldkGugik:
 
 
         elif object_type == 3:
-            resp = uldk_api.getCommuneById(teryt, objectType=3)
+            resp = uldk_api.getCommuneById(teryt, object_type=3)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -917,7 +917,7 @@ class UldkGugik:
 
 
         elif object_type == 4:
-            resp = uldk_api.getCountyById(teryt, objectType=4)
+            resp = uldk_api.getCountyById(teryt, object_type=4)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -946,7 +946,7 @@ class UldkGugik:
             voivodeship = res[3]
 
         elif object_type == 5:
-            resp = uldk_api.getVoivodeshipById(teryt, objectType=5)
+            resp = uldk_api.getVoivodeshipById(teryt, object_type=5)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -1004,7 +1004,7 @@ class UldkGugik:
             voivodeship = res[5]
 
         self.addResultsToLayer(
-            objectType=object_type,
+            object_type=object_type,
             wkt=wkt,
             teryt=teryt,
             parcel=parcel,
@@ -1032,7 +1032,7 @@ class UldkGugik:
     def performRequestXY(self, x, y, srid, zoomToFeature):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
-        objectType = self.checkedFeatureType()
+        object_type = self.checkedFeatureType()
 
         #Sprawdzenie, czy współrzędne są z przecinkiem czy kropką
         if "," in x or "," in y:
@@ -1042,17 +1042,17 @@ class UldkGugik:
             x = float(x)
             y = float(y)
 
-        requestPoint = QgsPoint(x, y)
+        request_point = QgsPoint(x, y)
         QgsMessageLog.logMessage(str(srid), 'ULDK')
         if str(srid) != DEFAULT_SRID:
             sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
             destCrs = QgsCoordinateReferenceSystem.fromEpsgId(DEFAULT_SRID)
             tr = QgsCoordinateTransform(sourceCrs, destCrs, self.project)
-            requestPoint.transform(tr)
-        pid = f"{str(requestPoint.x())},{str(requestPoint.y())}"
+            request_point.transform(tr)
+        pid = f"{str(request_point.x())},{str(request_point.y())}"
 
-        if objectType == 1:# działka
-            resp = uldk_xy.getParcelByXY(xy=pid, objectType=1)
+        if object_type == 1:# działka
+            resp = uldk_xy.getParcelByXY(xy=pid, object_type=1)
 
             if not resp:
                 self.iface.messageBar().pushMessage(
@@ -1071,8 +1071,8 @@ class UldkGugik:
             county = res[5]
             voivodeship = res[6]
 
-        elif objectType == 2:
-            resp = uldk_xy.getRegionByXY(xy=pid, objectType=2)
+        elif object_type == 2:
+            resp = uldk_xy.getRegionByXY(xy=pid, object_type=2)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -1091,8 +1091,8 @@ class UldkGugik:
             voivodeship = res[5]
 
 
-        elif objectType == 3:
-            resp = uldk_xy.getCommuneByXY(xy=pid, objectType=3)
+        elif object_type == 3:
+            resp = uldk_xy.getCommuneByXY(xy=pid, object_type=3)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -1111,8 +1111,8 @@ class UldkGugik:
             voivodeship = res[4]
 
 
-        elif objectType == 4:
-            resp = uldk_xy.getCountyByXY(xy=pid, objectType=4)
+        elif object_type == 4:
+            resp = uldk_xy.getCountyByXY(xy=pid, object_type=4)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -1131,8 +1131,8 @@ class UldkGugik:
             voivodeship = res[3]
 
 
-        elif objectType == 5:
-            resp = uldk_xy.getVoivodeshipByXY(xy=pid, objectType=5)
+        elif object_type == 5:
+            resp = uldk_xy.getVoivodeshipByXY(xy=pid, object_type=5)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -1151,8 +1151,8 @@ class UldkGugik:
             county = None
             voivodeship = res[2]
 
-        elif objectType == 6:
-            resp = uldk_xy.GetBuildingByXY(xy=pid, object_type=6)
+        elif object_type == 6:
+            resp = uldk_xy.getBuildingByXY(xy=pid, object_type=6)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
@@ -1171,7 +1171,7 @@ class UldkGugik:
             voivodeship = res[5]
 
         self.addResultsToLayer(
-            objectType=objectType,
+            object_type=object_type,
             wkt=wkt,
             teryt=teryt,
             parcel=parcel,
@@ -1189,17 +1189,17 @@ class UldkGugik:
             5: "województwo",
             6: "budynek"
         }
-        success_message = f"Pobrano {object[objectType]}"  % teryt if objectType == 1 else f"Pobrano {object[objectType]}"
+        success_message = f"Pobrano {object[object_type]}"  % teryt if object_type == 1 else f"Pobrano {object[object_type]}"
 
         self.iface.messageBar().pushMessage("Sukces:",
                                             success_message,
                                             level=Qgis.Success, duration=10)
 
-    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature):
+    def addResultsToLayer(self, object_type, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
         # layer
-        nazwa = self.nazwy_warstw[objectType]
+        nazwa = self.nazwy_warstw[object_type]
         layers = self.project.mapLayersByName(nazwa)
 
         # usuwanie pustych warstw z projektu
@@ -1221,27 +1221,27 @@ class UldkGugik:
 
             provider = layer.dataProvider()
 
-            voivField = QgsField('województwo', QVariant.String, len=30)
-            provider.addAttributes([voivField])
+            voiv_field = QgsField('województwo', QVariant.String, len=30)
+            provider.addAttributes([voiv_field])
 
-            if objectType==6 or objectType == 4 or objectType == 3 or objectType == 2 or objectType == 1:
-                conField = QgsField('powiat', QVariant.String, len=30)
-                provider.addAttributes([conField])
+            if object_type==6 or object_type == 4 or object_type == 3 or object_type == 2 or object_type == 1:
+                con_field = QgsField('powiat', QVariant.String, len=30)
+                provider.addAttributes([con_field])
 
-            if objectType==6 or objectType == 3 or objectType == 2 or objectType == 1:
-                comField = QgsField('gmina', QVariant.String, len=30)
-                provider.addAttributes([comField])
+            if object_type==6 or object_type == 3 or object_type == 2 or object_type == 1:
+                com_field = QgsField('gmina', QVariant.String, len=30)
+                provider.addAttributes([com_field])
 
-            if objectType==6 or objectType == 2 or objectType == 1:
-                regField = QgsField('obręb', QVariant.String, len=30)
-                provider.addAttributes([regField])
+            if object_type==6 or object_type == 2 or object_type == 1:
+                reg_field = QgsField('obręb', QVariant.String, len=30)
+                provider.addAttributes([reg_field])
 
-            if objectType == 1:
-                parField = QgsField('numer', QVariant.String, len=30)
-                provider.addAttributes([parField])
+            if object_type == 1:
+                par_field = QgsField('numer', QVariant.String, len=30)
+                provider.addAttributes([par_field])
 
-            idField = QgsField('teryt', QVariant.String, len=40)
-            provider.addAttributes([idField])
+            id_field = QgsField('teryt', QVariant.String, len=40)
+            provider.addAttributes([id_field])
 
             layer.updateFields()
 

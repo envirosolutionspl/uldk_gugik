@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_ULDK_GUGIKDialogBase(object):
+class UiUldkGugikDialogBase(object):
     def setupUi(self, ULDK_GUGIKDialogBase):
         ULDK_GUGIKDialogBase.setObjectName("ULDK_GUGIKDialogBase")
         ULDK_GUGIKDialogBase.setEnabled(True)

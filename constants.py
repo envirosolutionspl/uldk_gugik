@@ -55,9 +55,9 @@ DIALOG_MAPPING = {
 }
 
 ADMINISTRATIVE_UNITS_OBJECTS = {
-    'wojcomboBox': ('get_powiat_by_teryt', 'powcomboBox'),
-    'powcomboBox': ('get_gmina_by_teryt', 'gmicomboBox'),
-    'gmicomboBox': ('get_obreb_by_teryt', 'obrcomboBox'),
+    'wojcomboBox': ('getPowiatByTeryt', 'powcomboBox'),
+    'powcomboBox': ('getGminaByTeryt', 'gmicomboBox'),
+    'gmicomboBox': ('getObrebByTeryt', 'obrcomboBox'),
 }
 
 RADIOBUTTON_COMBOBOX_MAPPING = {
