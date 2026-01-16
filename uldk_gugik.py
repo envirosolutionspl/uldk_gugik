@@ -230,7 +230,7 @@ class UldkGugik:
         self.dlg.img_tab2.setPixmap(QPixmap(':/plugins/uldk_gugik/images/coords.png'))
 
         # rozmiar okna
-        self.dlg.setMinimumSize(self.dlg.size())
+        self.dlg.setFixedSize(self.dlg.size())
 
         # informacje o wersji
         self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
@@ -289,7 +289,6 @@ class UldkGugik:
             self.iface.messageBar().pushMessage("Ostrzeżenie:",
                                                 'Brak połączenia z internetem',
                                                 level=Qgis.Warning, duration=10)
-
         self.dlg.projectionWidget.setCrs(
             QgsCoordinateReferenceSystem.fromEpsgId(int(srid)))
 
