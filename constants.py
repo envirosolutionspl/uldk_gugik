@@ -24,7 +24,7 @@ INDUSTRIES = {
 DIALOG_MAPPING = {
     'rdb_bu': {
         'tab_title': 'Wybór obiektu przez identyfikator budynku',
-        'sample_id': '141301_1.0010.713/2.5_BUD',
+        'sample_id': '142608_2.0022.108_BUD',
         'description_label': ' - dla budynków: WWPPGG_R.OOOO.NR_DZ.Nr_BUD, WWPPGG_R.OOOO.AR_NR.NR_DZ.Nr_BUD lub WWPPGG_R.OOOO.Nr_BUD',
     },
     'rdb_dz': {
