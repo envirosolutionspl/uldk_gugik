@@ -32,7 +32,7 @@ import requests
 
 from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, \
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING
-from .uldk import RegionFetch
+from .uldk import region_fetch
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__),'ui','uldk_gugik_dialog_base.ui'))
@@ -40,24 +40,24 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
-    closingPlugin = pyqtSignal()
+    closing_plugin = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
         super(UldkGugikDialog, self).__init__(parent)
         self.setupUi(self)
-        self._setup_dialog()
-        self._setup_signals()
+        self._setupDialog()
+        self._setupSignals()
 
-    def _setup_signals(self):
+    def _setupSignals(self):
         for base_combo, combo_items in ADMINISTRATIVE_UNITS_OBJECTS.items():
             fetch_func, dependent_combo = combo_items
             combo_obj = getattr(self, base_combo)
             combo_obj.currentTextChanged.connect(
-                lambda _, func=fetch_func, combo=dependent_combo: self.setup_administrative_unit_obj(func, combo)
+                lambda _, func=fetch_func, combo=dependent_combo: self.setupAdministrativeUnitObj(func, combo)
             )
         for rdbt in DIALOG_MAPPING.keys():
-            getattr(self, rdbt).toggled.connect(self.setup_tab_widget)
+            getattr(self, rdbt).toggled.connect(self.setupTabWidget)
         self.parcel_lineedit.textChanged.connect(lambda: self.btn_download_tab3.setEnabled(False))
         self.obrcomboBox.currentTextChanged.connect(lambda: self.arkcomboBox.clear())
         for combo in COMBOBOX_RADIOBUTTON_MAPPING.keys():
@@ -68,20 +68,20 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                     lambda: self.btn_download_tab3.setEnabled(False) if self.rdb_dz.isChecked() else None
                 )
 
-    def _setup_dialog(self):
+    def _setupDialog(self):
         self.img_main.setMargin(9)
         self.tabWidget.setTabVisible(2, False)
         try:
-            self.regionFetch = RegionFetch(teryt='')
+            self.region_fetch = region_fetch(teryt='')
         except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
             QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
-            self.regionFetch = None
-        self.fill_voivodeships()
+            self.region_fetch = None
+        self.fillVoivodeships()
 
-    def fill_voivodeships(self):
-        if self.regionFetch:
-            voivodeships_ids = self.regionFetch.wojewodztwo_dict.keys()
-            voivodeships_names = self.regionFetch.wojewodztwo_dict.values()
+    def fillVoivodeships(self):
+        if self.region_fetch:
+            voivodeships_ids = self.region_fetch.wojewodztwo_dict.keys()
+            voivodeships_names = self.region_fetch.wojewodztwo_dict.values()
             self.wojcomboBox.clear()
             self.wojcomboBox.addItems(voivodeships_names)
             for idx, val in enumerate(voivodeships_ids):
@@ -90,7 +90,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
 
-    def setup_tab_widget(self):
+    def setupTabWidget(self):
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())
         rdbt_attrs = DIALOG_MAPPING.get(rdbt_name)
         tab_title = rdbt_attrs.get('tab_title')
@@ -99,14 +99,14 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.id_label.setText(f'''Wprowadź identyfikator obiektu (np. {rdbt_attrs.get('sample_id')})''')
         self.description_label.setText(rdbt_attrs.get('description_label'))
         self.parcel_lineedit.clear()
-        self.hide_comboboxes()
+        self.hideComboboxes()
         building_mode = rdbt_name == 'rdb_dz'
         self.btn_search_tab3.setEnabled(building_mode)
         self.parcel_lineedit.setEnabled(building_mode)
         self.btn_download_tab3.setEnabled(not building_mode)
         self.tabWidget.setTabVisible(2, rdbt_name != 'rdb_bu')
 
-    def hide_comboboxes(self):
+    def hideComboboxes(self):
         comboboxes_to_hide = []
         for rdbt, cmb in RADIOBUTTON_COMBOBOX_MAPPING.items():
             combo_obj = getattr(self, cmb)
@@ -121,13 +121,13 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
             combo_obj.setStyleSheet("QComboBox { color: transparent }")
             combo_obj.setEnabled(False)
             
-    def setup_administrative_unit_obj(self, func, dependent_combo):
+    def setupAdministrativeUnitObj(self, func, dependent_combo):
         combo_obj = getattr(self, dependent_combo)
         unit_data = self.sender().currentData()
         combo_obj.clear()
         combo_obj.blockSignals(True)
         if unit_data:
-            unit_dict = getattr(self.regionFetch, func)(unit_data)
+            unit_dict = getattr(self.region_fetch, func)(unit_data)
             combo_obj.addItems(unit_dict.values())
             for idx, val in enumerate(unit_dict.keys()):
                 combo_obj.setItemData(idx, val)
@@ -135,5 +135,5 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         combo_obj.blockSignals(False)
 
     def closeEvent(self, event):
-        self.closingPlugin.emit()
+        self.closing_plugin.emit()
         event.accept()

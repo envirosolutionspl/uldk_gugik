@@ -17,7 +17,7 @@ class QgisFeed:
         self.industries_dict = INDUSTRIES
 
         self.industry_decoded = [key for key, val in self.industries_dict.items() if val == selected_industry]
-        self.plugin_name_slug = self.create_slug(plugin_name)
+        self.plugin_name_slug = self.createSlug(plugin_name)
 
         self.es_url = (
             f"{FEED_URL}?industry={self.industry_decoded[0]}&plugin={self.plugin_name_slug}" if self.industry_decoded else FEED_URL
@@ -39,7 +39,7 @@ class QgisFeed:
 
         return re.sub(r'://|\.|:|/\?|=|&|-|:', '', url)
 
-    def create_slug(self, text):
+    def createSlug(self, text):
         """
         This function makes slug from a random text
         """
