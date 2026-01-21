@@ -2,7 +2,7 @@ from .constants import ULDK_GMINA_DICT_URL, ULDK_POWIAT_DICT_URL, ULDK_WOJEWODZT
 from .https_adapter import getLegacySession
 
 
-class region_fetch:
+class RegionFetch:
     def __init__(self, teryt):
         self.wojewodztwo_dict = self.__fetchWojewodztwoDict(teryt = '')
         self.powiat_dict = self.getPowiatByTeryt(teryt)
