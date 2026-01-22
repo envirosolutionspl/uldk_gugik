@@ -2,14 +2,14 @@ from urllib.parse import urlencode
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkReply
 from qgis.PyQt.QtCore import QUrl, QEventLoop
 from .uldk_gugik_dialog import UldkGugikDialog
-
+from .constants import ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_MIN_LINE_LEN
 
 class Request:
 
     def __init__(self, params):
         self.params = params
         self._data = set()
-        self.url = "http://uldk.gugik.gov.pl/"
+        self.url = ULDK_BASE_URL
         self.manager = QNetworkAccessManager()
 
         self.getRequest()
@@ -31,9 +31,9 @@ class Request:
         if reply.error() == QNetworkReply.NoError:
             returned_data = reply.readAll().data().decode('utf-8')
             for line in returned_data.split('\n'):
-                if len(line) < 3 :
+                if len(line) < ULDK_MIN_LINE_LEN :
                     pass
-                if line in "-1 brak wyników":
+                if line == ULDK_NO_RESULTS:
                     pass
                 else:
                     self._data.add(line.replace('\r',''))

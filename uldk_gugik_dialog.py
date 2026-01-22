@@ -30,9 +30,12 @@ from qgis.core import QgsMessageLog, Qgis
 
 import requests
 
-from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, \
-    RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING
-from .uldk import region_fetch
+from .uldk import RegionFetch
+from .constants import (
+    DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS,
+    RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING,
+    ULDK_LOG, ULDK_NO_INTERNET, COMBOBOX_STYLE_VISIBLE, COMBOBOX_STYLE_HIDDEN
+)
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__),'ui','uldk_gugik_dialog_base.ui'))
@@ -74,9 +77,9 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.region_fetch = region_fetch(teryt='')
         except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
-            QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
             self.region_fetch = None
         self.fillVoivodeships()
+            QgsMessageLog.logMessage(str(ULDK_NO_INTERNET), ULDK_LOG, level=Qgis.Warning)
 
     def fillVoivodeships(self):
         if self.region_fetch:
@@ -88,7 +91,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.wojcomboBox.setItemData(idx, val)
             self.wojcomboBox.setCurrentIndex(-1)
         else:
-            QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
+            QgsMessageLog.logMessage(str(ULDK_NO_INTERNET), ULDK_LOG, level=Qgis.Warning)
 
     def setupTabWidget(self):
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())

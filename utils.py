@@ -1,16 +1,15 @@
 import socket
-
-default_srid = 2180
+from .constants import INTERNET_HOST, INTERNET_PORT, INTERNET_TIMEOUT, MSG_CONNECTION_ERROR
 
 
 def isInternetConnected():
     try:
-        host = socket.gethostbyname("www.google.com")
-        s = socket.create_connection((host, 80), 2)
+        host = socket.gethostbyname(INTERNET_HOST)
+        s = socket.create_connection((host, INTERNET_PORT), INTERNET_TIMEOUT)
         shutDownConnection(s)
         return True
     except Exception as ex :
-        print(f"Błąd połączenia: {ex}")
+        print(MSG_CONNECTION_ERROR.format(error=ex))
         return False
 
 

@@ -4,7 +4,7 @@ from qgis.PyQt.QtCore import QUrl, QEventLoop
 
 from qgis.core import QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject
 
-URL = "http://uldk.gugik.gov.pl/"
+from .constants import ULDK_BASE_URL, ULDK_RESULT_TERYT
 
 
 def getRequestTeryt(xy, request):
@@ -21,8 +21,8 @@ def getRequestTeryt(xy, request):
             else:
                 result = data.split('\n')[1]
         loop.quit()
-    PARAMS = {'request': request, 'xy': xy, 'result': 'teryt'}    
-    url = URL + "?" + urlencode(PARAMS)
+    PARAMS = {'request': request, 'xy': xy, 'result': ULDK_RESULT_TERYT}    
+    url = ULDK_BASE_URL + "?" + urlencode(PARAMS)
     result = None
     request = QNetworkRequest(QUrl(url))
     manager = QNetworkAccessManager()
