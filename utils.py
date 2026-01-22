@@ -1,15 +1,15 @@
 import socket
-from .constants import INTERNET_HOST, INTERNET_PORT, INTERNET_TIMEOUT, MSG_CONNECTION_ERROR
+from .constants import CHECK_INTERNET_CLIENT
 
 
 def isInternetConnected():
     try:
-        host = socket.gethostbyname(INTERNET_HOST)
-        s = socket.create_connection((host, INTERNET_PORT), INTERNET_TIMEOUT)
+        host = socket.gethostbyname(CHECK_INTERNET_CLIENT["host"])
+        s = socket.create_connection((host, CHECK_INTERNET_CLIENT["port"]), CHECK_INTERNET_CLIENT["timeout"])
         shutDownConnection(s)
         return True
-    except Exception as ex :
-        print(MSG_CONNECTION_ERROR.format(error=ex))
+    except Exception as ex:
+        print(f"Błąd połączenia: {ex}")
         return False
 
 

@@ -2,8 +2,8 @@ from urllib.parse import urlencode
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkReply
 from qgis.PyQt.QtCore import QUrl, QEventLoop
 from .constants import (
-    ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_XML_MARKER, ULDK_ERROR_MARKER, 
-    ULDK_ENCODING, ULDK_MIN_LINE_LEN, ULDK_OBJ_REGION, ULDK_NOT_FOUND,
+    ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_XML_MARKER, ULDK_ERROR_MARKERS, 
+    ENCODING_SYSTEM, ULDK_MIN_LINE_LEN, ULDK_OBJ_REGION, ULDK_NOT_FOUND,
     ULDK_TERYT_SUFFIX_LEN
 )
 
@@ -31,10 +31,10 @@ class Request:
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
-            returnedData = reply.readAll().data().decode(ULDK_ENCODING)
+            returnedData = reply.readAll().data().decode(ENCODING_SYSTEM)
 
             for line in returned_data.split('\n'):
-                if len(line) < ULDK_MIN_LINE_LEN or line == ULDK_NO_RESULTS or line.find(ULDK_XML_MARKER)> ULDK_NOT_FOUND or line.find(ULDK_ERROR_MARKER)>ULDK_NOT_FOUND:
+                if len(line) < ULDK_MIN_LINE_LEN or line == ULDK_NO_RESULTS or line.find(ULDK_XML_MARKER)> ULDK_NOT_FOUND or any(line.find(marker) > ULDK_NOT_FOUND for marker in ULDK_ERROR_MARKERS):
                     continue
                 if ";" in line:
                     polygon = line.split(';')[1]

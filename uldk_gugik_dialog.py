@@ -34,8 +34,9 @@ from .uldk import RegionFetch
 from .constants import (
     DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS,
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING,
-    ULDK_LOG, ULDK_NO_INTERNET, COMBOBOX_STYLE_VISIBLE, COMBOBOX_STYLE_HIDDEN
+    COMBOBOX_STYLES
 )
+from . import PLUGIN_NAME as plugin_name
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__),'ui','uldk_gugik_dialog_base.ui'))
@@ -77,9 +78,9 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.region_fetch = region_fetch(teryt='')
         except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
-            self.region_fetch = None
-        self.fillVoivodeships()
-            QgsMessageLog.logMessage(str(ULDK_NO_INTERNET), ULDK_LOG, level=Qgis.Warning)
+            QgsMessageLog.logMessage("Brak połączenia z Internetem. Spróbuj ponownie później", plugin_name, level=Qgis.Warning)
+            self.regionFetch = None
+        self.fill_voivodeships()
 
     def fillVoivodeships(self):
         if self.region_fetch:
@@ -91,7 +92,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.wojcomboBox.setItemData(idx, val)
             self.wojcomboBox.setCurrentIndex(-1)
         else:
-            QgsMessageLog.logMessage(str(ULDK_NO_INTERNET), ULDK_LOG, level=Qgis.Warning)
+            QgsMessageLog.logMessage("Brak połączenia z Internetem. Spróbuj ponownie później", plugin_name, level=Qgis.Warning)
 
     def setupTabWidget(self):
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())
@@ -113,7 +114,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         comboboxes_to_hide = []
         for rdbt, cmb in RADIOBUTTON_COMBOBOX_MAPPING.items():
             combo_obj = getattr(self, cmb)
-            combo_obj.setStyleSheet("QComboBox { color: black }")
+            combo_obj.setStyleSheet(COMBOBOX_STYLES["visible"])
             getattr(self, cmb).setEnabled(True)
             if getattr(self, rdbt).isChecked():
                 combo_idx = list(RADIOBUTTON_COMBOBOX_MAPPING).index(rdbt) + 1
@@ -121,7 +122,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 break
         for combo in comboboxes_to_hide:
             combo_obj = getattr(self, combo)
-            combo_obj.setStyleSheet("QComboBox { color: transparent }")
+            combo_obj.setStyleSheet(COMBOBOX_STYLES["hidden"])
             combo_obj.setEnabled(False)
             
     def setupAdministrativeUnitObj(self, func, dependent_combo):

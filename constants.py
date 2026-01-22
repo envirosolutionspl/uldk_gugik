@@ -24,8 +24,8 @@ INDUSTRIES = {
 ULDK_BASE_URL = "http://uldk.gugik.gov.pl/"
 ULDK_NO_RESULTS = "-1 brak wyników"
 ULDK_XML_MARKER = "XML"
-ULDK_ERROR_MARKER = "błęd"
-ULDK_ENCODING = "utf-8"
+ULDK_ERROR_MARKERS = ["błęd"]
+ENCODING_SYSTEM = "utf-8"
 ULDK_MIN_LINE_LEN = 3
 ULDK_NOT_FOUND = -1
 ULDK_OBJ_REGION = 2
@@ -86,23 +86,24 @@ REQ_COMMUNE_BY_ID = "GetCommuneById"
 REQ_COUNTY_BY_ID = "GetCountyById"
 REQ_VOIVODESHIP_BY_ID = "GetVoivodeshipById"
 
-RES_BUILDING_BY_ID = "geom_wkt,teryt,region,commune,county,voivodeship"
-RES_PARCEL_BY_ID = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
-RES_REGION_BY_ID = "geom_wkt,teryt,region,commune,county,voivodeship"
-RES_COMMUNE_BY_ID = "geom_wkt,teryt,commune,county,voivodeship"
-RES_COUNTY_BY_ID = "geom_wkt,teryt,county,voivodeship"
-RES_VOIVODESHIP_BY_ID = "geom_wkt,teryt,voivodeship"
+RES_BUILDING_BY_ID = ",".join(["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"])
+RES_PARCEL_BY_ID = ",".join(["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"])
+RES_REGION_BY_ID = ",".join(["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"])
+RES_COMMUNE_BY_ID = ",".join(["geom_wkt", "teryt", "commune", "county", "voivodeship"])
+RES_COUNTY_BY_ID = ",".join(["geom_wkt", "teryt", "county", "voivodeship"])
+RES_VOIVODESHIP_BY_ID = ",".join(["geom_wkt", "teryt", "voivodeship"])
 
-ULDK_NO_INTERNET = "Brak połączenia z Internetem. Spróbuj ponownie później"
-ULDK_LOG = "ULDK"
-COMBOBOX_STYLE_VISIBLE = "QComboBox { color: black }"
-COMBOBOX_STYLE_HIDDEN = "QComboBox { color: transparent }"
+COMBOBOX_STYLES = {
+    "visible": "QComboBox { color: black }",
+    "hidden": "QComboBox { color: transparent }"
+}
 
-REQ_PARCEL_BY_ID_OR_NR = "GetParcelByIdOrNr"
-RES_PARCEL_BY_ID_OR_NR = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
+PARCEL_BY_ID_OR_NR = {
+    "request": "GetParcelByIdOrNr",
+    "result": ",".join(["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"])
+}
 
-REQ_REGION_BY_ID = "GetRegionById"
-RES_REGION_META = "teryt,region,commune,county,voivodeship"
+RES_REGION_META = ",".join(["teryt", "region", "commune", "county", "voivodeship"])
 
 ULDK_RESULT_TERYT = "teryt"
 
@@ -113,75 +114,49 @@ REQ_COMMUNE_BY_XY = "GetCommuneByXY"
 REQ_COUNTY_BY_XY = "GetCountyByXY"
 REQ_VOIVODESHIP_BY_XY = "GetVoivodeshipByXY"
 
-RES_BUILDING_BY_XY = "geom_wkt,teryt,region,commune,county,voivodeship"
-RES_PARCEL_BY_XY = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
-RES_REGION_BY_XY = "geom_wkt,teryt,region,commune,county,voivodeship"
-RES_COMMUNE_BY_XY = "geom_wkt,teryt,commune,county,voivodeship"
-RES_COUNTY_BY_XY = "geom_wkt,teryt,county,voivodeship"
-RES_VOIVODESHIP_BY_XY = "geom_wkt,teryt,voivodeship"
+RES_BUILDING_BY_XY = ",".join(["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"])
+RES_PARCEL_BY_XY = ",".join(["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"])
+RES_REGION_BY_XY = ",".join(["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"])
+RES_COMMUNE_BY_XY = ",".join(["geom_wkt", "teryt", "commune", "county", "voivodeship"])
+RES_COUNTY_BY_XY = ",".join(["geom_wkt", "teryt", "county", "voivodeship"])
+RES_VOIVODESHIP_BY_XY = ",".join(["geom_wkt", "teryt", "voivodeship"])
 
-INTERNET_HOST = "www.google.com"
-INTERNET_PORT = 80
-INTERNET_TIMEOUT = 2
-MSG_CONNECTION_ERROR = "Błąd połączenia: {error}"
+CHECK_INTERNET_CLIENT = {
+    "host": "www.google.com",
+    "port": 80,
+    "timeout": 2
+}
 
 ENV_MENU_NAME = "&EnviroSolutions"
 ENV_TOOLBAR_NAME = "EnviroSolutions"
 
 SWAP_XY_SRIDS = {"2180", "4326", "3857", "2176", "2177", "2178", "2179"}
 
-LAYER_NAMES_BY_TYPE = {
-    1: "dzialki_ew_uldk",
-    2: "obreby_ew_uldk",
-    3: "gminy_uldk",
-    4: "powiaty_uldk",
-    5: "wojewodztwa_uldk",
-    6: "budynki_uldk",
-}
-
-ICON_ULDK_PATH = ':/plugins/uldk_gugik/images/uldk.svg'
-ICON_COORDS_PATH = ':/plugins/uldk_gugik/images/coords.png'
 TOOLTIP_FROM_MAP = "skrót: ALT + F"
 
-MSG_PREFIX_WARNING = "Ostrzeżenie:"
-MSG_PREFIX_FORM_ERROR = "Błąd formularza:"
-MSG_PREFIX_FETCH_ERROR = "Nie udało się pobrać obiektu:"
-MSG_PREFIX_INFO = "Informacja:"
-MSG_PREFIX_SUCCESS = "Sukces:"
-
-MSG_NO_CRS_TITLE = "Projekt QGIS nie posiada zdefiniowanego układu współrzędnych."
-MSG_NO_CRS_BODY = "W celu dalszej pracy zdefiniuj układ współrzędnych dla projektu"
-MSG_ULDK_SERVER_DOWN = "Serwer ULDK nie odpowiada. Spróbuj ponownie później"
-ULDK_NO_INTERNET_SHORT = "Brak połączenia z internetem"
-
-MSG_MISSING_ID = "musisz wpisać identyfikator"
-MSG_MISSING_REGION = "musisz wpisać obręb"
-MSG_MISSING_PARCEL = "musisz wpisać numer działki"
-MSG_MISSING_X = "musisz wpisać współrzędną X"
-MSG_MISSING_Y = "musisz wpisać współrzędną Y"
-
-MSG_NO_PARCEL_RESULTS = "Nie zwrócono żadnej działki dla podanych parametrów"
-MSG_NO_PARCEL_DOWNLOADED = "Nie pobrano żadnej działki dla podanych parametrów"
-
-INFO_PARCELS_FOUND = "Znaleziono działkę/i dla podanych parametrów, wybierz numer arkusza."
-INFO_PARCEL_FOUND = "Znaleziono działkę dla podanych parametrów. Aby pobrać działkę, kliknij przycisk Pobierz."
-
-MSG_API_NO_RESPONSE = "API nie zwróciło odpowiedzi dla żądanego zapytania"
-MSG_API_NO_OBJECT_ID = "API nie zwróciło obiektu dla id {id}"
-MSG_API_NO_GEOM_ID = "API nie zwróciło geometrii dla id {id}"
-MSG_API_NO_OBJECT_QUERY = "API nie zwróciło obiektu dla wybranego zapytania"
-MSG_API_NO_OBJECT_COORDS = "API nie zwróciło obiektu dla współrzędnych {coords}"
-MSG_MORE_PARCELS_HINT = (
-    "W wybranym obrębie znaleziono więcej działek o identyfikatorze TERYT: {teryt}. "
-    "Dodaj numer arkusza w celu odnalezienia właściwej działki"
-)
-MSG_PARCEL_SUCCESS = "Pobrano działkę dla obiektu: {name}"
-
-OBJECT_TYPE_SUCCESS_LABELS = {
-    1: "działkę o nr teryt: %s",
-    2: "obręb ewidencyjny",
-    3: "gminę",
-    4: "powiat",
-    5: "województwo",
-    6: "budynek",
+OBJECT_TYPES = {
+    1: {
+        "layer_name": "dzialki_ew_uldk",
+        "success_label": "działkę o nr teryt: %s"
+    },
+    2: {
+        "layer_name": "obreby_ew_uldk",
+        "success_label": "obręb ewidencyjny"
+    },
+    3: {
+        "layer_name": "gminy_uldk",
+        "success_label": "gminę"
+    },
+    4: {
+        "layer_name": "powiaty_uldk",
+        "success_label": "powiat"
+    },
+    5: {
+        "layer_name": "wojewodztwa_uldk",
+        "success_label": "województwo"
+    },
+    6: {
+        "layer_name": "budynki_uldk",
+        "success_label": "budynek"
+    }
 }
