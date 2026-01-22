@@ -307,7 +307,7 @@ class UldkGugik:
             self.settings.setValue("showDialog", False) 
 
     def setupDialog(self):
-        if self.dlg.region_fetch is None:
+        if self.dlg.RegionFetch is None:
             self.dlg = UldkGugikDialog()
         self.dlg.show()
 
