@@ -103,6 +103,7 @@ PARCEL_BY_ID_OR_NR = {
     "result": ",".join(["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"])
 }
 
+REQ_REGION_BY_ID = "GetRegionById"
 RES_REGION_META = ",".join(["teryt", "region", "commune", "county", "voivodeship"])
 
 ULDK_RESULT_TERYT = "teryt"
