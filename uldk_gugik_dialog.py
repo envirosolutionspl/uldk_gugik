@@ -90,7 +90,10 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
 
-    def setupTabWidget(self):
+    def setupTabWidget(self, checked):
+        if not checked:
+            return
+
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())
         rdbt_attrs = DIALOG_MAPPING.get(rdbt_name)
         tab_title = rdbt_attrs.get('tab_title')
@@ -100,10 +103,13 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.description_label.setText(rdbt_attrs.get('description_label'))
         self.parcel_lineedit.clear()
         self.hideComboboxes()
-        building_mode = rdbt_name == 'rdb_dz'
-        self.btn_search_tab3.setEnabled(building_mode)
-        self.parcel_lineedit.setEnabled(building_mode)
-        self.btn_download_tab3.setEnabled(not building_mode)
+        parcel_mode = (rdbt_name == 'rdb_dz')
+        self.btn_search_tab3.setEnabled(parcel_mode)
+        self.parcel_lineedit.setEnabled(parcel_mode)
+        self.btn_download_tab3.setEnabled(not parcel_mode)
+        self.label_13.setVisible(parcel_mode)
+        self.parcel_lineedit.setVisible(parcel_mode)
+        self.btn_search_tab3.setVisible(parcel_mode)
         self.tabWidget.setTabVisible(2, rdbt_name != 'rdb_bu')
 
     def hideComboboxes(self):
