@@ -293,7 +293,7 @@ class UldkGugik:
                                                 'Brak połączenia z internetem',
                                                 level=Qgis.Warning, duration=10)
         self.dlg.projectionWidget.setCrs(
-            QgsCoordinateReferenceSystem(srid, QgsCoordinateReferenceSystem.EpsgCrsId))
+            QgsCoordinateReferenceSystem.fromEpsgId(int(srid)))
 
 
     def showBranchSelectionDialog(self):
