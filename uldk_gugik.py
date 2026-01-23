@@ -40,7 +40,7 @@ from .qgis_feed import QgisFeedDialog
 import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 from .constants import (
-    DEFAULT_SRID, ENV_MENU_NAME, ENV_TOOLBAR_NAME, SWAP_XY_SRIDS, TOOLTIP_FROM_MAP,
+    DEFAULT_SRID, ENV_MENU_NAME, SWAP_XY_SRIDS, TOOLTIP_FROM_MAP,
     OBJECT_TYPES, ULDK_MIN_LINE_LEN,
 )
 
@@ -101,10 +101,11 @@ class UldkGugik:
         self.menu = self.tr(ENV_MENU_NAME)
 
         #toolbar
-        self.toolbar = self.iface.mainWindow().findChild(QToolBar, ENV_TOOLBAR_NAME)
+        toolbar_name = ENV_MENU_NAME.replace("&", "")  # Zamiast dwóch zmiennych w constants - jedna po zamianie & na ""
+        self.toolbar = self.iface.mainWindow().findChild(QToolBar, toolbar_name)
         if not self.toolbar:
-            self.toolbar = self.iface.addToolBar(ENV_TOOLBAR_NAME)
-            self.toolbar.setObjectName(ENV_TOOLBAR_NAME)
+            self.toolbar = self.iface.addToolBar(toolbar_name)
+            self.toolbar.setObjectName(toolbar_name)
 
         self.shortcut = None
         # Check if plugin was started the first time in current QGIS session
@@ -1205,7 +1206,7 @@ class UldkGugik:
             voivodeship = res[2]
 
         elif objectType == 6:
-            resp = uldk_xy.GetBuildingByXY(xy=pid, object_type=6)
+            resp = uldk_xy.getBuildingByXY(xy=pid, object_type=6)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",

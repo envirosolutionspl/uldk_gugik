@@ -26,10 +26,10 @@ ULDK_NO_RESULTS = "-1 brak wyników"
 ULDK_XML_MARKER = "XML"
 ULDK_ERROR_MARKERS = ["błęd"]
 ENCODING_SYSTEM = "utf-8"
-ULDK_MIN_LINE_LEN = 3
-ULDK_NOT_FOUND = -1
-ULDK_OBJ_REGION = 2
-ULDK_TERYT_SUFFIX_LEN = 4
+ULDK_MIN_LINE_LEN = 3  # Do filtrowania zbyt krótkich odpowiedzi z serwera
+ULDK_NOT_FOUND = -1  # Wartość zwracana przez metodę find() gdy nie znajdzie tekstu
+ULDK_OBJ_REGION = 2  # Typ obiektu dla obrębu ewidencyjnego (region) z API ULDK
+ULDK_TERYT_SUFFIX_LEN = 4  # Kilka działek ma ten sam TERYT, mimo że należy do tego samego terenu -> ignorujemy 4 ostatnie cyfry
 
 
 DIALOG_MAPPING = {
@@ -86,12 +86,12 @@ REQ_COMMUNE_BY_ID = "GetCommuneById"
 REQ_COUNTY_BY_ID = "GetCountyById"
 REQ_VOIVODESHIP_BY_ID = "GetVoivodeshipById"
 
-RES_BUILDING_BY_ID = ",".join(["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"])
-RES_PARCEL_BY_ID = ",".join(["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"])
-RES_REGION_BY_ID = ",".join(["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"])
-RES_COMMUNE_BY_ID = ",".join(["geom_wkt", "teryt", "commune", "county", "voivodeship"])
-RES_COUNTY_BY_ID = ",".join(["geom_wkt", "teryt", "county", "voivodeship"])
-RES_VOIVODESHIP_BY_ID = ",".join(["geom_wkt", "teryt", "voivodeship"])
+RES_BUILDING_BY_ID = ["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"]
+RES_PARCEL_BY_ID = ["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"]
+RES_REGION_BY_ID = ["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"]
+RES_COMMUNE_BY_ID = ["geom_wkt", "teryt", "commune", "county", "voivodeship"]
+RES_COUNTY_BY_ID = ["geom_wkt", "teryt", "county", "voivodeship"]
+RES_VOIVODESHIP_BY_ID = ["geom_wkt", "teryt", "voivodeship"]
 
 COMBOBOX_STYLES = {
     "visible": "QComboBox { color: black }",
@@ -100,10 +100,10 @@ COMBOBOX_STYLES = {
 
 PARCEL_BY_ID_OR_NR = {
     "request": "GetParcelByIdOrNr",
-    "result": ",".join(["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"])
+    "result": ["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"]
 }
 
-RES_REGION_META = ",".join(["teryt", "region", "commune", "county", "voivodeship"])
+RES_REGION_META = ["teryt", "region", "commune", "county", "voivodeship"]
 
 ULDK_RESULT_TERYT = "teryt"
 
@@ -114,12 +114,12 @@ REQ_COMMUNE_BY_XY = "GetCommuneByXY"
 REQ_COUNTY_BY_XY = "GetCountyByXY"
 REQ_VOIVODESHIP_BY_XY = "GetVoivodeshipByXY"
 
-RES_BUILDING_BY_XY = ",".join(["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"])
-RES_PARCEL_BY_XY = ",".join(["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"])
-RES_REGION_BY_XY = ",".join(["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"])
-RES_COMMUNE_BY_XY = ",".join(["geom_wkt", "teryt", "commune", "county", "voivodeship"])
-RES_COUNTY_BY_XY = ",".join(["geom_wkt", "teryt", "county", "voivodeship"])
-RES_VOIVODESHIP_BY_XY = ",".join(["geom_wkt", "teryt", "voivodeship"])
+RES_BUILDING_BY_XY = ["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"]
+RES_PARCEL_BY_XY = ["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"]
+RES_REGION_BY_XY = ["geom_wkt", "teryt", "region", "commune", "county", "voivodeship"]
+RES_COMMUNE_BY_XY = ["geom_wkt", "teryt", "commune", "county", "voivodeship"]
+RES_COUNTY_BY_XY = ["geom_wkt", "teryt", "county", "voivodeship"]
+RES_VOIVODESHIP_BY_XY = ["geom_wkt", "teryt", "voivodeship"]
 
 CHECK_INTERNET_CLIENT = {
     "host": "www.google.com",
@@ -128,7 +128,6 @@ CHECK_INTERNET_CLIENT = {
 }
 
 ENV_MENU_NAME = "&EnviroSolutions"
-ENV_TOOLBAR_NAME = "EnviroSolutions"
 
 SWAP_XY_SRIDS = {"2180", "4326", "3857", "2176", "2177", "2178", "2179"}
 

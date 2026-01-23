@@ -80,7 +80,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
             QgsMessageLog.logMessage("Brak połączenia z Internetem. Spróbuj ponownie później", plugin_name, level=Qgis.Warning)
             self.regionFetch = None
-        self.fill_voivodeships()
+        self.fillVoivodeships()
 
     def fillVoivodeships(self):
         if self.region_fetch:

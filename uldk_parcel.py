@@ -11,7 +11,7 @@ def getParcelById(name, objectType, **kwargs):
     params = {
         'request': PARCEL_BY_ID_OR_NR["request"],
         'id': name,
-        'result': PARCEL_BY_ID_OR_NR["result"],
+        'result': ",".join(PARCEL_BY_ID_OR_NR["result"]),
         'srid': DEFAULT_SRID
     }
     res = RQ(params, objectType, **kwargs)
@@ -22,16 +22,16 @@ def getParcelById2(name, **kwargs):
     params = {
         'request': PARCEL_BY_ID_OR_NR["request"],
         'id': name,
-        'result': PARCEL_BY_ID_OR_NR["result"],
+        'result': ",".join(PARCEL_BY_ID_OR_NR["result"]),
         'srid': DEFAULT_SRID
     }
     res = RS(params, **kwargs)
     return res.data
 
 
-def GetRegionById(id, **kwargs):
+def getRegionById(id, **kwargs):
     request = REQ_REGION_BY_ID
-    result = RES_REGION_META
+    result = ",".join(RES_REGION_META)
     params = {'request': request, 'id': id, 'result': result, 'srid': DEFAULT_SRID}
     res = RR(params, **kwargs)
     return res.data

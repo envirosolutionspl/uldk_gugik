@@ -8,14 +8,14 @@ from .request import Request
 
 def getBuildingById(id, object_type):
     request = REQ_BUILDING_BY_ID
-    result = RES_BUILDING_BY_ID
+    result = ",".join(RES_BUILDING_BY_ID)
     params = {'request': request, 'id': id, 'result': result, 'srid': DEFAULT_SRID}
     res = Request(params, object_type)
     return res.data
 
 def getParcelById(id, object_type):
     request = REQ_PARCEL_BY_ID
-    result = RES_PARCEL_BY_ID
+    result = ",".join(RES_PARCEL_BY_ID)
     params = {'request': request, 'id': id, 'result': result, 'srid': DEFAULT_SRID}
     res = Request(params, object_type)
     return res.data
@@ -23,7 +23,7 @@ def getParcelById(id, object_type):
 
 def getRegionById(id, object_type, **kwargs):
     request = REQ_REGION_BY_ID
-    result = RES_REGION_BY_ID
+    result = ",".join(RES_REGION_BY_ID)
     params = {'request': request, 'id': id, 'result': result, 'srid': DEFAULT_SRID}
     res = Request(params, object_type, **kwargs)
     return res.data
@@ -31,7 +31,7 @@ def getRegionById(id, object_type, **kwargs):
 
 def getCommuneById(id, object_type):
     request = REQ_COMMUNE_BY_ID
-    result = RES_COMMUNE_BY_ID
+    result = ",".join(RES_COMMUNE_BY_ID)
     params = {'request': request, 'id': id, 'result': result, 'srid': DEFAULT_SRID}
     res = Request(params, object_type)
     return res.data
@@ -39,7 +39,7 @@ def getCommuneById(id, object_type):
 
 def getCountyById(id, object_type):
     request = REQ_COUNTY_BY_ID
-    result = RES_COUNTY_BY_ID
+    result = ",".join(RES_COUNTY_BY_ID)
     params = {'request': request, 'id': id, 'result': result, 'srid': DEFAULT_SRID}
     res = Request(params, object_type)
     return res.data
@@ -47,7 +47,7 @@ def getCountyById(id, object_type):
 
 def getVoivodeshipById(id, object_type):
     request = REQ_VOIVODESHIP_BY_ID
-    result = RES_VOIVODESHIP_BY_ID
+    result = ",".join(RES_VOIVODESHIP_BY_ID)
     params = {'request': request, 'id': id, 'result': result, 'srid': DEFAULT_SRID}
     res = Request(params, object_type)
     return res.data
