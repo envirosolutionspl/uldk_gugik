@@ -1,40 +1,58 @@
 from urllib.parse import urlencode
-from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkReply
-from qgis.PyQt.QtCore import QUrl, QEventLoop
+from qgis.PyQt.QtNetwork import QNetworkReply
+from qgis.PyQt.QtCore import QEventLoop
+from .https_adapter import getLegacySession
 from .uldk_gugik_dialog import UldkGugikDialog
+
+if not hasattr(QEventLoop, 'exec'):
+    QEventLoop.exec = QEventLoop.exec_
 
 
 class Request:
     def __init__(self, params):
         self.params = params
         self._data = set()
-        self.url = "http://uldk.gugik.gov.pl/"
-        self.manager = QNetworkAccessManager()
+        self.url = "https://uldk.gugik.gov.pl/"
+        self.session = getLegacySession()
+        
+        
+        self.loop = QEventLoop()
+        self.reply = None
 
         self.getRequest()
-        self.loop = QEventLoop()
-        self.loop.exec_()
+        self.loop.exec()
     def getRequest(self):
-        """Wysłanie zapytania z odpowiednimi parametrami"""
         final_url = self.url + "?" + urlencode(self.params)
-        req = QNetworkRequest(QUrl(final_url))
-        reply = self.manager.get(req)
-        reply.finished.connect(lambda: self.handleRequest(reply))
+        self.reply = self.session.get(final_url)
+        self.reply.finished.connect(lambda: self.handleRequest(self.reply))
         
 
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
-        self._data.clear()
-        if reply.error() == QNetworkReply.NoError:
-            returned_data = reply.readAll().data().decode('utf-8')
-            for line in returned_data.split('\n'):
-                if len(line) < 3 :
-                    pass
-                if line in "-1 brak wyników":
-                    pass
-                else:
+        try:
+            self._data.clear()
+            error_val = reply.error()
+            if hasattr(QNetworkReply, 'NetworkError'):
+                no_err = QNetworkReply.NetworkError.NoError  # Qt6
+                is_no_error = (error_val == no_err)  # W Qt6 porównujemy enumy bezpośrednio
+            else:
+                no_err = QNetworkReply.NoError  # Qt5
+                is_no_error = (int(error_val) == int(no_err))  # W Qt5 konwertujemy na int
+            if is_no_error:
+                returned_data = reply.readAll().data().decode('utf-8')
+                for line in returned_data.split('\n'):
+                    if len(line) < 3:
+                        continue
+                    if line == "-1 brak wyników":
+                        continue
                     self._data.add(line.replace('\r',''))
-        self.loop.quit()
+        except Exception:
+            pass
+        finally:
+            # Zawsze zakończ loop, nawet w przypadku błędu
+            if self.loop.isRunning():
+                self.loop.quit()
+            reply.deleteLater()
 
     @property
     def data(self):

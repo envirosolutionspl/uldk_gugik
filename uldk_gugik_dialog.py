@@ -28,8 +28,6 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget
 from qgis.core import QgsMessageLog, Qgis
 
-import requests
-
 from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, \
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING
 from .uldk import region_fetch
@@ -73,7 +71,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.tabWidget.setTabVisible(2, False)
         try:
             self.region_fetch = region_fetch(teryt='')
-        except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
+        except Exception:
             QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
             self.region_fetch = None
         self.fillVoivodeships()

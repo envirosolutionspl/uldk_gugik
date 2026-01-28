@@ -27,9 +27,13 @@ from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel, Q
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import (Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField,
                        QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform, QgsMessageLog,
-                       QgsSettings)
+                       QgsSettings, QgsNetworkAccessManager)
+from qgis.PyQt.QtCore import QUrl, QEventLoop
+from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 
-import requests
+# Kompatybilność Qt5/Qt6 - w Qt5 metoda to exec_(), w Qt6 to exec()
+if not hasattr(QEventLoop, 'exec'):
+    QEventLoop.exec = QEventLoop.exec_
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -270,25 +274,58 @@ class UldkGugik:
             if Qgis.QGIS_VERSION_INT >= 30000:
                 # skrot klawiszowy
                 self.shortcut = QShortcut(self.iface.mainWindow())
-                self.shortcut.setKey(QKeySequence(Qt.ALT + Qt.Key_F))
+                # Qt6 compatibility: use string format instead of Qt.ALT + Qt.Key_F
+                self.shortcut.setKey(QKeySequence("Alt+F"))
                 self.shortcut.activated.connect(self.shortcutActivated)
             else:
-                self.shortcut = QShortcut(QKeySequence(Qt.ALT + Qt.Key_F), self.iface.mainWindow())
+                self.shortcut = QShortcut(QKeySequence("Alt+F"), self.iface.mainWindow())
                 self.shortcut.setContext(Qt.ApplicationShortcut)
                 self.shortcut.activated.connect(self.shortcutActivated)
         
         try:
-            odpowiedz = requests.get('https://uldk.gugik.gov.pl', verify=False)
-
-            if odpowiedz.status_code == 200:
-                self.setupDialog()
-                # self.disable_button_download()
+            url = QUrl('https://uldk.gugik.gov.pl')
+            request = QNetworkRequest(url)
+            if hasattr(QNetworkRequest, 'KnownHeaders'):
+                ua_header = QNetworkRequest.KnownHeaders.UserAgentHeader
+            else:
+                ua_header = QNetworkRequest.UserAgentHeader
+            request.setHeader(ua_header, f"QGIS-Plugin-{plugin_name}")
+            
+            manager = QgsNetworkAccessManager.instance()
+            reply = manager.get(request)
+            
+            loop = QEventLoop()
+            reply.finished.connect(loop.quit)
+            loop.exec()
+            
+            error_val = reply.error()
+            
+            if hasattr(QNetworkReply, 'NetworkError'):
+                no_err = QNetworkReply.NetworkError.NoError  # Qt6
+                is_no_error = (error_val == no_err)  # W Qt6 porównujemy enumy bezpośrednio
+            else:
+                no_err = QNetworkReply.NoError  # Qt5
+                is_no_error = (int(error_val) == int(no_err))  # W Qt5 konwertujemy na int
+            
+            if is_no_error:
+                if hasattr(QNetworkRequest, 'Attribute'):
+                    status_code = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)  # Qt6
+                else:
+                    status_code = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)  # Qt5
+                if status_code and status_code == 200:
+                    self.setupDialog()
+                    # self.disable_button_download()
+                else:
+                    self.iface.messageBar().pushMessage("Ostrzeżenie:", 
+                                                    'Serwer ULDK nie odpowiada. Spróbuj ponownie później',
+                                                    level=Qgis.Warning, duration=10)
             else:
                 self.iface.messageBar().pushMessage("Ostrzeżenie:", 
-                                                'Serwer ULDK nie odpowiada. Spróbuj ponownie później',
+                                                'Brak połączenia z internetem',
                                                 level=Qgis.Warning, duration=10)
+            reply.deleteLater()
 
-        except requests.exceptions.ConnectionError:
+        except Exception as e:
             self.iface.messageBar().pushMessage("Ostrzeżenie:", 
                                                 'Brak połączenia z internetem',
                                                 level=Qgis.Warning, duration=10)
@@ -308,7 +345,12 @@ class UldkGugik:
 
     def setupDialog(self):
         if self.dlg.region_fetch is None:
-            self.dlg = UldkGugikDialog()
+            try:
+                from .uldk import region_fetch
+                self.dlg.region_fetch = region_fetch(teryt='')
+                self.dlg.fillVoivodeships()
+            except Exception:
+                pass
         self.dlg.show()
 
     def btnDownloadTab1Clicked(self):
@@ -700,8 +742,6 @@ class UldkGugik:
         self.canvas.unsetMapTool(self.click_tool)
         self.dlg.doubleSpinBoxX.setValue(point.x())
         self.dlg.doubleSpinBoxY.setValue(point.y())
-        coords = "{}, {}".format(point.x(), point.y())
-        QgsMessageLog.logMessage(str(coords), 'ULDK')
         srid = self.project.crs().postgisSrid()
         self.downloadByXY(srid, type="click", zoomToFeature=False)
 
@@ -1043,7 +1083,6 @@ class UldkGugik:
             y = float(y)
 
         request_point = QgsPoint(x, y)
-        QgsMessageLog.logMessage(str(srid), 'ULDK')
         if str(srid) != DEFAULT_SRID:
             sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
             destCrs = QgsCoordinateReferenceSystem.fromEpsgId(DEFAULT_SRID)
