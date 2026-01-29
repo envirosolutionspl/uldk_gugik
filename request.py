@@ -31,7 +31,7 @@ class Request:
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
-            returnedData = reply.readAll().data().decode(ENCODING_SYSTEM)
+            returned_data = reply.readAll().data().decode(ENCODING_SYSTEM)
 
             for line in returned_data.split('\n'):
                 if len(line) < ULDK_MIN_LINE_LEN or line == ULDK_NO_RESULTS or line.find(ULDK_XML_MARKER)> ULDK_NOT_FOUND or any(line.find(marker) > ULDK_NOT_FOUND for marker in ULDK_ERROR_MARKERS):
