@@ -98,10 +98,10 @@ class UldkGugik:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(ENV_MENU_NAME)
+        self.menu = self.tr(f"&{ENV_MENU_NAME}")
 
         #toolbar
-        toolbar_name = ENV_MENU_NAME.replace("&", "")  # Zamiast dwóch zmiennych w constants - jedna po zamianie & na ""
+        toolbar_name = ENV_MENU_NAME
         self.toolbar = self.iface.mainWindow().findChild(QToolBar, toolbar_name)
         if not self.toolbar:
             self.toolbar = self.iface.addToolBar(toolbar_name)
@@ -206,7 +206,7 @@ class UldkGugik:
 
         if add_to_menu:
             self.iface.addPluginToMenu(
-                self.tr(ENV_MENU_NAME),
+                self.tr(f"&{ENV_MENU_NAME}"),
                 action)
 
         self.actions.append(action)
