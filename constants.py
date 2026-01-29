@@ -21,7 +21,7 @@ INDUSTRIES = {
     "n": "Nieruchomości"
 }
 
-ULDK_BASE_URL = "http://uldk.gugik.gov.pl/"
+ULDK_BASE_URL = "https://uldk.gugik.gov.pl/"
 ULDK_NO_RESULTS = "-1 brak wyników"
 ULDK_XML_MARKER = "XML"
 ULDK_ERROR_MARKERS = ["błęd"]
