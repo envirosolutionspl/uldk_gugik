@@ -127,7 +127,7 @@ CHECK_INTERNET_CLIENT = {
     "timeout": 2
 }
 
-ENV_MENU_NAME = "&EnviroSolutions"
+ENV_MENU_NAME = "EnviroSolutions"
 
 SWAP_XY_SRIDS = {"2180", "4326", "3857", "2176", "2177", "2178", "2179"}
 
