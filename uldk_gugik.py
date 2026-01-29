@@ -53,7 +53,7 @@ plugin_name = 'ULDK GUGiK'
 
 class UldkGugik:
     """QGIS Plugin Implementation."""
-    nazwy_warstw = {1: "dzialki_ew_uldk", 2: "obreby_ew_uldk", 3: "gminy_uldk", 4: "powiaty_uldk", 5: "wojewodztwa_uldk", 6: "budynki_uldk"}
+    layer_names = {1: "dzialki_ew_uldk", 2: "obreby_ew_uldk", 3: "gminy_uldk", 4: "powiaty_uldk", 5: "wojewodztwa_uldk", 6: "budynki_uldk"}
 
     def __init__(self, iface):
         """Constructor.
@@ -460,8 +460,8 @@ class UldkGugik:
                 result = uldk_parcel.getParcelById2(name)
                 result = list(result)
 
-                for rezultat in result:
-                    if rezultat.find("-1 brak wyników") >= 1 or rezultat.find("usługa nie zwróciła odpowiedzi") >= 1 or rezultat.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź") >= 1 or rezultat.find("XML") >= 1 or rezultat.find("błędny format") >= 1:
+                for result_item in result:
+                    if result_item.find("-1 brak wyników") >= 1 or result_item.find("usługa nie zwróciła odpowiedzi") >= 1 or result_item.find("błędny format odpowiedzi XML, usługa zwróciła odpowiedź") >= 1 or result_item.find("XML") >= 1 or result_item.find("błędny format") >= 1:
                         response = False
                     else:
                         response = True
@@ -781,9 +781,9 @@ class UldkGugik:
             voivodeship = res[6]
 
             # layer
-            nazwa = self.nazwy_warstw[object_type]
+            layer_name = self.layer_names[object_type]
 
-            layers = self.project.mapLayersByName(nazwa)
+            layers = self.project.mapLayersByName(layer_name)
 
             if layers:
                 # jezeli istnieje to dodaj obiekt do warstwy
@@ -791,7 +791,7 @@ class UldkGugik:
             else:
                 # jezeli nie istnieje to stworz warstwe
                 epsg = f"Polygon?crs=EPSG:{DEFAULT_SRID}"
-                layer = QgsVectorLayer(epsg, nazwa, "memory")
+                layer = QgsVectorLayer(epsg, layer_name, "memory")
                 self.project.addMapLayer(layer)
             
             provider = layer.dataProvider()
@@ -1243,8 +1243,8 @@ class UldkGugik:
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
         # layer
-        nazwa = self.nazwy_warstw[object_type]
-        layers = self.project.mapLayersByName(nazwa)
+        layer_name = self.layer_names[object_type]
+        layers = self.project.mapLayersByName(layer_name)
 
         # usuwanie pustych warstw z projektu
         for layer in layers:
@@ -1260,7 +1260,7 @@ class UldkGugik:
 
         else:
             # jezeli nie istnieje to stworz warstwe
-            layer = QgsVectorLayer(f"Polygon?crs=EPSG:{DEFAULT_SRID}", nazwa, "memory")
+            layer = QgsVectorLayer(f"Polygon?crs=EPSG:{DEFAULT_SRID}", layer_name, "memory")
             self.project.addMapLayer(layer)
 
             provider = layer.dataProvider()
