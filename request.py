@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
-from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest
-from qgis.PyQt.QtCore import QEventLoop, QUrl
-from qgis.core import QgsMessageLog, Qgis, QgsNetworkAccessManager
+from qgis.PyQt.QtNetwork import QNetworkReply
+from qgis.PyQt.QtCore import QEventLoop
+from qgis.utils import iface
 from .https_adapter import getLegacySession
 
 if not hasattr(QEventLoop, 'exec'):
@@ -28,101 +28,103 @@ class Request:
     def getRequest(self):
         try:
             final_url = f"{self.url}?{urlencode(self.params)}"
-            self.reply = self.session.get(final_url)
-            if not self.reply:
-                return
         except Exception as e:
+            iface.messageBar().pushWarning(
+                "ULDK",
+                f"Nie udało się zbudować adresu zapytania: {e}",
+            )
+            self._data = None
+            return
+        try:
+            self.reply = self.session.get(final_url)
+        except Exception as e:
+            iface.messageBar().pushWarning(
+                "ULDK",
+                f"Błąd podczas wysyłania zapytania do ULDK: {e}",
+            )
+            self._data = None
+            return
+        if not self.reply:
+            iface.messageBar().pushWarning(
+                "ULDK",
+                "Serwer ULDK nie zwrócił odpowiedzi.",
+            )
+            self._data = None
             return
 
+        # Czekamy na zakończenie odpowiedzi
+        self.reply.finished.connect(self.handleReply)
+
+    def handleReply(self):
+        """Obsłużenie odpowiedzi"""
+        reply = self.reply
         try:
-            is_finished = self.reply.isFinished()
-            if is_finished:
-                self.handleReply()
-                return
-        except Exception as e:
-            pass
-        
-        def handleReply():
-            reply = self.reply
-            try:
-                error_val = reply.error()
-                if hasattr(QNetworkReply, 'NetworkError'):
-                    no_err = QNetworkReply.NetworkError.NoError  # Qt6
-                    is_no_error = (error_val == no_err)  # W Qt6 porównujemy enumy bezpośrednio
-                else:
-                    no_err = QNetworkReply.NoError  # Qt5
-                    is_no_error = (int(error_val) == int(no_err))  # W Qt5 konwertujemy na int
-                
-                if is_no_error:
-                    read_data = reply.readAll()
-                    if hasattr(read_data, 'data'):
-                        returned_data = read_data.data().decode('utf-8')
-                    else:
-                        returned_data = bytes(read_data).decode('utf-8')
-                    
-                    if not returned_data or len(returned_data.strip()) == 0:
-                        self._data = None
-                    else:
-                        for line in returned_data.split('\n'):
-                            if len(line) < 3 or line == "-1 brak wyników" or line.find("XML")>-1 or line.find("błęd")>-1:
-                                continue
-                            if ";" in line:
-                                polygon = line.split(';')[1]
-                                if not self.teryt:
-                                    self._data = polygon
-                                    break
-                                
-                                try:
-                                    if self.object_type in [1, 6]:
-                                        teryt = polygon.split('|')[1].split('.')[0]
-                                    elif self.object_type == 2:
-                                        if polygon.split('|')[1].find(".") > -1:
-                                            teryt = polygon.split('|')[1].split('.')[0]
-                                        else:
-                                            continue
-                                    else:
-                                        teryt = polygon.split('|')[1]
+            # Sprawdzenie błędu w sposób zgodny z Qt5 i Qt6
+            error_val = reply.error()
+            if hasattr(QNetworkReply, 'NetworkError'):
+                no_err = QNetworkReply.NetworkError.NoError  # Qt6
+                is_no_error = (error_val == no_err)
+            else:
+                no_err = QNetworkReply.NoError  # Qt5
+                is_no_error = (int(error_val) == int(no_err))
 
-                                    if self.teryt and teryt[:-4] == self.teryt[:-4]:
-                                        # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
-                                        self._data = polygon
-                                        break
-                                except (IndexError, AttributeError):
-                                    continue
-
-                            else:
-                                if not self.teryt:
-                                    self._data = line
-                                    break
-
-                                try:
-                                    if self.object_type in [1, 6]:
-                                        teryt = line.split('|')[1].split('.')[0]
-                                    elif self.object_type == 2:
-                                        if line.split('|')[1].find(".") > -1:
-                                            teryt = line.split('|')[1].split('.')[0]
-                                        else:
-                                            continue
-                                    else:
-                                        teryt = line.split('|')[1].split('.')[0]
-                                    
-                                    if self.teryt and teryt[:-4] == self.teryt[:-4]:
-                                        self._data = line
-                                        break
-                                except (IndexError, AttributeError):
-                                    continue
-
-                else:
-                    self._data = None
-            except Exception:
+            if not is_no_error:
+                iface.messageBar().pushWarning(
+                    "ULDK",
+                    f"Błąd sieci podczas pobierania danych z ULDK: {reply.errorString()}",
+                )
                 self._data = None
-            finally:
-                if self.loop.isRunning():
-                    self.loop.quit()
-                reply.deleteLater()
-        
-        if self.reply:
-            self.reply.finished.connect(handleReply)
+                return
+
+            # Odczyt danych (działa i w Qt5, i w Qt6)
+            read_data = reply.readAll()
+            if hasattr(read_data, 'data'):
+                returned_data = read_data.data().decode('utf-8')
+            else:
+                returned_data = bytes(read_data).decode('utf-8')
+
+            if not returned_data or len(returned_data.strip()) == 0:
+                iface.messageBar().pushWarning(
+                    "ULDK",
+                    "Serwer ULDK zwrócił pustą odpowiedź.",
+                )
+                self._data = None
+                return
+
+            for line in returned_data.split('\n'):
+                if len(line) < 3 or line == "-1 brak wyników" or "XML" in line or "błęd" in line:
+                    continue
+
+                if not self.teryt:
+                    if ";" in line:
+                        self._data = line.split(';')[1]
+                    else:
+                        self._data = line
+                    break
+
+                if self.teryt in line:
+                    if ";" in line:
+                        self._data = line.split(';')[1]
+                    else:
+                        self._data = line
+                    break
+
+            if self._data is None:
+                iface.messageBar().pushWarning(
+                    "ULDK",
+                    "Brak wyników dla podanego zapytania do ULDK.",
+                )
+
+        except Exception as e:
+            iface.messageBar().pushWarning(
+                "ULDK",
+                f"Nieoczekiwany błąd podczas przetwarzania odpowiedzi ULDK: {e}",
+            )
+            self._data = None
+        finally:
+            if self.loop.isRunning():
+                self.loop.quit()
+            reply.deleteLater()
 
     @property
     def data(self):

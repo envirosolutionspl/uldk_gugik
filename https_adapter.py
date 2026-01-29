@@ -25,9 +25,11 @@ class CustomHttpAdapter:
 
 
 class LegacySession:
-    def __init__(self, adapter, manager):
-        self.adapter = adapter
-        self.manager = manager
+    def __init__(self):
+        warnings.filterwarnings("ignore", category=ResourceWarning)
+        ctx = ssl.create_default_context()
+        self.adapter = CustomHttpAdapter(ctx)
+        self.manager = QgsNetworkAccessManager.instance()
 
     def get(self, url, **kwargs):
         if isinstance(url, str):
@@ -38,8 +40,4 @@ class LegacySession:
 
 
 def getLegacySession():
-    warnings.filterwarnings("ignore", category=ResourceWarning)
-    ctx = ssl.create_default_context()
-    adapter = CustomHttpAdapter(ctx)
-    manager = QgsNetworkAccessManager.instance()
-    return LegacySession(adapter, manager)
+    return LegacySession()

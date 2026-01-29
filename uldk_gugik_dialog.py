@@ -30,7 +30,7 @@ from qgis.core import QgsMessageLog, Qgis
 
 from .constants import DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS, \
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING
-from .uldk import region_fetch
+from .uldk import RegionFetch
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__),'ui','uldk_gugik_dialog_base.ui'))
@@ -70,16 +70,16 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.img_main.setMargin(9)
         self.tabWidget.setTabVisible(2, False)
         try:
-            self.region_fetch = region_fetch(teryt='')
+            self.RegionFetch = RegionFetch(teryt='')
         except Exception:
             QgsMessageLog.logMessage(str("Brak połączenia z  Internetem. Spróbuj ponownie później"), 'ULDK', level=Qgis.Warning)
-            self.region_fetch = None
+            self.RegionFetch = None
         self.fillVoivodeships()
 
     def fillVoivodeships(self):
-        if self.region_fetch:
-            voivodeships_ids = self.region_fetch.wojewodztwo_dict.keys()
-            voivodeships_names = self.region_fetch.wojewodztwo_dict.values()
+        if self.RegionFetch:
+            voivodeships_ids = self.RegionFetch.wojewodztwo_dict.keys()
+            voivodeships_names = self.RegionFetch.wojewodztwo_dict.values()
             self.wojcomboBox.clear()
             self.wojcomboBox.addItems(voivodeships_names)
             for idx, val in enumerate(voivodeships_ids):
@@ -125,7 +125,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         combo_obj.clear()
         combo_obj.blockSignals(True)
         if unit_data:
-            unit_dict = getattr(self.region_fetch, func)(unit_data)
+            unit_dict = getattr(self.RegionFetch, func)(unit_data)
             combo_obj.addItems(unit_dict.values())
             for idx, val in enumerate(unit_dict.keys()):
                 combo_obj.setItemData(idx, val)

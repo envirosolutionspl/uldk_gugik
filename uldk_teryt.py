@@ -22,21 +22,37 @@ def getRequestTeryt(xy, request):
                 is_no_error = (error_val == no_err)  # W Qt6 porównujemy enumy bezpośrednio
             else:
                 no_err = QNetworkReply.NoError  # Qt5
-                is_no_error = (int(error_val) == int(no_err))  # W Qt5 konwertujemy na int
-            if is_no_error:
-                data = reply.readAll().data().decode('utf-8')
-                if len(data) > 0 and data[0] != '0':
-                    result = None
-                elif ";" in data:
-                    result = data.split('\n')[1].split(';')[1]
-                else:
-                    result = data.split('\n')[1]
-            else:
+                is_no_error = (int(error_val) == int(no_err))
+
+            if not is_no_error:
                 result = None
+                return
+
+            data = reply.readAll().data().decode('utf-8')
+
+            if not data or len(data) == 0:
+                result = None
+                return
+
+            if data[0] != '0':
+                result = None
+                return
+
+            lines = data.split('\n')
+            if len(lines) < 2:
+                result = None
+                return
+
+            second_line = lines[1]
+
+            if ";" in second_line:
+                result = second_line.split(';')[1]
+            else:
+                result = second_line
+
         except Exception:
             result = None
         finally:
-            # Zawsze zakończ loop, nawet w przypadku błędu
             if loop.isRunning():
                 loop.quit()
             reply.deleteLater()

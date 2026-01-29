@@ -40,6 +40,7 @@ from .resources import *
 # Import the code for the dialog
 from .uldk_gugik_dialog import UldkGugikDialog
 from .uldk_gugik_dialog_parcel import UldkGugikDialogParcel
+from .uldk import RegionFetch
 from .qgis_feed import QgisFeedDialog
 import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
@@ -344,13 +345,17 @@ class UldkGugik:
             self.settings.setValue("showDialog", False) 
 
     def setupDialog(self):
-        if self.dlg.region_fetch is None:
+        if self.dlg.RegionFetch is None:
             try:
-                from .uldk import region_fetch
-                self.dlg.region_fetch = region_fetch(teryt='')
+                self.dlg.RegionFetch = RegionFetch(teryt='')
                 self.dlg.fillVoivodeships()
-            except Exception:
-                pass
+            except Exception as e:
+                self.iface.messageBar().pushMessage(
+                    "Ostrzeżenie:",
+                    f"Nie udało się zainicjować listy województw: {e}",
+                    level=Qgis.Warning,
+                    duration=10,
+                )
         self.dlg.show()
 
     def btnDownloadTab1Clicked(self):
