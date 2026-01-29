@@ -39,16 +39,17 @@ from .uldk_gugik_dialog_parcel import UldkGugikDialogParcel
 from .qgis_feed import QgisFeedDialog
 import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
-from .constants import DEFAULT_SRID
+from .constants import (
+    DEFAULT_SRID, ENV_MENU_NAME, SWAP_XY_SRIDS, TOOLTIP_FROM_MAP,
+    OBJECT_TYPES, ULDK_MIN_LINE_LEN,
+)
 
+from . import PLUGIN_VERSION as plugin_version
+from . import PLUGIN_NAME as plugin_name
 
-"""Wersja wtyczki"""
-plugin_version = '1.4.2'
-plugin_name = 'ULDK GUGiK'  
 
 class UldkGugik:
     """QGIS Plugin Implementation."""
-    nazwy_warstw = {1: "dzialki_ew_uldk", 2: "obreby_ew_uldk", 3: "gminy_uldk", 4: "powiaty_uldk", 5: "wojewodztwa_uldk", 6: "budynki_uldk"}
 
     def __init__(self, iface):
         """Constructor.
@@ -97,13 +98,14 @@ class UldkGugik:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&EnviroSolutions')
+        self.menu = self.tr(f"&{ENV_MENU_NAME}")
 
         #toolbar
-        self.toolbar = self.iface.mainWindow().findChild(QToolBar, 'EnviroSolutions')
+        toolbar_name = ENV_MENU_NAME
+        self.toolbar = self.iface.mainWindow().findChild(QToolBar, toolbar_name)
         if not self.toolbar:
-            self.toolbar = self.iface.addToolBar(u'EnviroSolutions')
-            self.toolbar.setObjectName(u'EnviroSolutions')
+            self.toolbar = self.iface.addToolBar(toolbar_name)
+            self.toolbar.setObjectName(toolbar_name)
 
         self.shortcut = None
         # Check if plugin was started the first time in current QGIS session
@@ -204,7 +206,7 @@ class UldkGugik:
 
         if add_to_menu:
             self.iface.addPluginToMenu(
-                self.menu,
+                self.tr(f"&{ENV_MENU_NAME}"),
                 action)
 
         self.actions.append(action)
@@ -215,8 +217,8 @@ class UldkGugik:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
 
-        icon_path = ':/plugins/uldk_gugik/images/uldk.svg'
-        self.addAction(
+        icon_path = os.path.join(self.plugin_dir, 'images', 'uldk.svg')
+        self.add_action(
             icon_path,
             text=self.tr(u'Usługa Lokalizacji Działek Katastralnych (ULDK)'),
             callback=self.run,
@@ -229,7 +231,7 @@ class UldkGugik:
 
 
         # Inicjacja grafik
-        self.dlg.img_tab2.setPixmap(QPixmap(':/plugins/uldk_gugik/images/coords.png'))
+        self.dlg.img_tab2.setPixmap(QPixmap(os.path.join(self.plugin_dir, 'images', 'coords.png')))
 
         # rozmiar okna
         self.dlg.setFixedSize(self.dlg.size())
@@ -244,14 +246,14 @@ class UldkGugik:
         self.dlg.btn_search_tab3.clicked.connect(self.btnSearchTab3Clicked)
         
         self.dlg.btn_frommap.clicked.connect(self.btnFrommapClicked)
-        self.dlg.btn_frommap.setToolTip("skrót: ALT + F")
+        self.dlg.btn_frommap.setToolTip(TOOLTIP_FROM_MAP)
 
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&EnviroSolutions'),
+                self.tr(ENV_MENU_NAME),
                 action)
             # self.iface.removeToolBarIcon(action)
             self.toolbar.removeAction(action)
@@ -261,9 +263,12 @@ class UldkGugik:
         try:
             srid = self.project.crs().postgisSrid()
         except IndexError:
-            self.iface.messageBar().pushMessage("Projekt QGIS nie posiada zdefiniowanego układu współrzędnych.", 
-                                                "W celu dalszej pracy zdefiniuj układ współrzędnych dla projektu",
-                                                level=Qgis.Warning, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Projekt QGIS nie posiada zdefiniowanego układu współrzędnych.",
+                "W celu dalszej pracy zdefiniuj układ współrzędnych dla projektu",
+                level=Qgis.Warning,
+                duration=10,
+            )
             return 1
         if self.first_start == True:
             self.first_start = False
@@ -284,14 +289,20 @@ class UldkGugik:
                 self.setupDialog()
                 # self.disable_button_download()
             else:
-                self.iface.messageBar().pushMessage("Ostrzeżenie:", 
-                                                'Serwer ULDK nie odpowiada. Spróbuj ponownie później',
-                                                level=Qgis.Warning, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Ostrzeżenie:",
+                    "Serwer ULDK nie odpowiada. Spróbuj ponownie później",
+                    level=Qgis.Warning,
+                    duration=10,
+                )
 
         except requests.exceptions.ConnectionError:
-            self.iface.messageBar().pushMessage("Ostrzeżenie:", 
-                                                'Brak połączenia z internetem',
-                                                level=Qgis.Warning, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Ostrzeżenie:",
+                "Brak połączenia z internetem",
+                level=Qgis.Warning,
+                duration=10,
+            )
         self.dlg.projectionWidget.setCrs(
             QgsCoordinateReferenceSystem.fromEpsgId(int(srid)))
 
@@ -317,25 +328,31 @@ class UldkGugik:
         teryt = self.dlg.edit_id.text().strip()
 
         if not teryt:
-            self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                'musisz wpisać identyfikator',
-                                                level=Qgis.Warning, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Błąd formularza:",
+                "musisz wpisać identyfikator",
+                level=Qgis.Warning,
+                duration=10,
+            )
         elif utils.isInternetConnected():
             try:
                 self.performRequestTeryt(teryt=teryt)
             except:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    'API nie zwróciło odpowiedzi dla żądanego zapytania',
+                    "API nie zwróciło odpowiedzi dla żądanego zapytania",
                     level=Qgis.Critical,
                     duration=10
                 )
 
 
         else:
-            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                'brak połączenia z internetem',
-                                                level=Qgis.Critical, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Nie udało się pobrać obiektu:",
+                "Brak połączenia z internetem",
+                level=Qgis.Critical,
+                duration=10,
+            )
 
     def btnDownloadTab2Clicked(self):
         """kliknięcie klawisza pobierania według X i Y wpisanych w oknie wtyczki"""
@@ -359,15 +376,21 @@ class UldkGugik:
         teryt = self.dlg.gmicomboBox.itemData(current_idx)
         obj_parcel = self.dlg.parcel_lineedit.text().strip() # nr działki
 
-        if not obj_region:
-            self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                'musisz wpisać obręb',
-                                                level=Qgis.Warning, duration=10)
+        if not objRegion:
+            self.iface.messageBar().pushMessage(
+                "Błąd formularza:",
+                "musisz wpisać obręb",
+                level=Qgis.Warning,
+                duration=10,
+            )
 
-        if not obj_parcel:
-            self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                'musisz wpisać numer działki',
-                                                level=Qgis.Warning, duration=10)
+        if not objParcel:
+            self.iface.messageBar().pushMessage(
+                "Błąd formularza:",
+                "musisz wpisać numer działki",
+                level=Qgis.Warning,
+                duration=10,
+            )
 
         elif utils.isInternetConnected():
             self.dlg.arkcomboBox.clear()
@@ -380,7 +403,7 @@ class UldkGugik:
 
             #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
             for obreb in result_obreb:
-                if len(obreb) < 3:
+                if len(obreb) < ULDK_MIN_LINE_LEN:
                     result_obreb.remove(obreb)
                 else:
                     pass
@@ -421,7 +444,7 @@ class UldkGugik:
 
                 if response == True:
                     for i in range(len(result)):
-                        if len(result[i]) < 3:
+                        if len(result[i]) < ULDK_MIN_LINE_LEN:
                             pass
                         elif result[i].find(";") > -1:
                             if result[i].split(";")[1].split("|")[1].split(".")[-2].find("AR") > -1:
@@ -444,27 +467,33 @@ class UldkGugik:
                         pass
                     self.successDownload(arkusze_numery)
                 else:
-                    self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                        'Nie zwrócono żadnej działki dla podanych parametrów',
-                                                             level=Qgis.Warning, duration=10)
+                    self.iface.messageBar().pushMessage(
+                        "Ostrzeżenie:",
+                        "Nie zwrócono żadnej działki dla podanych parametrów",
+                        level=Qgis.Warning,
+                        duration=10,
+                    )
             except IndexError:
-                self.iface.messageBar().pushMessage("Ostrzeżenie:",
-                                                    'Nie zwrócono żadnej działki dla podanych parametrów',
-                                                    level=Qgis.Warning, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Ostrzeżenie:",
+                    "Nie zwrócono żadnej działki dla podanych parametrów",
+                    level=Qgis.Warning,
+                    duration=10,
+                )
         self.dlg.parcel_lineedit.setReadOnly(False)
 
     def successDownload(self, arkusze_numery):
         if len(arkusze_numery) >= 1:
             self.iface.messageBar().pushMessage(
-                'Informacja:',
-                'Znaleziono działkę/i dla podanych parametrów, wybierz numer arkusza.',
+                "Informacja:",
+                "Znaleziono działkę/i dla podanych parametrów, wybierz numer arkusza.",
                 level=Qgis.Info,
                 duration=10
             )
         else:
             self.iface.messageBar().pushMessage(
-                'Informacja:',
-                'Znaleziono działkę dla podanych parametrów. Aby pobrać działkę, kliknij przycisk Pobierz.',
+                "Informacja:",
+                "Znaleziono działkę dla podanych parametrów. Aby pobrać działkę, kliknij przycisk Pobierz.",
                 level=Qgis.Info,
                 duration=10
             )
@@ -481,23 +510,32 @@ class UldkGugik:
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
             obj_parcel = self.dlg.parcel_lineedit.text().strip() # nr działki
-            if not obj_region:
-                self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                    'musisz wpisać obręb',
-                                                    level=Qgis.Warning, duration=10)
+            if not objRegion:
+                self.iface.messageBar().pushMessage(
+                    "Błąd formularza:",
+                    "musisz wpisać obręb",
+                    level=Qgis.Warning,
+                    duration=10,
+                )
 
-            if not obj_parcel:
-                self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                    'musisz wpisać numer działki',
-                                                    level=Qgis.Warning, duration=10)
+            if not objParcel:
+                self.iface.messageBar().pushMessage(
+                    "Błąd formularza:",
+                    "musisz wpisać numer działki",
+                    level=Qgis.Warning,
+                    duration=10,
+                )
 
             elif utils.isInternetConnected():
                 self.performRequestParcel(region=obj_region, parcel=obj_parcel, teryt=None, zoomToFeature=True)
 
             else:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'brak połączenia z internetem',
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    "Brak połączenia z internetem",
+                    level=Qgis.Critical,
+                    duration=10,
+                )
 
             return
         elif object_type == 2:  # obręb
@@ -507,8 +545,8 @@ class UldkGugik:
             resp = uldk_api.getRegionById(teryt, object_type=2, obreb=True)
             if not resp:
                 self.iface.messageBar().pushMessage(
-                    "Nie udało się pobrać obrębu:",
-                    f'API nie zwróciło obrębu dla id {teryt}',
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -517,8 +555,8 @@ class UldkGugik:
             res = resp.split("|")
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
-                    "Nie udało się pobrać obrębu:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -538,8 +576,8 @@ class UldkGugik:
             resp = uldk_api.getCommuneById(teryt, object_type=3)
             if not resp:
                 self.iface.messageBar().pushMessage(
-                    "Nie udało się pobrać gminy:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -548,8 +586,8 @@ class UldkGugik:
             res = resp.split("|")
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
-                    "Nie udało się pobrać gminy:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -570,8 +608,8 @@ class UldkGugik:
 
             if not resp:
                 self.iface.messageBar().pushMessage(
-                    "Nie udało się pobrać powiatu:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -580,8 +618,8 @@ class UldkGugik:
             res = resp.split("|")
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
-                    "Nie udało się pobrać powiatu:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -601,8 +639,8 @@ class UldkGugik:
             resp = uldk_api.getVoivodeshipById(teryt, object_type=5)
             if not resp:
                 self.iface.messageBar().pushMessage(
-                    "Nie udało się pobrać województwa:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -611,8 +649,8 @@ class UldkGugik:
             res = resp.split("|")
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
-                    "Nie udało się pobrać województwa:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -637,19 +675,15 @@ class UldkGugik:
             voivodeship=voivodeship,
             zoomToFeature=True)
 
-        object ={
-            1: "działkę o nr teryt: %s",
-            2: "obręb ewidencyjny",
-            3: "gminę",
-            4: "powiat",
-            5: "województwo",
-        }
+        label = OBJECT_TYPES[objectType]["success_label"]
+        success_message = f"Pobrano {label}" % teryt if "%s" in label else f"Pobrano {label}"
 
-        success_message = f"Pobrano {object[object_type]}"  % teryt if object_type == 1 else f"Pobrano {object[object_type]}"
-
-        self.iface.messageBar().pushMessage("Sukces:",
-                                            success_message,
-                                            level=Qgis.Success, duration=10)
+        self.iface.messageBar().pushMessage(
+            "Sukces:",
+            success_message,
+            level=Qgis.Success,
+            duration=10,
+        )
 
     def downloadByXY(self, srid, type, zoomToFeature=False):
         """pobranie według X i Y i SRID"""
@@ -657,34 +691,46 @@ class UldkGugik:
         objX = self.dlg.doubleSpinBoxX.text().strip()
         objY = self.dlg.doubleSpinBoxY.text().strip()
 
-        if type == "form" and srid in ['2180', '4326', '3857', '2176', '2177', '2178', '2179']:
+        if type == "form" and srid in SWAP_XY_SRIDS:
             objX = self.dlg.doubleSpinBoxY.text().strip()
             objY = self.dlg.doubleSpinBoxX.text().strip()
 
         if not objX:
-            self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                'musisz wpisać współrzędną X',
-                                                level=Qgis.Warning, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Błąd formularza:",
+                "musisz wpisać współrzędną X",
+                level=Qgis.Warning,
+                duration=10,
+            )
 
         if not objY:
-            self.iface.messageBar().pushMessage("Błąd formularza:",
-                                                'musisz wpisać współrzędną Y',
-                                                level=Qgis.Warning, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Błąd formularza:",
+                "musisz wpisać współrzędną Y",
+                level=Qgis.Warning,
+                duration=10,
+            )
 
         elif utils.isInternetConnected():
             try:
                 self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
                 # self.dlg.hide()  # jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
             except:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla wybranego zapytania',
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    "API nie zwróciło obiektu dla wybranego zapytania",
+                    level=Qgis.Critical,
+                    duration=10,
+                )
 
 
         else:
-            self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                'brak połączenia z internetem',
-                                                level=Qgis.Critical, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Nie udało się pobrać obiektu:",
+                "Brak połączenia z internetem",
+                level=Qgis.Critical,
+                duration=10,
+            )
 
     def shortcutActivated(self):
         """zdarzenie aktywowania klawisza skrótu wskazania działki na mapie"""
@@ -697,34 +743,40 @@ class UldkGugik:
 
     def canvasClicked(self, point):
         """kliknięcie na mapie"""
-        self.canvas.unsetMapTool(self.click_tool)
+        self.canvas.unsetMapTool(self.clickTool)
         self.dlg.doubleSpinBoxX.setValue(point.x())
         self.dlg.doubleSpinBoxY.setValue(point.y())
         coords = "{}, {}".format(point.x(), point.y())
-        QgsMessageLog.logMessage(str(coords), 'ULDK')
+        QgsMessageLog.logMessage(str(coords), plugin_name)
         srid = self.project.crs().postgisSrid()
         self.downloadByXY(srid, type="click", zoomToFeature=False)
 
     def performRequestParcel(self, region, parcel, teryt, zoomToFeature=True):
-        object_type = self.checkedFeatureType()
+        objectType = self.checkedFeatureType()
         try:
             if self.dlg.arkcomboBox.currentText() != '':
                 name = region + '.' + self.dlg.arkcomboBox.currentText() + '.' + parcel
             else:
                 name = region + '.' + parcel
-            result = uldk_parcel.getParcelById(name, object_type=1)
+            result = uldk_parcel.getParcelById(name, objectType=1)
 
             if result is None:
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło obiektu dla id %s' % name,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło obiektu dla id {name}",
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             res = result.split("|")
             if res[0] == '':
-                self.iface.messageBar().pushMessage("Nie udało się pobrać obiektu:",
-                                                    'API nie zwróciło geometrii dla id %s' % name,
-                                                    level=Qgis.Critical, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Nie udało się pobrać obiektu:",
+                    f"API nie zwróciło geometrii dla id {name}",
+                    level=Qgis.Critical,
+                    duration=10,
+                )
                 return
 
             wkt = res[0]
@@ -736,7 +788,8 @@ class UldkGugik:
             voivodeship = res[6]
 
             # layer
-            nazwa = self.nazwy_warstw[object_type]
+            nazwa = OBJECT_TYPES[objectType]["layer_name"]
+
 
             layers = self.project.mapLayersByName(nazwa)
 
@@ -753,23 +806,23 @@ class UldkGugik:
             layer.updateExtents()
 
             if not layers:
-                voiv_field = QgsField('województwo', QVariant.String, len=30)
-                provider.addAttributes([voiv_field])
+                voivField = QgsField('województwo', QVariant.String, len=30)
+                provider.addAttributes([voivField])
 
-                con_field = QgsField('powiat', QVariant.String, len=30)
-                provider.addAttributes([con_field])
+                conField = QgsField('powiat', QVariant.String, len=30)
+                provider.addAttributes([conField])
 
-                com_field = QgsField('gmina', QVariant.String, len=30)
-                provider.addAttributes([com_field])
+                comField = QgsField('gmina', QVariant.String, len=30)
+                provider.addAttributes([comField])
 
-                reg_field = QgsField('obręb', QVariant.String, len=30)
-                provider.addAttributes([reg_field])
+                regField = QgsField('obręb', QVariant.String, len=30)
+                provider.addAttributes([regField])
 
-                par_field = QgsField('numer', QVariant.String, len=30)
-                provider.addAttributes([par_field])
+                parField = QgsField('numer', QVariant.String, len=30)
+                provider.addAttributes([parField])
                 
-                id_field = QgsField('teryt', QVariant.String, len=40)
-                provider.addAttributes([id_field])
+                idField = QgsField('teryt', QVariant.String, len=40)
+                provider.addAttributes([idField])
 
                 layer.updateFields()
 
@@ -791,9 +844,12 @@ class UldkGugik:
 
             provider.addFeature(feat)
 
-            self.iface.messageBar().pushMessage("Sukces:",
-                                                'Pobrano działkę dla obiektu: %s' % (name),
-                                                level=Qgis.Success, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Sukces:",
+                f"Pobrano działkę dla obiektu: {name}",
+                level=Qgis.Success,
+                duration=10,
+            )
 
             if zoomToFeature:
                 project_crs = self.project.crs().postgisSrid()
@@ -812,8 +868,8 @@ class UldkGugik:
 
         except IndexError:
             self.iface.messageBar().pushMessage(
-                'Ostrzeżenie:',
-                'Nie pobrano żadnej działki dla podanych parametrów',
+                "Ostrzeżenie:",
+                "Nie pobrano żadnej działki dla podanych parametrów",
                 level=Qgis.Warning,
                 duration=10
             )
@@ -823,11 +879,11 @@ class UldkGugik:
         object_type = self.checkedFeatureType()
 
         if object_type == 1:
-            resp = uldk_api.getParcelById(teryt, object_type=1)
+            resp = uldk_api.getParcelById(teryt, objectType=1)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -837,16 +893,19 @@ class UldkGugik:
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
                 return
 
             if teryt != res[1] and "AR" in res[1]:
-                self.iface.messageBar().pushMessage("Informacja:",
-                                                    'W wybranym obrębie znaleziono więcej działek o identyfikatorze TERYT: %s. \r\nDodaj numer arkusza w celu odnalezienia właściwej działki' % teryt,
-                                                    level=Qgis.Info, duration=10)
+                self.iface.messageBar().pushMessage(
+                    "Informacja:",
+                    f"W wybranym obrębie znaleziono więcej działek o identyfikatorze TERYT: {teryt}. Dodaj numer arkusza w celu odnalezienia właściwej działki",
+                    level=Qgis.Info,
+                    duration=10,
+                )
             wkt = res[0]
             teryt = res[1]
             parcel = res[2]
@@ -857,11 +916,11 @@ class UldkGugik:
 
 
         elif object_type == 2:
-            resp = uldk_api.getRegionById(teryt, object_type=2)
+            resp = uldk_api.getRegionById(teryt, objectType=2)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -871,7 +930,7 @@ class UldkGugik:
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -887,11 +946,11 @@ class UldkGugik:
 
 
         elif object_type == 3:
-            resp = uldk_api.getCommuneById(teryt, object_type=3)
+            resp = uldk_api.getCommuneById(teryt, objectType=3)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -901,7 +960,7 @@ class UldkGugik:
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -917,11 +976,11 @@ class UldkGugik:
 
 
         elif object_type == 4:
-            resp = uldk_api.getCountyById(teryt, object_type=4)
+            resp = uldk_api.getCountyById(teryt, objectType=4)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -931,7 +990,7 @@ class UldkGugik:
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -946,11 +1005,11 @@ class UldkGugik:
             voivodeship = res[3]
 
         elif object_type == 5:
-            resp = uldk_api.getVoivodeshipById(teryt, object_type=5)
+            resp = uldk_api.getVoivodeshipById(teryt, objectType=5)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -960,7 +1019,7 @@ class UldkGugik:
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -979,7 +1038,7 @@ class UldkGugik:
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla id {teryt}',
+                    f"API nie zwróciło obiektu dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -989,7 +1048,7 @@ class UldkGugik:
             if res[0] == '':
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło geometrii dla id {teryt}',
+                    f"API nie zwróciło geometrii dla id {teryt}",
                     level=Qgis.Critical,
                     duration=10
                 )
@@ -1004,7 +1063,7 @@ class UldkGugik:
             voivodeship = res[5]
 
         self.addResultsToLayer(
-            object_type=object_type,
+            objectType=object_type,
             wkt=wkt,
             teryt=teryt,
             parcel=parcel,
@@ -1014,25 +1073,20 @@ class UldkGugik:
             voivodeship=voivodeship,
             zoomToFeature=zoomToFeature)
 
-        object ={
-            1: "działkę o nr teryt: %s",
-            2: "obręb ewidencyjny",
-            3: "gminę",
-            4: "powiat",
-            5: "województwo",
-            6: "budynek",
-        }
+        label = OBJECT_TYPES[object_type]["success_label"]
+        success_message = f"Pobrano {label}" % teryt if "%s" in label else f"Pobrano {label}"
 
-        success_message = f"Pobrano {object[object_type]}"  % teryt if object_type == 1 else f"Pobrano {object[object_type]}"
-
-        self.iface.messageBar().pushMessage("Sukces:",
-                                            success_message,
-                                            level=Qgis.Success, duration=10)
+        self.iface.messageBar().pushMessage(
+            "Sukces:",
+            success_message,
+            level=Qgis.Success,
+            duration=10,
+        )
 
     def performRequestXY(self, x, y, srid, zoomToFeature):
         """wykonanie zapytania pobierającego obiekt na podstawie współrzędnych"""
 
-        object_type = self.checkedFeatureType()
+        objectType = self.checkedFeatureType()
 
         #Sprawdzenie, czy współrzędne są z przecinkiem czy kropką
         if "," in x or "," in y:
@@ -1042,22 +1096,22 @@ class UldkGugik:
             x = float(x)
             y = float(y)
 
-        request_point = QgsPoint(x, y)
-        QgsMessageLog.logMessage(str(srid), 'ULDK')
+        requestPoint = QgsPoint(x, y)
+        QgsMessageLog.logMessage(str(srid), plugin_name)
         if str(srid) != DEFAULT_SRID:
             sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
             destCrs = QgsCoordinateReferenceSystem.fromEpsgId(DEFAULT_SRID)
             tr = QgsCoordinateTransform(sourceCrs, destCrs, self.project)
-            request_point.transform(tr)
-        pid = f"{str(request_point.x())},{str(request_point.y())}"
+            requestPoint.transform(tr)
+        pid = f"{str(requestPoint.x())},{str(requestPoint.y())}"
 
-        if object_type == 1:# działka
-            resp = uldk_xy.getParcelByXY(xy=pid, object_type=1)
+        if objectType == 1:# działka
+            resp = uldk_xy.getParcelByXY(xy=pid, objectType=1)
 
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    f"API nie zwróciło obiektu dla współrzędnych {pid}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -1071,12 +1125,12 @@ class UldkGugik:
             county = res[5]
             voivodeship = res[6]
 
-        elif object_type == 2:
-            resp = uldk_xy.getRegionByXY(xy=pid, object_type=2)
+        elif objectType == 2:
+            resp = uldk_xy.getRegionByXY(xy=pid, objectType=2)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    f"API nie zwróciło obiektu dla współrzędnych {pid}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -1091,12 +1145,12 @@ class UldkGugik:
             voivodeship = res[5]
 
 
-        elif object_type == 3:
-            resp = uldk_xy.getCommuneByXY(xy=pid, object_type=3)
+        elif objectType == 3:
+            resp = uldk_xy.getCommuneByXY(xy=pid, objectType=3)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    f"API nie zwróciło obiektu dla współrzędnych {pid}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -1111,12 +1165,12 @@ class UldkGugik:
             voivodeship = res[4]
 
 
-        elif object_type == 4:
-            resp = uldk_xy.getCountyByXY(xy=pid, object_type=4)
+        elif objectType == 4:
+            resp = uldk_xy.getCountyByXY(xy=pid, objectType=4)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    f"API nie zwróciło obiektu dla współrzędnych {pid}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -1131,12 +1185,12 @@ class UldkGugik:
             voivodeship = res[3]
 
 
-        elif object_type == 5:
-            resp = uldk_xy.getVoivodeshipByXY(xy=pid, object_type=5)
+        elif objectType == 5:
+            resp = uldk_xy.getVoivodeshipByXY(xy=pid, objectType=5)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    f"API nie zwróciło obiektu dla współrzędnych {pid}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -1151,12 +1205,12 @@ class UldkGugik:
             county = None
             voivodeship = res[2]
 
-        elif object_type == 6:
+        elif objectType == 6:
             resp = uldk_xy.getBuildingByXY(xy=pid, object_type=6)
             if not resp:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
-                    f'API nie zwróciło obiektu dla współrzędnych {pid}',
+                    f"API nie zwróciło obiektu dla współrzędnych {pid}",
                     level=Qgis.Critical,
                     duration=10,
                 )
@@ -1171,7 +1225,7 @@ class UldkGugik:
             voivodeship = res[5]
 
         self.addResultsToLayer(
-            object_type=object_type,
+            objectType=objectType,
             wkt=wkt,
             teryt=teryt,
             parcel=parcel,
@@ -1181,25 +1235,21 @@ class UldkGugik:
             voivodeship=voivodeship,
             zoomToFeature=zoomToFeature)
 
-        object ={
-            1: "działkę o nr teryt: %s",
-            2: "obręb ewidencyjny",
-            3: "gminę",
-            4: "powiat",
-            5: "województwo",
-            6: "budynek"
-        }
-        success_message = f"Pobrano {object[object_type]}"  % teryt if object_type == 1 else f"Pobrano {object[object_type]}"
+        label = OBJECT_TYPES[objectType]["success_label"]
+        success_message = f"Pobrano {label}" % teryt if "%s" in label else f"Pobrano {label}"
 
-        self.iface.messageBar().pushMessage("Sukces:",
-                                            success_message,
-                                            level=Qgis.Success, duration=10)
+        self.iface.messageBar().pushMessage(
+            "Sukces:",
+            success_message,
+            level=Qgis.Success,
+            duration=10,
+        )
 
-    def addResultsToLayer(self, object_type, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature):
+    def addResultsToLayer(self, objectType, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
         # layer
-        nazwa = self.nazwy_warstw[object_type]
+        nazwa = OBJECT_TYPES[objectType]["layer_name"]
         layers = self.project.mapLayersByName(nazwa)
 
         # usuwanie pustych warstw z projektu
@@ -1221,27 +1271,27 @@ class UldkGugik:
 
             provider = layer.dataProvider()
 
-            voiv_field = QgsField('województwo', QVariant.String, len=30)
-            provider.addAttributes([voiv_field])
+            voivField = QgsField('województwo', QVariant.String, len=30)
+            provider.addAttributes([voivField])
 
-            if object_type==6 or object_type == 4 or object_type == 3 or object_type == 2 or object_type == 1:
-                con_field = QgsField('powiat', QVariant.String, len=30)
-                provider.addAttributes([con_field])
+            if objectType==6 or objectType == 4 or objectType == 3 or objectType == 2 or objectType == 1:
+                conField = QgsField('powiat', QVariant.String, len=30)
+                provider.addAttributes([conField])
 
-            if object_type==6 or object_type == 3 or object_type == 2 or object_type == 1:
-                com_field = QgsField('gmina', QVariant.String, len=30)
-                provider.addAttributes([com_field])
+            if objectType==6 or objectType == 3 or objectType == 2 or objectType == 1:
+                comField = QgsField('gmina', QVariant.String, len=30)
+                provider.addAttributes([comField])
 
-            if object_type==6 or object_type == 2 or object_type == 1:
-                reg_field = QgsField('obręb', QVariant.String, len=30)
-                provider.addAttributes([reg_field])
+            if objectType==6 or objectType == 2 or objectType == 1:
+                regField = QgsField('obręb', QVariant.String, len=30)
+                provider.addAttributes([regField])
 
-            if object_type == 1:
-                par_field = QgsField('numer', QVariant.String, len=30)
-                provider.addAttributes([par_field])
+            if objectType == 1:
+                parField = QgsField('numer', QVariant.String, len=30)
+                provider.addAttributes([parField])
 
-            id_field = QgsField('teryt', QVariant.String, len=40)
-            provider.addAttributes([id_field])
+            idField = QgsField('teryt', QVariant.String, len=40)
+            provider.addAttributes([idField])
 
             layer.updateFields()
 

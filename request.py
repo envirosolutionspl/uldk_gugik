@@ -1,13 +1,17 @@
 from urllib.parse import urlencode
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkReply
 from qgis.PyQt.QtCore import QUrl, QEventLoop
-
+from .constants import (
+    ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_XML_MARKER, ULDK_ERROR_MARKERS, 
+    ENCODING_SYSTEM, ULDK_MIN_LINE_LEN, ULDK_OBJ_REGION, ULDK_NOT_FOUND,
+    ULDK_TERYT_SUFFIX_LEN
+)
 
 class Request:
     def __init__(self, params,object_type, **kwargs):
         self.params = params
         self._data = None
-        self.url = "http://uldk.gugik.gov.pl/"
+        self.url = ULDK_BASE_URL
         self.manager = QNetworkAccessManager()
 
         self.teryt = kwargs.get('teryt', None)
@@ -27,10 +31,10 @@ class Request:
     def handleRequest(self, reply):
         """Obsłużenie odpowiedzi"""
         if reply.error() == QNetworkReply.NoError:
-            returned_data = reply.readAll().data().decode('utf-8')
+            returnedData = reply.readAll().data().decode(ENCODING_SYSTEM)
 
             for line in returned_data.split('\n'):
-                if len(line) < 3 or line == "-1 brak wyników" or line.find("XML")>-1 or line.find("błęd")>-1:
+                if len(line) < ULDK_MIN_LINE_LEN or line == ULDK_NO_RESULTS or line.find(ULDK_XML_MARKER)> ULDK_NOT_FOUND or any(line.find(marker) > ULDK_NOT_FOUND for marker in ULDK_ERROR_MARKERS):
                     continue
                 if ";" in line:
                     polygon = line.split(';')[1]
@@ -41,9 +45,9 @@ class Request:
                     if self.object_type in [1, 6]:
                         teryt = polygon.split('|')[1].split('.')[0]
                         break
-                    elif self.object_type ==2:
-                        if polygon.split('|')[1].find(".") >-1:
-                            teryt = polygon.split('|')[1].split('.')[0]
+                    elif self.object_type == ULDK_OBJ_REGION:
+                        if polygon.split("|")[1].find(".") > ULDK_NOT_FOUND:
+                            teryt = polygon.split("|")[1].split(".")[0]
                             break
                         else:
                             pass
@@ -51,7 +55,7 @@ class Request:
                         teryt = polygon.split('|')[1]
                         break
 
-                    if teryt[:-4] == self.teryt[:-4]:
+                    if teryt[:-ULDK_TERYT_SUFFIX_LEN] == self.teryt[:-ULDK_TERYT_SUFFIX_LEN]:
                         # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
                         self._data = polygon
                         break
@@ -68,15 +72,15 @@ class Request:
                             pass
                         break
 
-                    elif self.object_type ==2:
-                        if line.split('|')[1].find(".") >-1:
-                            teryt = line.split('|')[1].split('.')[0]
+                    elif self.object_type == ULDK_OBJ_REGION:
+                        if line.split("|")[1].find(".") >ULDK_NOT_FOUND:
+                            teryt = line.split("|")[1].split(".")[0]
                             break
                         else:
                             pass
                     else:
-                        teryt = line.split('|')[1].split('.')[0]
-                    if teryt[:-4] == self.teryt[:-4]:
+                        teryt = line.split("|")[1].split(".")[0]
+                    if teryt[:-ULDK_TERYT_SUFFIX_LEN] == self.teryt[:-ULDK_TERYT_SUFFIX_LEN]:
                         self._data = line
                         break
 
