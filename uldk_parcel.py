@@ -7,14 +7,14 @@ from .request_search import Request as RS
 from .request_region import Request as RR
 
 
-def getParcelById(name, objectType, **kwargs):
+def getParcelById(name, object_type, **kwargs):
     params = {
         'request': PARCEL_BY_ID_OR_NR["request"],
         'id': name,
         'result': ",".join(PARCEL_BY_ID_OR_NR["result"]),
         'srid': DEFAULT_SRID
     }
-    res = RQ(params, objectType, **kwargs)
+    res = RQ(params, object_type, **kwargs)
     return res.data
 
 
