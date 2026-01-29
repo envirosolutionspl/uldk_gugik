@@ -76,16 +76,16 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.img_main.setMargin(9)
         self.tabWidget.setTabVisible(2, False)
         try:
-            self.region_fetch = region_fetch(teryt='')
+            self.RegionFetch = RegionFetch(teryt='')
         except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
             QgsMessageLog.logMessage("Brak połączenia z Internetem. Spróbuj ponownie później", plugin_name, level=Qgis.Warning)
             self.regionFetch = None
         self.fillVoivodeships()
 
     def fillVoivodeships(self):
-        if self.region_fetch:
-            voivodeships_ids = self.region_fetch.wojewodztwo_dict.keys()
-            voivodeships_names = self.region_fetch.wojewodztwo_dict.values()
+        if self.RegionFetch:
+            voivodeships_ids = self.RegionFetch.wojewodztwo_dict.keys()
+            voivodeships_names = self.RegionFetch.wojewodztwo_dict.values()
             self.wojcomboBox.clear()
             self.wojcomboBox.addItems(voivodeships_names)
             for idx, val in enumerate(voivodeships_ids):
@@ -94,7 +94,10 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             QgsMessageLog.logMessage("Brak połączenia z Internetem. Spróbuj ponownie później", plugin_name, level=Qgis.Warning)
 
-    def setupTabWidget(self):
+    def setupTabWidget(self, checked):
+        if not checked:
+            return
+
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())
         rdbt_attrs = DIALOG_MAPPING.get(rdbt_name)
         tab_title = rdbt_attrs.get('tab_title')
@@ -104,10 +107,13 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.description_label.setText(rdbt_attrs.get('description_label'))
         self.parcel_lineedit.clear()
         self.hideComboboxes()
-        building_mode = rdbt_name == 'rdb_dz'
-        self.btn_search_tab3.setEnabled(building_mode)
-        self.parcel_lineedit.setEnabled(building_mode)
-        self.btn_download_tab3.setEnabled(not building_mode)
+        is_parcel_mode = (rdbt_name == 'rdb_dz')
+        self.btn_search_tab3.setEnabled(is_parcel_mode)
+        self.parcel_lineedit.setEnabled(is_parcel_mode)
+        self.btn_download_tab3.setEnabled(not is_parcel_mode)
+        self.label_13.setVisible(is_parcel_mode)
+        self.parcel_lineedit.setVisible(is_parcel_mode)
+        self.btn_search_tab3.setVisible(is_parcel_mode)
         self.tabWidget.setTabVisible(2, rdbt_name != 'rdb_bu')
 
     def hideComboboxes(self):
@@ -131,7 +137,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         combo_obj.clear()
         combo_obj.blockSignals(True)
         if unit_data:
-            unit_dict = getattr(self.region_fetch, func)(unit_data)
+            unit_dict = getattr(self.RegionFetch, func)(unit_data)
             combo_obj.addItems(unit_dict.values())
             for idx, val in enumerate(unit_dict.keys()):
                 combo_obj.setItemData(idx, val)
