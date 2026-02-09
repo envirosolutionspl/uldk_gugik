@@ -1,65 +1,64 @@
-from .constants import ULDK_GMINA_DICT_URL, ULDK_POWIAT_DICT_URL, ULDK_WOJEWODZTWO_DICT_URL, ULDK_OBREB_DICT_URL
-from qgis.PyQt.QtCore import QUrl, QUrlQuery, QEventLoop
-from qgis.PyQt.QtNetwork import QNetworkReply
-from .https_adapter import getLegacySession
+import requests
+from qgis.core import QgsMessageLog
+
+from .constants import (
+    REST_API_BASE_URL,
+    REST_ENDPOINT_VOIVODESHIP,
+    REST_ENDPOINT_COUNTY,
+    REST_ENDPOINT_COMMUNE,
+    REST_ENDPOINT_PRECINCT,
+    LOG_TAG,
+)
 
 
 class RegionFetch:
     def __init__(self, teryt):
-        self.wojewodztwo_dict = self.__fetchWojewodztwoDict(teryt = '')
-        self.powiat_dict = self.getPowiatByTeryt(teryt)
-        self.gmina_dict = self.getGminaByTeryt(teryt)
-        self.obreb_dict = self.getObrebByTeryt(teryt)
+        self.wojewodztwo_dict = self.__fetch_wojewodztwo_dict()
+        self.powiat_dict = self.get_powiat_by_teryt(teryt)
+        self.gmina_dict = self.get_gmina_by_teryt(teryt)
+        self.obreb_dict = self.get_obreb_by_teryt(teryt)
 
     @staticmethod
-    def fetchUnitDict(url, teryt):
+    def fetch_unit_dict(endpoint):
         unit_dict = {}
-        url = url+teryt
-        session = getLegacySession()
-        reply = session.get(url)
-        loop = QEventLoop()
-        
-        def handleReply():
-            error_val = reply.error()
-            if hasattr(QNetworkReply, 'NetworkError'):
-                no_err = QNetworkReply.NetworkError.NoError  # Qt6
-                is_no_error = (error_val == no_err)  # W Qt6 porównujemy enumy bezpośrednio
+        url = f"{REST_API_BASE_URL}{endpoint}"
+        try:
+            QgsMessageLog.logMessage(f"Pobieranie danych z: {url}", LOG_TAG)
+            resp = requests.get(url, timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                for item in data:
+                    unit_dict[item['teryt']] = item['name']
             else:
-                no_err = QNetworkReply.NoError  # Qt5
-                is_no_error = (int(error_val) == int(no_err))  # W Qt5 konwertujemy na int
-            
-            if is_no_error:
-                read_data = reply.readAll()
-                if hasattr(read_data, 'data'):
-                    data = read_data.data().decode("utf-8")
-                else:
-                    data = bytes(read_data).decode("utf-8")
-                resp_text = data.strip().split('\n')
-                if resp_text:
-                    for el in resp_text[1:]:
-                        split = el.split('|')
-                        if len(split) >= 2:
-                            unit_dict[split[1]] = split[0]
-            reply.deleteLater()
-            if loop.isRunning():
-                loop.quit()
-        
-        reply.finished.connect(handleReply)
-        loop.exec()
+                QgsMessageLog.logMessage(
+                    f"Błąd HTTP {resp.status_code} przy pobieraniu: {url}", LOG_TAG
+                )
+        except Exception as e:
+            QgsMessageLog.logMessage(
+                f"Wyjątek przy pobieraniu {url}: {str(e)}", LOG_TAG
+            )
         return unit_dict
 
-    def __fetchWojewodztwoDict(self, teryt):
-        return self.fetchUnitDict(ULDK_WOJEWODZTWO_DICT_URL, teryt='')
+    def __fetch_wojewodztwo_dict(self):
+        return self.fetch_unit_dict(REST_ENDPOINT_VOIVODESHIP)
 
-    def getPowiatByTeryt(self, teryt):
-        return self.fetchUnitDict(ULDK_POWIAT_DICT_URL, teryt)  
+    def get_powiat_by_teryt(self, teryt):
+        if not teryt:
+            return {}
+        return self.fetch_unit_dict(f"{REST_ENDPOINT_COUNTY}/{teryt}")
 
-    def getGminaByTeryt(self, teryt):
-        return self.fetchUnitDict(ULDK_GMINA_DICT_URL, teryt)
+    def get_gmina_by_teryt(self, teryt):
+        if not teryt:
+            return {}
+        return self.fetch_unit_dict(f"{REST_ENDPOINT_COMMUNE}/{teryt}")
 
-    def getObrebByTeryt(self, teryt):
-        return self.fetchUnitDict(ULDK_OBREB_DICT_URL, teryt)
+    def get_obreb_by_teryt(self, teryt):
+        if not teryt:
+            return {}
+        return self.fetch_unit_dict(f"{REST_ENDPOINT_PRECINCT}/{teryt}")
 
-
-# if __name__ == '__main__':
-#     region_fetch = region_fetch(teryt)
+    # Aliasy dla dialogu (constants.ADMINISTRATIVE_UNITS_OBJECTS
+    # wywołuje getPowiatByTeryt, getGminaByTeryt, getObrebByTeryt przez getattr)
+    getPowiatByTeryt = get_powiat_by_teryt
+    getGminaByTeryt = get_gmina_by_teryt
+    getObrebByTeryt = get_obreb_by_teryt
