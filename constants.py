@@ -5,7 +5,7 @@ ULDK_POWIAT_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=powiat&wyni
 ULDK_WOJEWODZTWO_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=wojewodztwo&wynik=wojewodztwo,teryt'
 
 # REST API endpoints (nowe API)
-REST_API_BASE_URL = "https://rest.enviro-dev.pl/dzialki"
+REST_API_BASE_URL = "https://rest.enviro.pl/dzialki"
 REST_ENDPOINT_VOIVODESHIP = "/getVoivodeship"
 REST_ENDPOINT_COUNTY = "/getCounty"
 REST_ENDPOINT_COMMUNE = "/getCommune"
