@@ -3,6 +3,15 @@ ULDK_OBREB_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=obreb&wynik=
 ULDK_GMINA_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=gmina&wynik=gmina,teryt&teryt='
 ULDK_POWIAT_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=powiat&wynik=powiat,teryt&teryt='
 ULDK_WOJEWODZTWO_DICT_URL = 'https://uldk.gugik.gov.pl/service.php?obiekt=wojewodztwo&wynik=wojewodztwo,teryt'
+
+# REST API endpoints (nowe API)
+REST_API_BASE_URL = "https://rest.enviro-dev.pl/dzialki"
+REST_ENDPOINT_VOIVODESHIP = "/getVoivodeship"
+REST_ENDPOINT_COUNTY = "/getCounty"
+REST_ENDPOINT_COMMUNE = "/getCommune"
+REST_ENDPOINT_PRECINCT = "/getPrecinct"
+LOG_TAG = "TerytFetch"
+
 FEED_URL = 'https://qgisfeed.envirosolutions.pl/'
 
 INDUSTRIES = {
