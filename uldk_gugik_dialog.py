@@ -28,18 +28,23 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget
 from qgis.core import QgsMessageLog, Qgis
 
-import requests
-
 from .uldk import RegionFetch
 from .constants import (
     DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS,
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING,
     COMBOBOX_STYLES
 )
-from . import PLUGIN_NAME as plugin_name
+
+# Nazwa do logów (jeśli istnieje w __init__.py)
+try:
+    from . import PLUGIN_NAME as plugin_name
+except Exception:
+    plugin_name = "ULDK"
+
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__),'ui','uldk_gugik_dialog_base.ui'))
+    os.path.dirname(__file__), 'ui', 'uldk_gugik_dialog_base.ui'
+))
 
 
 class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -60,13 +65,16 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
             combo_obj.currentTextChanged.connect(
                 lambda _, func=fetch_func, combo=dependent_combo: self.setupAdministrativeUnitObj(func, combo)
             )
+
         for rdbt in DIALOG_MAPPING.keys():
             getattr(self, rdbt).toggled.connect(self.setupTabWidget)
+
         self.parcel_lineedit.textChanged.connect(lambda: self.btn_download_tab3.setEnabled(False))
         self.obrcomboBox.currentTextChanged.connect(lambda: self.arkcomboBox.clear())
+
         for combo in COMBOBOX_RADIOBUTTON_MAPPING.keys():
             combo_obj = getattr(self, combo)
-            
+
             if combo_obj.objectName() != 'arkcomboBox':
                 combo_obj.currentTextChanged.connect(
                     lambda: self.btn_download_tab3.setEnabled(False) if self.rdb_dz.isChecked() else None
@@ -75,11 +83,17 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
     def _setupDialog(self):
         self.img_main.setMargin(9)
         self.tabWidget.setTabVisible(2, False)
+
         try:
             self.RegionFetch = RegionFetch(teryt='')
-        except (requests.exceptions.ConnectionError, requests.exceptions.RequestException):
-            QgsMessageLog.logMessage("Brak połączenia z Internetem. Spróbuj ponownie później", plugin_name, level=Qgis.Warning)
-            self.regionFetch = None
+        except Exception:
+            QgsMessageLog.logMessage(
+                "Brak połączenia z Internetem. Spróbuj ponownie później",
+                plugin_name,
+                level=Qgis.Warning
+            )
+            self.RegionFetch = None
+
         self.fillVoivodeships()
 
     def fillVoivodeships(self):
@@ -92,7 +106,11 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.wojcomboBox.setItemData(idx, val)
             self.wojcomboBox.setCurrentIndex(-1)
         else:
-            QgsMessageLog.logMessage("Brak połączenia z Internetem. Spróbuj ponownie później", plugin_name, level=Qgis.Warning)
+            QgsMessageLog.logMessage(
+                "Brak połączenia z Internetem. Spróbuj ponownie później",
+                plugin_name,
+                level=Qgis.Warning
+            )
 
     def setupTabWidget(self, checked):
         if not checked:
@@ -103,7 +121,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         tab_title = rdbt_attrs.get('tab_title')
         self.tabWidget.setTabText(2, tab_title)
         self.tab3.findChild(QWidget).setText(tab_title)
-        self.id_label.setText(f'''Wprowadź identyfikator obiektu (np. {rdbt_attrs.get('sample_id')})''')
+        self.id_label.setText(f"""Wprowadź identyfikator obiektu (np. {rdbt_attrs.get('sample_id')})""")
         self.description_label.setText(rdbt_attrs.get('description_label'))
         self.parcel_lineedit.clear()
         self.hideComboboxes()
@@ -126,17 +144,18 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 combo_idx = list(RADIOBUTTON_COMBOBOX_MAPPING).index(rdbt) + 1
                 comboboxes_to_hide = list(list(RADIOBUTTON_COMBOBOX_MAPPING.values())[combo_idx:])
                 break
+
         for combo in comboboxes_to_hide:
             combo_obj = getattr(self, combo)
             combo_obj.setStyleSheet(COMBOBOX_STYLES["hidden"])
             combo_obj.setEnabled(False)
-            
+
     def setupAdministrativeUnitObj(self, func, dependent_combo):
         combo_obj = getattr(self, dependent_combo)
         unit_data = self.sender().currentData()
         combo_obj.clear()
         combo_obj.blockSignals(True)
-        if unit_data:
+        if unit_data and self.RegionFetch:
             unit_dict = getattr(self.RegionFetch, func)(unit_data)
             combo_obj.addItems(unit_dict.values())
             for idx, val in enumerate(unit_dict.keys()):

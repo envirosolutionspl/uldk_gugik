@@ -1,33 +1,43 @@
 import warnings
-
-import requests
-import urllib3
 import ssl
 
-from urllib3.exceptions import InsecureRequestWarning
+from qgis.core import QgsNetworkAccessManager
+from qgis.PyQt.QtNetwork import QNetworkRequest, QSslConfiguration, QSslSocket
+from qgis.PyQt.QtCore import QUrl
 
 
-class CustomHttpAdapter (requests.adapters.HTTPAdapter):
-    # "Transport adapter" that allows us to use custom ssl_context.
-
+class CustomHttpAdapter:
     def __init__(self, ssl_context=None, **kwargs):
         self.ssl_context = ssl_context
-        super().__init__(**kwargs)
 
-    def initPoolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = urllib3.poolmanager.PoolManager(
-            num_pools=connections, maxsize=maxsize,
-            block=block, ssl_context=self.ssl_context)
+    def configureRequest(self, request):
+        ssl_conf = request.sslConfiguration()
+        if ssl_conf.isNull():
+            ssl_conf = QSslConfiguration.defaultConfiguration()
+        if hasattr(QSslSocket, 'PeerVerifyMode'):
+            verify_mode = QSslSocket.PeerVerifyMode.VerifyNone  # Qt6
+        else:
+            verify_mode = QSslSocket.VerifyNone  # Qt5
+        ssl_conf.setPeerVerifyMode(verify_mode)
+        ssl_conf.setPeerVerifyDepth(0)
+        request.setSslConfiguration(ssl_conf)
+        return request
+
+
+class LegacySession:
+    def __init__(self):
+        warnings.filterwarnings("ignore", category=ResourceWarning)
+        ctx = ssl.create_default_context()
+        self.adapter = CustomHttpAdapter(ctx)
+        self.manager = QgsNetworkAccessManager.instance()
+
+    def get(self, url, **kwargs):
+        if isinstance(url, str):
+            url = QUrl(url)
+        request = QNetworkRequest(url)
+        request = self.adapter.configureRequest(request)
+        return self.manager.get(request)
 
 
 def getLegacySession():
-    warnings.filterwarnings("ignore", category=ResourceWarning)
-    warnings.filterwarnings("ignore", category=InsecureRequestWarning)
-    ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-    ctx.options |= 0x4  # OP_LEGACY_SERVER_CONNECT
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    session = requests.session()
-    session.mount('https://', CustomHttpAdapter(ctx))
-    session.verify = False
-    return session
+    return LegacySession()
