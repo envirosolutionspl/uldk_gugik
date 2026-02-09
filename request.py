@@ -2,26 +2,33 @@ from urllib.parse import urlencode
 from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.PyQt.QtCore import QEventLoop
 from qgis.utils import iface
-from .https_adapter import getLegacySession
 
+from .https_adapter import getLegacySession
+from .constants import (
+    ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_XML_MARKER, ULDK_ERROR_MARKERS,
+    ENCODING_SYSTEM, ULDK_MIN_LINE_LEN, ULDK_OBJ_REGION, ULDK_NOT_FOUND,
+    ULDK_TERYT_SUFFIX_LEN
+)
+
+# Qt5/Qt6 compat: QEventLoop.exec_ -> exec
 if not hasattr(QEventLoop, 'exec'):
     QEventLoop.exec = QEventLoop.exec_
 
 
 class Request:
-    def __init__(self, params,object_type, **kwargs):
+    def __init__(self, params, object_type, **kwargs):
         self.params = params
         self._data = None
-        self.url = "https://uldk.gugik.gov.pl/"
         self.session = getLegacySession()
+        self.url = ULDK_BASE_URL
 
         self.teryt = kwargs.get('teryt', None)
         self.object_type = object_type
-        
+
         # Utworzenie loop PRZED wywołaniem request
         self.loop = QEventLoop()
         self.reply = None
-        
+
         self.getRequest()
         self.loop.exec()
 
@@ -35,6 +42,7 @@ class Request:
             )
             self._data = None
             return
+
         try:
             self.reply = self.session.get(final_url)
         except Exception as e:
@@ -44,6 +52,7 @@ class Request:
             )
             self._data = None
             return
+
         if not self.reply:
             iface.messageBar().pushWarning(
                 "ULDK",
@@ -56,7 +65,7 @@ class Request:
         self.reply.finished.connect(self.handleReply)
 
     def handleReply(self):
-        """Obsłużenie odpowiedzi"""
+        """Obsłużenie odpowiedzi (Qt5/Qt6 kompatybilnie + logika constants)"""
         reply = self.reply
         try:
             # Sprawdzenie błędu w sposób zgodny z Qt5 i Qt6
@@ -79,9 +88,9 @@ class Request:
             # Odczyt danych (działa i w Qt5, i w Qt6)
             read_data = reply.readAll()
             if hasattr(read_data, 'data'):
-                returned_data = read_data.data().decode('utf-8')
+                returned_data = read_data.data().decode(ENCODING_SYSTEM)
             else:
-                returned_data = bytes(read_data).decode('utf-8')
+                returned_data = bytes(read_data).decode(ENCODING_SYSTEM)
 
             if not returned_data or len(returned_data.strip()) == 0:
                 iface.messageBar().pushWarning(
@@ -91,22 +100,55 @@ class Request:
                 self._data = None
                 return
 
+            teryt = None
+
             for line in returned_data.split('\n'):
-                if len(line) < 3 or line == "-1 brak wyników" or "XML" in line or "błęd" in line:
+                if (
+                    len(line) < ULDK_MIN_LINE_LEN
+                    or line == ULDK_NO_RESULTS
+                    or line.find(ULDK_XML_MARKER) > ULDK_NOT_FOUND
+                    or any(line.find(marker) > ULDK_NOT_FOUND for marker in ULDK_ERROR_MARKERS)
+                ):
                     continue
 
+                if ";" in line:
+                    polygon = line.split(';')[1]
+                else:
+                    polygon = line
+                    
                 if not self.teryt:
-                    if ";" in line:
-                        self._data = line.split(';')[1]
-                    else:
-                        self._data = line
+                    self._data = polygon
                     break
 
-                if self.teryt in line:
-                    if ";" in line:
-                        self._data = line.split(';')[1]
+                if self.object_type in [1, 6]:
+                    try:
+                        teryt = polygon.split('|')[1].split('.')[0]
+                    except IndexError:
+                        continue
+
+                elif self.object_type == ULDK_OBJ_REGION:
+                    try:
+                        field = polygon.split("|")[1]
+                    except IndexError:
+                        continue
+
+                    if field.find(".") > ULDK_NOT_FOUND:
+                        teryt = field.split(".")[0]
                     else:
-                        self._data = line
+                        continue
+
+                else:
+                    try:
+                        teryt = polygon.split('|')[1]
+                    except IndexError:
+                        continue
+                        
+                if (
+                    teryt
+                    and self.teryt
+                    and teryt[:-ULDK_TERYT_SUFFIX_LEN] == self.teryt[:-ULDK_TERYT_SUFFIX_LEN]
+                ):
+                    self._data = polygon
                     break
 
             if self._data is None:
