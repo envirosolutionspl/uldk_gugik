@@ -1,6 +1,9 @@
-import requests
+import json
 from qgis.core import QgsMessageLog
+from qgis.PyQt.QtNetwork import QNetworkReply
+from qgis.PyQt.QtCore import QEventLoop
 
+from .https_adapter import getLegacySession
 from .constants import (
     REST_API_BASE_URL,
     REST_ENDPOINT_VOIVODESHIP,
@@ -9,6 +12,10 @@ from .constants import (
     REST_ENDPOINT_PRECINCT,
     LOG_TAG,
 )
+
+# Qt5/Qt6 compat
+if not hasattr(QEventLoop, 'exec'):
+    QEventLoop.exec = QEventLoop.exec_
 
 
 class RegionFetch:
@@ -24,15 +31,41 @@ class RegionFetch:
         url = f"{REST_API_BASE_URL}{endpoint}"
         try:
             QgsMessageLog.logMessage(f"Pobieranie danych z: {url}", LOG_TAG)
-            resp = requests.get(url, timeout=5)
-            if resp.status_code == 200:
-                data = resp.json()
-                for item in data:
-                    unit_dict[item['teryt']] = item['name']
+
+            session = getLegacySession()
+            reply = session.get(url)
+
+            loop = QEventLoop()
+            reply.finished.connect(loop.quit)
+            loop.exec()
+
+            # Sprawdzenie błędu (Qt5/Qt6)
+            error_val = reply.error()
+            if hasattr(QNetworkReply, 'NetworkError'):
+                no_err = QNetworkReply.NetworkError.NoError
             else:
+                no_err = QNetworkReply.NoError
+
+            if error_val != no_err:
                 QgsMessageLog.logMessage(
-                    f"Błąd HTTP {resp.status_code} przy pobieraniu: {url}", LOG_TAG
+                    f"Błąd sieci przy pobieraniu: {url}: {reply.errorString()}", LOG_TAG
                 )
+                reply.deleteLater()
+                return unit_dict
+
+            # Odczyt danych (Qt5/Qt6)
+            read_data = reply.readAll()
+            if hasattr(read_data, 'data'):
+                raw = read_data.data().decode('utf-8')
+            else:
+                raw = bytes(read_data).decode('utf-8')
+
+            reply.deleteLater()
+
+            data = json.loads(raw)
+            for item in data:
+                unit_dict[item['teryt']] = item['name']
+
         except Exception as e:
             QgsMessageLog.logMessage(
                 f"Wyjątek przy pobieraniu {url}: {str(e)}", LOG_TAG
