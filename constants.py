@@ -103,7 +103,7 @@ RES_COUNTY_BY_ID = ["geom_wkt", "teryt", "county", "voivodeship"]
 RES_VOIVODESHIP_BY_ID = ["geom_wkt", "teryt", "voivodeship"]
 
 COMBOBOX_STYLES = {
-    "visible": "QComboBox { color: black }",
+    "visible": "",
     "hidden": "QComboBox { color: transparent }"
 }
 
