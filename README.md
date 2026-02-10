@@ -38,6 +38,8 @@
    Jeżeli chcemy pobrać warstwę województwa, w którym przykładowo znajduje się nasza działka należy zaznaczyć w bocznym panelu "Województwo". 
    Mając wpisany identyfikator działki wtyczka automatycznie pobierze przypisane do niej województwo lub inny wybrany obszar.
    Jeśli numer działki występuje więcej niż jeden raz w danym obrębie, w górnej części QGIS’a pojawi się komunikat i zostanie pobrana pierwsza z działek zwrócona przez usługę ULDK.
+   
+![uldk_gif](https://github.com/user-attachments/assets/415b51a4-8ef5-4492-abea-bae393b68edc)
 
 ### Uwaga
 
