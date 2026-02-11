@@ -3,7 +3,7 @@ from qgis.core import QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject
 from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.PyQt.QtCore import QEventLoop
 
-from .https_adapter import getLegacySession
+from .https_adapter import LegacySession
 from .constants import ULDK_BASE_URL, ULDK_RESULT_TERYT
 
 # Qt5/Qt6 compat: QEventLoop.exec_ -> exec
@@ -65,7 +65,7 @@ def getRequestTeryt(xy, request):
     url = ULDK_BASE_URL + "?" + urlencode(PARAMS)
 
     result = None
-    session = getLegacySession()
+    session = LegacySession()
     reply = session.get(url)
 
     # Utworzenie loop PRZED połączeniem callback

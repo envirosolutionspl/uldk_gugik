@@ -64,7 +64,8 @@ class UldkGugik:
             application at run time.
         :type iface: QgsInterface
         """
-        self.settings = QgsSettings() 
+        self.settings = QgsSettings()
+        self.iface = iface
 
         if Qgis.QGIS_VERSION_INT >= 31000:
             from .qgis_feed import QgisFeed
@@ -83,8 +84,6 @@ class UldkGugik:
 
         #DialogOnTop
 
-        # Save reference to the QGIS interface
-        self.iface = iface
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
@@ -127,6 +126,12 @@ class UldkGugik:
         self.region_name = None
         self.project = QgsProject.instance()
         
+
+    def showBranchSelectionDialog(self):
+        """Wyświetla dialog wyboru branży dla QGIS Feed."""
+        dialog = QgisFeedDialog(self.iface.mainWindow())
+        dialog.exec()
+        self.selected_industry = self.settings.value("selected_industry", None)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -477,7 +482,7 @@ class UldkGugik:
                 self.region_name = result_obreb[0].split("|")[0]
                 name = self.region_name + '.' + obj_parcel
 
-                result = uldk_parcel.getParcelById2(name)
+                result = uldk_parcel.getParcelById(name)
                 result = list(result)
 
                 for result_item in result:
@@ -801,7 +806,7 @@ class UldkGugik:
                 name = region + '.' + self.dlg.arkcomboBox.currentText() + '.' + parcel
             else:
                 name = region + '.' + parcel
-            result = uldk_parcel.getParcelById(name, object_type=1)
+            result = uldk_parcel.getParcelByIdSearch(name, object_type=1)
 
             if result is None:
                 self.iface.messageBar().pushMessage(

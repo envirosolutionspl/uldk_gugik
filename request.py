@@ -3,7 +3,7 @@ from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.PyQt.QtCore import QEventLoop
 from qgis.utils import iface
 
-from .https_adapter import getLegacySession
+from .https_adapter import LegacySession
 from .constants import (
     ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_XML_MARKER, ULDK_ERROR_MARKERS,
     ENCODING_SYSTEM, ULDK_MIN_LINE_LEN, ULDK_OBJ_REGION, ULDK_NOT_FOUND,
@@ -19,7 +19,7 @@ class Request:
     def __init__(self, params, object_type, **kwargs):
         self.params = params
         self._data = None
-        self.session = getLegacySession()
+        self.session = LegacySession()
         self.url = ULDK_BASE_URL
 
         self.teryt = kwargs.get('teryt', None)
