@@ -14,18 +14,18 @@ from .constants import (
 
 class RegionFetch:
     def __init__(self, teryt):
+        self.manager = NetworkManager()
         self.wojewodztwo_dict = self.__fetch_wojewodztwo_dict()
         self.powiat_dict = self.get_powiat_by_teryt(teryt)
         self.gmina_dict = self.get_gmina_by_teryt(teryt)
         self.obreb_dict = self.get_obreb_by_teryt(teryt)
 
-    @staticmethod
-    def fetch_unit_dict(endpoint):
+    def fetch_unit_dict(self, endpoint):
         unit_dict = {}
         url = f"{REST_API_BASE_URL}{endpoint}"
         try:
             QgsMessageLog.logMessage(f"Pobieranie danych z: {url}", LOG_TAG)
-            raw = NetworkManager().getSync(url)
+            raw = self.manager.getSync(url)
             if raw is None:
                 QgsMessageLog.logMessage(
                     f"Błąd sieci przy pobieraniu: {url}", LOG_TAG
