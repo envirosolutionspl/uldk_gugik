@@ -1,37 +1,57 @@
-W = "POLYGON((0 0,1 0,1 1,0 1,0 0))"
+WKT_POLYGON = "POLYGON((0 0,1 0,1 1,0 1,0 0))"
 
 MIASTA = [
-    {"xy": "500629,639049", "bud": "146501_1.0001.123_BUD", "dz": "146501_1.0001.123/4", "nr": "123/4",
-     "obr": "146501_1.0001", "ob": "0001", "gm": "146501_1", "g": "Warszawa",
-     "pow": "1465", "p": "m. st. Warszawa", "woj": "14", "w": "mazowieckie"},
-    {"xy": "424049,237499", "bud": "126101_1.0001.456_BUD", "dz": "126101_1.0001.456/7", "nr": "456/7",
-     "obr": "126101_1.0001", "ob": "0001", "gm": "126101_1", "g": "Kraków",
-     "pow": "1261", "p": "Kraków", "woj": "12", "w": "małopolskie"},
-    {"xy": "501849,721789", "bud": "226101_1.0004.89_BUD", "dz": "226101_1.0004.89/1", "nr": "89/1",
-     "obr": "226101_1.0004", "ob": "0004", "gm": "226101_1", "g": "Gdańsk",
-     "pow": "2261", "p": "Gdańsk", "woj": "22", "w": "pomorskie"},
-    {"xy": "363589,504129", "bud": "306401_1.0002.12_BUD", "dz": "306401_1.0002.12", "nr": "12",
-     "obr": "306401_1.0002", "ob": "0002", "gm": "306401_1", "g": "Poznań",
-     "pow": "3064", "p": "Poznań", "woj": "30", "w": "wielkopolskie"},
-    {"xy": "365489,363209", "bud": "026401_1.0003.77_BUD", "dz": "026401_1.0003.77/2", "nr": "77/2",
-     "obr": "026401_1.0003", "ob": "0003", "gm": "026401_1", "g": "Wrocław",
-     "pow": "0264", "p": "Wrocław", "woj": "02", "w": "dolnośląskie"},
+    {"xy": "500629,639049",
+     "teryt_budynku": "146501_1.0001.123_BUD",
+     "teryt_dzialki": "146501_1.0001.123/4", "numer_dzialki": "123/4",
+     "teryt_obrebu": "146501_1.0001", "numer_obrebu": "0001",
+     "teryt_gminy": "146501_1", "nazwa_gminy": "Warszawa",
+     "teryt_powiatu": "1465", "nazwa_powiatu": "m. st. Warszawa",
+     "teryt_wojewodztwa": "14", "nazwa_wojewodztwa": "mazowieckie"},
+    {"xy": "424049,237499",
+     "teryt_budynku": "126101_1.0001.456_BUD",
+     "teryt_dzialki": "126101_1.0001.456/7", "numer_dzialki": "456/7",
+     "teryt_obrebu": "126101_1.0001", "numer_obrebu": "0001",
+     "teryt_gminy": "126101_1", "nazwa_gminy": "Kraków",
+     "teryt_powiatu": "1261", "nazwa_powiatu": "Kraków",
+     "teryt_wojewodztwa": "12", "nazwa_wojewodztwa": "małopolskie"},
+    {"xy": "501849,721789",
+     "teryt_budynku": "226101_1.0004.89_BUD",
+     "teryt_dzialki": "226101_1.0004.89/1", "numer_dzialki": "89/1",
+     "teryt_obrebu": "226101_1.0004", "numer_obrebu": "0004",
+     "teryt_gminy": "226101_1", "nazwa_gminy": "Gdańsk",
+     "teryt_powiatu": "2261", "nazwa_powiatu": "Gdańsk",
+     "teryt_wojewodztwa": "22", "nazwa_wojewodztwa": "pomorskie"},
+    {"xy": "363589,504129",
+     "teryt_budynku": "306401_1.0002.12_BUD",
+     "teryt_dzialki": "306401_1.0002.12", "numer_dzialki": "12",
+     "teryt_obrebu": "306401_1.0002", "numer_obrebu": "0002",
+     "teryt_gminy": "306401_1", "nazwa_gminy": "Poznań",
+     "teryt_powiatu": "3064", "nazwa_powiatu": "Poznań",
+     "teryt_wojewodztwa": "30", "nazwa_wojewodztwa": "wielkopolskie"},
+    {"xy": "365489,363209",
+     "teryt_budynku": "026401_1.0003.77_BUD",
+     "teryt_dzialki": "026401_1.0003.77/2", "numer_dzialki": "77/2",
+     "teryt_obrebu": "026401_1.0003", "numer_obrebu": "0003",
+     "teryt_gminy": "026401_1", "nazwa_gminy": "Wrocław",
+     "teryt_powiatu": "0264", "nazwa_powiatu": "Wrocław",
+     "teryt_wojewodztwa": "02", "nazwa_wojewodztwa": "dolnośląskie"},
 ]
 
-XY_BUDYNKI     = [{"xy": m["xy"], "object_type": 6, "expected": f"{W}|{m['bud']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-XY_DZIALKI     = [{"xy": m["xy"], "object_type": 1, "expected": f"{W}|{m['dz']}|{m['nr']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-XY_OBREBY      = [{"xy": m["xy"], "object_type": 2, "expected": f"{W}|{m['obr']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-XY_GMINY       = [{"xy": m["xy"], "object_type": 3, "expected": f"{W}|{m['gm']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-XY_POWIATY     = [{"xy": m["xy"], "object_type": 4, "expected": f"{W}|{m['pow']}|{m['p']}|{m['w']}"} for m in MIASTA]
-XY_WOJEWODZTWA = [{"xy": m["xy"], "object_type": 5, "expected": f"{W}|{m['woj']}|{m['w']}"} for m in MIASTA]
+XY_BUDYNKI     = [{"xy": m["xy"], "object_type": 6, "expected": f"{WKT_POLYGON}|{m['teryt_budynku']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+XY_DZIALKI     = [{"xy": m["xy"], "object_type": 1, "expected": f"{WKT_POLYGON}|{m['teryt_dzialki']}|{m['numer_dzialki']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+XY_OBREBY      = [{"xy": m["xy"], "object_type": 2, "expected": f"{WKT_POLYGON}|{m['teryt_obrebu']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+XY_GMINY       = [{"xy": m["xy"], "object_type": 3, "expected": f"{WKT_POLYGON}|{m['teryt_gminy']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+XY_POWIATY     = [{"xy": m["xy"], "object_type": 4, "expected": f"{WKT_POLYGON}|{m['teryt_powiatu']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+XY_WOJEWODZTWA = [{"xy": m["xy"], "object_type": 5, "expected": f"{WKT_POLYGON}|{m['teryt_wojewodztwa']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
 
-ID_BUDYNKI     = [{"id": m["bud"], "object_type": 6, "expected": f"{W}|{m['bud']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-ID_DZIALKI     = [{"id": m["dz"],  "object_type": 1, "expected": f"{W}|{m['dz']}|{m['nr']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-ID_OBREBY      = [{"id": m["obr"], "object_type": 2, "expected": f"{W}|{m['obr']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-ID_GMINY       = [{"id": m["gm"],  "object_type": 3, "expected": f"{W}|{m['gm']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-ID_POWIATY     = [{"id": m["pow"], "object_type": 4, "expected": f"{W}|{m['pow']}|{m['p']}|{m['w']}"} for m in MIASTA]
-ID_WOJEWODZTWA = [{"id": m["woj"], "object_type": 5, "expected": f"{W}|{m['woj']}|{m['w']}"} for m in MIASTA]
+ID_BUDYNKI     = [{"id": m["teryt_budynku"], "object_type": 6, "expected": f"{WKT_POLYGON}|{m['teryt_budynku']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+ID_DZIALKI     = [{"id": m["teryt_dzialki"],  "object_type": 1, "expected": f"{WKT_POLYGON}|{m['teryt_dzialki']}|{m['numer_dzialki']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+ID_OBREBY      = [{"id": m["teryt_obrebu"], "object_type": 2, "expected": f"{WKT_POLYGON}|{m['teryt_obrebu']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+ID_GMINY       = [{"id": m["teryt_gminy"],  "object_type": 3, "expected": f"{WKT_POLYGON}|{m['teryt_gminy']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+ID_POWIATY     = [{"id": m["teryt_powiatu"], "object_type": 4, "expected": f"{WKT_POLYGON}|{m['teryt_powiatu']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+ID_WOJEWODZTWA = [{"id": m["teryt_wojewodztwa"], "object_type": 5, "expected": f"{WKT_POLYGON}|{m['teryt_wojewodztwa']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
 
-PARCEL_BY_ID  = [{"name": m["dz"], "object_type": 1, "expected": f"{W}|{m['dz']}|{m['nr']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"} for m in MIASTA]
-PARCEL_BY_ID2 = [{"name": m["dz"], "expected": {f"{W}|{m['dz']}|{m['nr']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"}} for m in MIASTA]
-REGION_BY_ID  = [{"id": m["obr"], "expected": {f"{W}|{m['obr']}|{m['ob']}|{m['g']}|{m['p']}|{m['w']}"}} for m in MIASTA]
+PARCEL_BY_ID_SEARCH = [{"name": m["teryt_dzialki"], "object_type": 1, "expected": f"{WKT_POLYGON}|{m['teryt_dzialki']}|{m['numer_dzialki']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"} for m in MIASTA]
+PARCEL_BY_ID        = [{"name": m["teryt_dzialki"], "expected": {f"{WKT_POLYGON}|{m['teryt_dzialki']}|{m['numer_dzialki']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"}} for m in MIASTA]
+REGION_BY_ID        = [{"id": m["teryt_obrebu"], "expected": {f"{WKT_POLYGON}|{m['teryt_obrebu']}|{m['numer_obrebu']}|{m['nazwa_gminy']}|{m['nazwa_powiatu']}|{m['nazwa_wojewodztwa']}"}} for m in MIASTA]

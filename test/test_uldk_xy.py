@@ -26,9 +26,14 @@ class TestUldkXY(unittest.TestCase):
                 out = getBuildingByXY(case["xy"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_BUILDING_BY_XY, "xy": case["xy"],
-                     "result": ",".join(RES_BUILDING_BY_XY), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_BUILDING_BY_XY,
+                        "xy": case["xy"],
+                        "result": ",".join(RES_BUILDING_BY_XY),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_xy.Request')
     def test_getParcelByXY(self, mock_cls):
@@ -39,9 +44,14 @@ class TestUldkXY(unittest.TestCase):
                 out = getParcelByXY(case["xy"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_PARCEL_BY_XY, "xy": case["xy"],
-                     "result": ",".join(RES_PARCEL_BY_XY), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_PARCEL_BY_XY,
+                        "xy": case["xy"],
+                        "result": ",".join(RES_PARCEL_BY_XY),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_xy.Request')
     def test_getRegionByXY(self, mock_cls):
@@ -52,9 +62,14 @@ class TestUldkXY(unittest.TestCase):
                 out = getRegionByXY(case["xy"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_REGION_BY_XY, "xy": case["xy"],
-                     "result": ",".join(RES_REGION_BY_XY), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_REGION_BY_XY,
+                        "xy": case["xy"],
+                        "result": ",".join(RES_REGION_BY_XY),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_xy.Request')
     def test_getCommuneByXY(self, mock_cls):
@@ -65,9 +80,14 @@ class TestUldkXY(unittest.TestCase):
                 out = getCommuneByXY(case["xy"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_COMMUNE_BY_XY, "xy": case["xy"],
-                     "result": ",".join(RES_COMMUNE_BY_XY), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_COMMUNE_BY_XY,
+                        "xy": case["xy"],
+                        "result": ",".join(RES_COMMUNE_BY_XY),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_xy.Request')
     def test_getCountyByXY(self, mock_cls):
@@ -78,9 +98,14 @@ class TestUldkXY(unittest.TestCase):
                 out = getCountyByXY(case["xy"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_COUNTY_BY_XY, "xy": case["xy"],
-                     "result": ",".join(RES_COUNTY_BY_XY), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_COUNTY_BY_XY,
+                        "xy": case["xy"],
+                        "result": ",".join(RES_COUNTY_BY_XY),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_xy.Request')
     def test_getVoivodeshipByXY(self, mock_cls):
@@ -91,6 +116,11 @@ class TestUldkXY(unittest.TestCase):
                 out = getVoivodeshipByXY(case["xy"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_VOIVODESHIP_BY_XY, "xy": case["xy"],
-                     "result": ",".join(RES_VOIVODESHIP_BY_XY), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_VOIVODESHIP_BY_XY,
+                        "xy": case["xy"],
+                        "result": ",".join(RES_VOIVODESHIP_BY_XY),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )

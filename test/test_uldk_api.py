@@ -26,9 +26,14 @@ class TestUldkApi(unittest.TestCase):
                 out = getBuildingById(case["id"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_BUILDING_BY_ID, "id": case["id"],
-                     "result": ",".join(RES_BUILDING_BY_ID), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_BUILDING_BY_ID,
+                        "id": case["id"],
+                        "result": ",".join(RES_BUILDING_BY_ID),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_api.Request')
     def test_getParcelById(self, mock_cls):
@@ -39,9 +44,14 @@ class TestUldkApi(unittest.TestCase):
                 out = getParcelById(case["id"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_PARCEL_BY_ID, "id": case["id"],
-                     "result": ",".join(RES_PARCEL_BY_ID), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_PARCEL_BY_ID,
+                        "id": case["id"],
+                        "result": ",".join(RES_PARCEL_BY_ID),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_api.Request')
     def test_getRegionById(self, mock_cls):
@@ -52,9 +62,14 @@ class TestUldkApi(unittest.TestCase):
                 out = getRegionById(case["id"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_REGION_BY_ID, "id": case["id"],
-                     "result": ",".join(RES_REGION_BY_ID), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_REGION_BY_ID,
+                        "id": case["id"],
+                        "result": ",".join(RES_REGION_BY_ID),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_api.Request')
     def test_getCommuneById(self, mock_cls):
@@ -65,9 +80,14 @@ class TestUldkApi(unittest.TestCase):
                 out = getCommuneById(case["id"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_COMMUNE_BY_ID, "id": case["id"],
-                     "result": ",".join(RES_COMMUNE_BY_ID), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_COMMUNE_BY_ID,
+                        "id": case["id"],
+                        "result": ",".join(RES_COMMUNE_BY_ID),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_api.Request')
     def test_getCountyById(self, mock_cls):
@@ -78,9 +98,14 @@ class TestUldkApi(unittest.TestCase):
                 out = getCountyById(case["id"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_COUNTY_BY_ID, "id": case["id"],
-                     "result": ",".join(RES_COUNTY_BY_ID), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_COUNTY_BY_ID,
+                        "id": case["id"],
+                        "result": ",".join(RES_COUNTY_BY_ID),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )
 
     @patch('uldk_api.Request')
     def test_getVoivodeshipById(self, mock_cls):
@@ -91,6 +116,11 @@ class TestUldkApi(unittest.TestCase):
                 out = getVoivodeshipById(case["id"], case["object_type"])
                 self.assertEqual(out, case["expected"])
                 mock_cls.assert_called_once_with(
-                    {"request": REQ_VOIVODESHIP_BY_ID, "id": case["id"],
-                     "result": ",".join(RES_VOIVODESHIP_BY_ID), "srid": DEFAULT_SRID},
-                    case["object_type"])
+                    {
+                        "request": REQ_VOIVODESHIP_BY_ID,
+                        "id": case["id"],
+                        "result": ",".join(RES_VOIVODESHIP_BY_ID),
+                        "srid": DEFAULT_SRID,
+                    },
+                    case["object_type"],
+                )

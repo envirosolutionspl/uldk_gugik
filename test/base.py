@@ -18,5 +18,5 @@ for name in ['constants', 'https_adapter', 'request', 'request_search',
               'uldk_xy', 'uldk_api', 'uldk_parcel']:
     try:
         sys.modules[name] = importlib.import_module(f"{PLUGIN_NAME}.{name}")
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Nie udało się zaimportować modułu '{name}': {e}")
