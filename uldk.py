@@ -1,7 +1,7 @@
 import json
 from qgis.core import QgsMessageLog
 
-from .https_adapter import getSync
+from .https_adapter import NetworkManager
 from .constants import (
     REST_API_BASE_URL,
     REST_ENDPOINT_VOIVODESHIP,
@@ -25,7 +25,7 @@ class RegionFetch:
         url = f"{REST_API_BASE_URL}{endpoint}"
         try:
             QgsMessageLog.logMessage(f"Pobieranie danych z: {url}", LOG_TAG)
-            raw = getSync(url)
+            raw = NetworkManager().getSync(url)
             if raw is None:
                 QgsMessageLog.logMessage(
                     f"Błąd sieci przy pobieraniu: {url}", LOG_TAG

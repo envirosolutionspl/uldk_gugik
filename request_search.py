@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.PyQt.QtCore import QEventLoop
 
-from .https_adapter import getLegacySession
+from .https_adapter import LegacySession
 from .uldk_gugik_dialog import UldkGugikDialog
 from .constants import ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_MIN_LINE_LEN
 
@@ -17,7 +17,7 @@ class Request:
         self._data = set()
 
         self.url = ULDK_BASE_URL
-        self.session = getLegacySession()
+        self.session = LegacySession()
 
         # Utworzenie loop PRZED wywołaniem request
         self.loop = QEventLoop()

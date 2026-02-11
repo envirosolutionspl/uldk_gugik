@@ -5,6 +5,8 @@ from qgis.core import QgsNetworkAccessManager
 from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply, QSslConfiguration, QSslSocket
 from qgis.PyQt.QtCore import QUrl, QEventLoop
 
+from .constants import ENCODING_SYSTEM
+
 # Qt5/Qt6 compat
 if not hasattr(QEventLoop, 'exec'):
     QEventLoop.exec = QEventLoop.exec_
@@ -43,43 +45,43 @@ class LegacySession:
         return self.manager.get(request)
 
 
-def getLegacySession():
-    return LegacySession()
+class NetworkManager:
 
+    def __init__(self):
+        self.session = LegacySession()
 
-def getSync(url):
-    session = getLegacySession()
-    reply = session.get(url)
+    def getSync(self, url):
+        reply = self.session.get(url)
 
-    loop = QEventLoop()
-    reply.finished.connect(loop.quit)
-    loop.exec()
+        loop = QEventLoop()
+        reply.finished.connect(loop.quit)
+        loop.exec()
 
-    try:
-        # Sprawdzenie błędu sieciowego (Qt5/Qt6)
-        error_val = reply.error()
-        if hasattr(QNetworkReply, 'NetworkError'):
-            no_err = QNetworkReply.NetworkError.NoError
-        else:
-            no_err = QNetworkReply.NoError
+        try:
+            # Sprawdzenie błędu sieciowego (Qt5/Qt6)
+            error_val = reply.error()
+            if hasattr(QNetworkReply, 'NetworkError'):
+                no_err = QNetworkReply.NetworkError.NoError
+            else:
+                no_err = QNetworkReply.NoError
 
-        if error_val != no_err:
-            return None
+            if error_val != no_err:
+                return None
 
-        # Sprawdzenie kodu HTTP
-        if hasattr(QNetworkRequest, 'Attribute'):
-            status_attr = QNetworkRequest.Attribute.HttpStatusCodeAttribute
-        else:
-            status_attr = QNetworkRequest.HttpStatusCodeAttribute
+            # Sprawdzenie kodu HTTP
+            if hasattr(QNetworkRequest, 'Attribute'):
+                status_attr = QNetworkRequest.Attribute.HttpStatusCodeAttribute
+            else:
+                status_attr = QNetworkRequest.HttpStatusCodeAttribute
 
-        status_code = reply.attribute(status_attr)
-        if status_code != 200:
-            return None
+            status_code = reply.attribute(status_attr)
+            if status_code != 200:
+                return None
 
-        # Odczyt danych (Qt5/Qt6)
-        read_data = reply.readAll()
-        if hasattr(read_data, 'data'):
-            return read_data.data().decode('utf-8')
-        return bytes(read_data).decode('utf-8')
-    finally:
-        reply.deleteLater()
+            # Odczyt danych (Qt5/Qt6)
+            read_data = reply.readAll()
+            if hasattr(read_data, 'data'):
+                return read_data.data().decode(ENCODING_SYSTEM)
+            return bytes(read_data).decode(ENCODING_SYSTEM)
+        finally:
+            reply.deleteLater()
