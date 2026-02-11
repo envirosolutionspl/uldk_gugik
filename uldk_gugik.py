@@ -64,7 +64,8 @@ class UldkGugik:
             application at run time.
         :type iface: QgsInterface
         """
-        self.settings = QgsSettings() 
+        self.settings = QgsSettings()
+        self.iface = iface
 
         if Qgis.QGIS_VERSION_INT >= 31000:
             from .qgis_feed import QgisFeed
@@ -83,8 +84,6 @@ class UldkGugik:
 
         #DialogOnTop
 
-        # Save reference to the QGIS interface
-        self.iface = iface
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
@@ -127,6 +126,12 @@ class UldkGugik:
         self.region_name = None
         self.project = QgsProject.instance()
         
+
+    def showBranchSelectionDialog(self):
+        """Wyświetla dialog wyboru branży dla QGIS Feed."""
+        dialog = QgisFeedDialog(self.iface.mainWindow())
+        dialog.exec()
+        self.selected_industry = self.settings.value("selected_industry", None)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
