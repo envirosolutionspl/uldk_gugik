@@ -1,5 +1,4 @@
 import json
-from qgis.core import QgsMessageLog
 
 from .https_adapter import NetworkManager
 from .constants import (
@@ -7,9 +6,9 @@ from .constants import (
     REST_ENDPOINT_VOIVODESHIP,
     REST_ENDPOINT_COUNTY,
     REST_ENDPOINT_COMMUNE,
-    REST_ENDPOINT_PRECINCT,
-    LOG_TAG,
+    REST_ENDPOINT_PRECINCT
 )
+from .utils import MessageUtils
 
 
 class RegionFetch:
@@ -24,19 +23,19 @@ class RegionFetch:
         unit_dict = {}
         url = f"{REST_API_BASE_URL}{endpoint}"
         try:
-            QgsMessageLog.logMessage(f"Pobieranie danych z: {url}", LOG_TAG)
+            MessageUtils.pushLogInfo(f"Pobieranie danych z: {url}")
             raw = self.manager.getSync(url)
             if raw is None:
-                QgsMessageLog.logMessage(
-                    f"Błąd sieci przy pobieraniu: {url}", LOG_TAG
+                MessageUtils.pushLogWarningFetch(
+                    f"Błąd sieci przy pobieraniu: {url}"
                 )
                 return unit_dict
             data = json.loads(raw)
             for item in data:
                 unit_dict[item['teryt']] = item['name']
         except Exception as e:
-            QgsMessageLog.logMessage(
-                f"Wyjątek przy pobieraniu {url}: {str(e)}", LOG_TAG
+            MessageUtils.pushLogWarningFetch(
+                f"Wyjątek przy pobieraniu {url}: {str(e)}"
             )
         return unit_dict
 
