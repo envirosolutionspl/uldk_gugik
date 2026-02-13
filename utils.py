@@ -1,8 +1,9 @@
 import socket
 from qgis.utils import iface
-from qgis.core import Qgis
+from qgis.core import Qgis, QgsMessageLog
 from qgis.PyQt.QtCore import QT_VERSION_STR
 from .constants import CHECK_INTERNET_CLIENT
+from . import PLUGIN_NAME
 
 class VersionUtils:
 
