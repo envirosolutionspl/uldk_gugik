@@ -21,7 +21,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, Qt
+from qgis.PyQt.QtCore import (QSettings, QTranslator, qVersion, 
+                              QCoreApplication, QVariant, Qt, QT_VERSION_STR)
 from qgis.PyQt.QtGui import QIcon, QPixmap, QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel, QDialog
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
@@ -282,16 +283,15 @@ class UldkGugik:
             return 1
         if self.first_start == True:
             self.first_start = False
-            if Qgis.QGIS_VERSION_INT >= 30000:
-                # skrot klawiszowy
-                self.shortcut = QShortcut(self.iface.mainWindow())
-                # Qt6 compatibility: use string format instead of Qt.ALT + Qt.Key_F
-                self.shortcut.setKey(QKeySequence("Alt+F"))
-                self.shortcut.activated.connect(self.shortcutActivated)
+            # skrot klawiszowy
+            self.shortcut = QShortcut(self.iface.mainWindow())
+            # Qt6 compatibility: use "Alt+F" string format instead of Qt.ALT + Qt.Key_F
+            self.shortcut.setKey(QKeySequence("Alt+F"))
+            if QT_VERSION_STR.startswith('6'):
+                self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
             else:
-                self.shortcut = QShortcut(QKeySequence("Alt+F"), self.iface.mainWindow())
                 self.shortcut.setContext(Qt.ApplicationShortcut)
-                self.shortcut.activated.connect(self.shortcutActivated)
+            self.shortcut.activated.connect(self.shortcutActivated)
         
         try:
             url = QUrl('https://uldk.gugik.gov.pl')
@@ -764,7 +764,6 @@ class UldkGugik:
         elif utils.isInternetConnected():
             try:
                 self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
-                # self.dlg.hide()  # jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
             except:
                 self.iface.messageBar().pushMessage(
                     "Nie udało się pobrać obiektu:",
