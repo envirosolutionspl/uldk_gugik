@@ -10,7 +10,6 @@ REST_ENDPOINT_VOIVODESHIP = "/getVoivodeship"
 REST_ENDPOINT_COUNTY = "/getCounty"
 REST_ENDPOINT_COMMUNE = "/getCommune"
 REST_ENDPOINT_PRECINCT = "/getPrecinct"
-LOG_TAG = "TerytFetch"
 
 FEED_URL = 'https://qgisfeed.envirosolutions.pl/'
 

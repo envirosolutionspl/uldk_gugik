@@ -13,6 +13,75 @@ class VersionUtils:
         else:
             return False
 
+class MessageUtils:
+    
+    @staticmethod
+    def pushSuccess(iface, message: str) -> None:
+        iface.messageBar().pushMessage(
+            "Sukces:",
+            message,
+            level=Qgis.Success,
+            duration=10
+        )
+
+    @staticmethod
+    def pushInfo(iface, message: str) -> None:
+        iface.messageBar().pushMessage(
+            'Informacja',
+            message,
+            level=Qgis.Info,
+            duration=10
+        )
+
+    @staticmethod
+    def pushWarning(iface, message: str) -> None:
+        iface.messageBar().pushMessage(
+            "Ostrzeżenie",
+            message,
+            level=Qgis.Warning,
+            duration=10
+        )
+    
+    @staticmethod
+    def pushCritical(iface, message: str) -> None:
+        iface.messageBar().pushMessage(
+            message,
+            level=Qgis.Critical,
+            duration=10
+        )
+
+    @staticmethod
+    def pushLogSuccess(message: str) -> None:
+        QgsMessageLog.logMessage(
+            message,
+            tag=PLUGIN_NAME,
+            level=Qgis.Success
+        )
+
+    @staticmethod
+    def pushLogInfo(message: str) -> None:
+        QgsMessageLog.logMessage(
+            message,
+            tag=PLUGIN_NAME,
+            level=Qgis.Info
+        )
+    
+    @staticmethod
+    def pushLogWarning(message: str) -> None:
+        QgsMessageLog.logMessage(
+            message,
+            tag=PLUGIN_NAME,
+            level=Qgis.Warning
+        )
+    
+    @staticmethod
+    def pushLogCritical(message: str) -> None:
+        QgsMessageLog.logMessage(
+            message,
+            tag=PLUGIN_NAME,
+            level=Qgis.Critical
+        )
+
 def isInternetConnected():
     try:
         host = socket.gethostbyname(CHECK_INTERNET_CLIENT["host"])

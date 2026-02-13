@@ -26,7 +26,7 @@ import os
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QWidget
-from qgis.core import QgsMessageLog, Qgis
+from qgis.core import Qgis
 
 from .uldk import RegionFetch
 from .constants import (
@@ -34,6 +34,7 @@ from .constants import (
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING,
     COMBOBOX_STYLES
 )
+from .utils import MessageUtils
 
 # Nazwa do logów (jeśli istnieje w __init__.py)
 try:
@@ -87,10 +88,8 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.RegionFetch = RegionFetch(teryt='')
         except Exception:
-            QgsMessageLog.logMessage(
-                "Brak połączenia z Internetem. Spróbuj ponownie później",
-                plugin_name,
-                level=Qgis.Warning
+            MessageUtils.pushLogWarning(
+                "Brak połączenia z Internetem. Spróbuj ponownie później"
             )
             self.RegionFetch = None
 
@@ -106,10 +105,8 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.wojcomboBox.setItemData(idx, val)
             self.wojcomboBox.setCurrentIndex(-1)
         else:
-            QgsMessageLog.logMessage(
-                "Brak połączenia z Internetem. Spróbuj ponownie później",
-                plugin_name,
-                level=Qgis.Warning
+            MessageUtils.pushLogWarning(
+                "Brak połączenia z Internetem. Spróbuj ponownie później"
             )
 
     def setupTabWidget(self, checked):
