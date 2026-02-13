@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 from qgis.PyQt.QtCore import (QSettings, QTranslator, qVersion, 
-                              QCoreApplication, QVariant, Qt, QT_VERSION_STR)
+                              QCoreApplication, QVariant, Qt)
 from qgis.PyQt.QtGui import QIcon, QPixmap, QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel, QDialog
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
