@@ -721,7 +721,7 @@ class UldkGugik:
                 self.performRequestXY(x=objX, y=objY, srid=srid, zoomToFeature=zoomToFeature)
                 # self.dlg.hide()  # jeżeli wtyczka ma zostawiać włączone okno, zamiast hide wpisz show
             except Exception as e:
-                MessageUtils.pushLogWarning(f"Bła: {e}")
+                MessageUtils.pushLogWarning(f"Błąd: {e}")
                 MessageUtils.pushLogWarning(
                     "Nie udało się pobrać obiektu: "
                     "API nie zwróciło obiektu dla wybranego zapytania"
