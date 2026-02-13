@@ -1,9 +1,78 @@
 import socket
 from qgis.utils import iface
-from qgis.core import Qgis
-
+from qgis.core import Qgis, QgsMessageLog
+from . import PLUGIN_NAME
 from .constants import CHECK_INTERNET_CLIENT
 
+
+class MessageUtils:
+    
+    @staticmethod
+    def pushSuccess(iface, message: str) -> None:
+        iface.messageBar().pushMessage(
+            "Sukces:",
+            message,
+            level=Qgis.Success,
+            duration=10
+        )
+
+    @staticmethod
+    def pushInfo(iface, message: str) -> None:
+        iface.messageBar().pushMessage(
+            'Informacja',
+            message,
+            level=Qgis.Info,
+            duration=10
+        )
+
+    @staticmethod
+    def pushWarning(iface, message: str) -> None:
+        iface.messageBar().pushMessage(
+            "Ostrzeżenie",
+            message,
+            level=Qgis.Warning,
+            duration=10
+        )
+    
+    @staticmethod
+    def pushCritical(iface, message: str) -> None:
+        iface.messageBar().pushMessage(
+            message,
+            level=Qgis.Critical,
+            duration=10
+        )
+
+    @staticmethod
+    def pushLogSuccess(message: str) -> None:
+        QgsMessageLog.logMessage(
+            message,
+            tag=PLUGIN_NAME,
+            level=Qgis.Success
+        )
+
+    @staticmethod
+    def pushLogInfo(message: str) -> None:
+        QgsMessageLog.logMessage(
+            message,
+            tag=PLUGIN_NAME,
+            level=Qgis.Info
+        )
+    
+    @staticmethod
+    def pushLogWarning(message: str) -> None:
+        QgsMessageLog.logMessage(
+            message,
+            tag=PLUGIN_NAME,
+            level=Qgis.Warning
+        )
+    
+    @staticmethod
+    def pushLogCritical(message: str) -> None:
+        QgsMessageLog.logMessage(
+            message,
+            tag=PLUGIN_NAME,
+            level=Qgis.Critical
+        )
 
 def isInternetConnected():
     try:

@@ -9,6 +9,7 @@ from .constants import (
     ENCODING_SYSTEM, ULDK_MIN_LINE_LEN, ULDK_OBJ_REGION, ULDK_NOT_FOUND,
     ULDK_TERYT_SUFFIX_LEN
 )
+from .utils import MessageUtils
 
 # Qt5/Qt6 compat: QEventLoop.exec_ -> exec
 if not hasattr(QEventLoop, 'exec'):
@@ -36,9 +37,8 @@ class Request:
         try:
             final_url = f"{self.url}?{urlencode(self.params)}"
         except Exception as e:
-            iface.messageBar().pushWarning(
-                "ULDK",
-                f"Nie udało się zbudować adresu zapytania: {e}",
+            MessageUtils.pushLogWarning(
+                f"Nie udało się zbudować adresu zapytania: {e}"
             )
             self._data = None
             return
@@ -46,16 +46,14 @@ class Request:
         try:
             self.reply = self.session.get(final_url)
         except Exception as e:
-            iface.messageBar().pushWarning(
-                "ULDK",
-                f"Błąd podczas wysyłania zapytania do ULDK: {e}",
+            MessageUtils.pushLogWarning(
+                f"Błąd podczas wysyłania zapytania do ULDK: {e}"
             )
             self._data = None
             return
 
         if not self.reply:
-            iface.messageBar().pushWarning(
-                "ULDK",
+            MessageUtils.pushLogWarning(
                 "Serwer ULDK nie zwrócił odpowiedzi.",
             )
             self._data = None
@@ -78,9 +76,9 @@ class Request:
                 is_no_error = (int(error_val) == int(no_err))
 
             if not is_no_error:
-                iface.messageBar().pushWarning(
-                    "ULDK",
-                    f"Błąd sieci podczas pobierania danych z ULDK: {reply.errorString()}",
+                MessageUtils.pushLogWarning(
+                    "Błąd sieci podczas pobierania danych z ULDK: "
+                    f"{reply.errorString()}"
                 )
                 self._data = None
                 return
@@ -93,9 +91,8 @@ class Request:
                 returned_data = bytes(read_data).decode(ENCODING_SYSTEM)
 
             if not returned_data or len(returned_data.strip()) == 0:
-                iface.messageBar().pushWarning(
-                    "ULDK",
-                    "Serwer ULDK zwrócił pustą odpowiedź.",
+                MessageUtils.pushLogWarning(
+                    "Serwer ULDK zwrócił pustą odpowiedź."
                 )
                 self._data = None
                 return
@@ -152,15 +149,14 @@ class Request:
                     break
 
             if self._data is None:
-                iface.messageBar().pushWarning(
-                    "ULDK",
-                    "Brak wyników dla podanego zapytania do ULDK.",
+                MessageUtils.pushLogWarning(
+                    "Brak wyników dla podanego zapytania do ULDK."
                 )
 
         except Exception as e:
-            iface.messageBar().pushWarning(
-                "ULDK",
-                f"Nieoczekiwany błąd podczas przetwarzania odpowiedzi ULDK: {e}",
+            MessageUtils.pushLogWarning(
+                "Nieoczekiwany błąd podczas przetwarzania odpowiedzi ULDK: "
+                f"{e}"
             )
             self._data = None
         finally:

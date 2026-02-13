@@ -1,5 +1,5 @@
 from qgis.core import (QgsNewsFeedParser, QgsSettings, QgsNewsFeedModel,
-                       QgsMessageLog, QgsApplication)
+                       QgsApplication)
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QComboBox, QPushButton
@@ -9,6 +9,7 @@ import os
 import unicodedata
 
 from .constants import INDUSTRIES, FEED_URL
+from .utils import MessageUtils
 
 
 class QgisFeed:
@@ -57,7 +58,7 @@ class QgisFeed:
         """
         Function registers QGIS Feed
         """
-        QgsMessageLog.logMessage('Registering feed')
+        MessageUtils.pushLogInfo('Zapisuję feed')
         for key in self.s.allKeys():
             if self.envirosolutionsFeedPattern_old.match(key) or self.envirosolutionsFeedPattern_new.match(key):
                 finalKey = re.sub(r'(\d+)', r'9999\1', key.replace(self.industry_url_short, 'httpsfeedqgisorg'))
