@@ -49,6 +49,7 @@ from .constants import (
     DEFAULT_SRID, ENV_MENU_NAME, SWAP_XY_SRIDS, TOOLTIP_FROM_MAP,
     OBJECT_TYPES, ULDK_MIN_LINE_LEN,
 )
+from .utils import VersionUtils
 
 from . import PLUGIN_VERSION as plugin_version
 from . import PLUGIN_NAME as plugin_name
@@ -287,7 +288,7 @@ class UldkGugik:
             self.shortcut = QShortcut(self.iface.mainWindow())
             # Qt6 compatibility: use "Alt+F" string format instead of Qt.ALT + Qt.Key_F
             self.shortcut.setKey(QKeySequence("Alt+F"))
-            if QT_VERSION_STR.startswith('6'):
+            if VersionUtils.isQt6():
                 self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
             else:
                 self.shortcut.setContext(Qt.ApplicationShortcut)

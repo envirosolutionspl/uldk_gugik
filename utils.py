@@ -1,9 +1,17 @@
 import socket
 from qgis.utils import iface
 from qgis.core import Qgis
-
+from qgis.PyQt.QtCore import QT_VERSION_STR
 from .constants import CHECK_INTERNET_CLIENT
 
+class VersionUtils:
+
+    @staticmethod
+    def isQt6():
+        if QT_VERSION_STR.startswith('6'):
+            return True
+        else:
+            return False
 
 def isInternetConnected():
     try:
