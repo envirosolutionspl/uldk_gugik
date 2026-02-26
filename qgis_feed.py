@@ -1,5 +1,5 @@
 from qgis.core import (QgsNewsFeedParser, QgsSettings, QgsNewsFeedModel,
-                       QgsMessageLog, QgsApplication)
+                       QgsApplication)
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QComboBox, QPushButton
@@ -9,6 +9,7 @@ import os
 import unicodedata
 
 from .constants import INDUSTRIES, FEED_URL
+from .utils import MessageUtils
 
 
 class QgisFeed:
@@ -17,7 +18,7 @@ class QgisFeed:
         self.industries_dict = INDUSTRIES
 
         self.industry_decoded = [key for key, val in self.industries_dict.items() if val == selected_industry]
-        self.plugin_name_slug = self.create_slug(plugin_name)
+        self.plugin_name_slug = self.createSlug(plugin_name)
 
         self.es_url = (
             f"{FEED_URL}?industry={self.industry_decoded[0]}&plugin={self.plugin_name_slug}" if self.industry_decoded else FEED_URL
@@ -39,7 +40,7 @@ class QgisFeed:
 
         return re.sub(r'://|\.|:|/\?|=|&|-|:', '', url)
 
-    def create_slug(self, text):
+    def createSlug(self, text):
         """
         This function makes slug from a random text
         """
@@ -57,7 +58,7 @@ class QgisFeed:
         """
         Function registers QGIS Feed
         """
-        QgsMessageLog.logMessage('Registering feed')
+        MessageUtils.pushLogInfo('Zapisuję feed')
         for key in self.s.allKeys():
             if self.envirosolutionsFeedPattern_old.match(key) or self.envirosolutionsFeedPattern_new.match(key):
                 finalKey = re.sub(r'(\d+)', r'9999\1', key.replace(self.industry_url_short, 'httpsfeedqgisorg'))

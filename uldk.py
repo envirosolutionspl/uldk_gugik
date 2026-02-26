@@ -1,39 +1,64 @@
-from .constants import ULDK_GMINA_DICT_URL, ULDK_POWIAT_DICT_URL, ULDK_WOJEWODZTWO_DICT_URL, ULDK_OBREB_DICT_URL
-from .https_adapter import get_legacy_session
+import json
+
+from .https_adapter import NetworkManager
+from .constants import (
+    REST_API_BASE_URL,
+    REST_ENDPOINT_VOIVODESHIP,
+    REST_ENDPOINT_COUNTY,
+    REST_ENDPOINT_COMMUNE,
+    REST_ENDPOINT_PRECINCT
+)
+from .utils import MessageUtils
 
 
 class RegionFetch:
     def __init__(self, teryt):
-        self.wojewodztwo_dict = self.__fetch_wojewodztwo_dict(teryt = '')
+        self.manager = NetworkManager()
+        self.wojewodztwo_dict = self.__fetch_wojewodztwo_dict()
         self.powiat_dict = self.get_powiat_by_teryt(teryt)
         self.gmina_dict = self.get_gmina_by_teryt(teryt)
         self.obreb_dict = self.get_obreb_by_teryt(teryt)
 
-    @staticmethod
-    def fetch_unit_dict(url, teryt):
+    def fetch_unit_dict(self, endpoint):
         unit_dict = {}
-        url = url+teryt
-        with get_legacy_session().get(url=url, verify=False) as resp:
-            resp_text = resp.text.strip().split('\n')
-            if not resp_text:
-                return
-            for el in resp_text[1:]:
-                split = el.split('|')
-                unit_dict[split[1]] = split[0]
+        url = f"{REST_API_BASE_URL}{endpoint}"
+        try:
+            MessageUtils.pushLogInfo(f"Pobieranie danych z: {url}")
+            raw = self.manager.getSync(url)
+            if raw is None:
+                MessageUtils.pushLogWarningFetch(
+                    f"Błąd sieci przy pobieraniu: {url}"
+                )
+                return unit_dict
+            data = json.loads(raw)
+            for item in data:
+                unit_dict[item['teryt']] = item['name']
+        except Exception as e:
+            MessageUtils.pushLogWarningFetch(
+                f"Wyjątek przy pobieraniu {url}: {str(e)}"
+            )
         return unit_dict
 
-    def __fetch_wojewodztwo_dict(self, teryt):
-        return self.fetch_unit_dict(ULDK_WOJEWODZTWO_DICT_URL, teryt='')
+    def __fetch_wojewodztwo_dict(self):
+        return self.fetch_unit_dict(REST_ENDPOINT_VOIVODESHIP)
 
     def get_powiat_by_teryt(self, teryt):
-        return self.fetch_unit_dict(ULDK_POWIAT_DICT_URL, teryt)  
+        if not teryt:
+            return {}
+        return self.fetch_unit_dict(f"{REST_ENDPOINT_COUNTY}/{teryt}")
 
     def get_gmina_by_teryt(self, teryt):
-        return self.fetch_unit_dict(ULDK_GMINA_DICT_URL, teryt)
+        if not teryt:
+            return {}
+        return self.fetch_unit_dict(f"{REST_ENDPOINT_COMMUNE}/{teryt}")
 
     def get_obreb_by_teryt(self, teryt):
-        return self.fetch_unit_dict(ULDK_OBREB_DICT_URL, teryt)
+        if not teryt:
+            return {}
+        return self.fetch_unit_dict(f"{REST_ENDPOINT_PRECINCT}/{teryt}")
 
-
-# if __name__ == '__main__':
-#     regionFetch = RegionFetch(teryt)
+    # Aliasy dla dialogu (constants.ADMINISTRATIVE_UNITS_OBJECTS
+    # wywołuje getPowiatByTeryt, getGminaByTeryt, getObrebByTeryt przez getattr)
+    getPowiatByTeryt = get_powiat_by_teryt
+    getGminaByTeryt = get_gmina_by_teryt
+    getObrebByTeryt = get_obreb_by_teryt

@@ -1,50 +1,54 @@
-from .constants import DEFAULT_SRID
+from .constants import (
+    DEFAULT_SRID,
+    REQ_BUILDING_BY_XY, REQ_PARCEL_BY_XY, REQ_REGION_BY_XY, REQ_COMMUNE_BY_XY, REQ_COUNTY_BY_XY, REQ_VOIVODESHIP_BY_XY,
+    RES_BUILDING_BY_XY, RES_PARCEL_BY_XY, RES_REGION_BY_XY, RES_COMMUNE_BY_XY, RES_COUNTY_BY_XY, RES_VOIVODESHIP_BY_XY,
+)
 from .request import Request
 
 
-def GetBuildingByXY(xy, object_type):
-    request = "GetBuildingByXY"
-    result = "geom_wkt,teryt,region,commune,county,voivodeship"
+def getBuildingByXY(xy, object_type):
+    request = REQ_BUILDING_BY_XY
+    result = ",".join(RES_BUILDING_BY_XY)
     params = {'request': request, 'xy': xy, 'result': result, 'srid': DEFAULT_SRID}
     res = Request(params, object_type)
     return res.data
 
 
-def getParcelByXY(xy, objectType):
-    request = "GetParcelByXY"
-    result = "geom_wkt,teryt,parcel,region,commune,county,voivodeship"
+def getParcelByXY(xy, object_type):
+    request = REQ_PARCEL_BY_XY
+    result = ",".join(RES_PARCEL_BY_XY)
     params = {'request': request, 'xy': xy, 'result': result, 'srid': DEFAULT_SRID}
-    res = Request(params, objectType)
+    res = Request(params, object_type)
     return res.data
 
 
-def getRegionByXY(xy, objectType):
-    request = "GetRegionByXY"
-    result = "geom_wkt,teryt,region,commune,county,voivodeship"
+def getRegionByXY(xy, object_type):
+    request = REQ_REGION_BY_XY
+    result = ",".join(RES_REGION_BY_XY)
     params = {'request': request, 'xy': xy, 'result': result, 'srid': DEFAULT_SRID}
-    res = Request(params, objectType)
+    res = Request(params, object_type)
     return res.data
 
 
-def getCommuneByXY(xy, objectType):
-    request = "GetCommuneByXY"
-    result = "geom_wkt,teryt,commune,county,voivodeship"
+def getCommuneByXY(xy, object_type):
+    request = REQ_COMMUNE_BY_XY
+    result = ",".join(RES_COMMUNE_BY_XY)
     params = {'request': request, 'xy': xy, 'result': result, 'srid': DEFAULT_SRID}
-    res = Request(params, objectType)
+    res = Request(params, object_type)
     return res.data
 
 
-def getCountyByXY(xy, objectType):
-    request = "GetCountyByXY"
-    result = "geom_wkt,teryt,county,voivodeship"
+def getCountyByXY(xy, object_type):
+    request = REQ_COUNTY_BY_XY
+    result = ",".join(RES_COUNTY_BY_XY)
     params = {'request': request, 'xy': xy, 'result': result, 'srid': DEFAULT_SRID}
-    res = Request(params, objectType)
+    res = Request(params, object_type)
     return res.data
 
 
-def getVoivodeshipByXY(xy, objectType):
-    request = "GetVoivodeshipByXY"
-    result = "geom_wkt,teryt,voivodeship"
+def getVoivodeshipByXY(xy, object_type):
+    request = REQ_VOIVODESHIP_BY_XY
+    result = ",".join(RES_VOIVODESHIP_BY_XY)
     params = {'request': request, 'xy': xy, 'result': result, 'srid': DEFAULT_SRID}
-    res = Request(params, objectType)
+    res = Request(params, object_type)
     return res.data

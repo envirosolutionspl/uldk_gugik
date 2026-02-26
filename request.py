@@ -1,89 +1,168 @@
 from urllib.parse import urlencode
-from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkReply
-from qgis.PyQt.QtCore import QUrl, QEventLoop
+from qgis.PyQt.QtNetwork import QNetworkReply
+from qgis.PyQt.QtCore import QEventLoop
+from qgis.utils import iface
+
+from .https_adapter import LegacySession
+from .constants import (
+    ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_XML_MARKER, ULDK_ERROR_MARKERS,
+    ENCODING_SYSTEM, ULDK_MIN_LINE_LEN, ULDK_OBJ_REGION, ULDK_NOT_FOUND,
+    ULDK_TERYT_SUFFIX_LEN
+)
+from .utils import MessageUtils
+
+# Qt5/Qt6 compat: QEventLoop.exec_ -> exec
+if not hasattr(QEventLoop, 'exec'):
+    QEventLoop.exec = QEventLoop.exec_
 
 
 class Request:
-    def __init__(self, params,objectType, **kwargs):
+    def __init__(self, params, object_type, **kwargs):
         self.params = params
         self._data = None
-        self.url = "http://uldk.gugik.gov.pl/"
-        self.manager = QNetworkAccessManager()
+        self.session = LegacySession()
+        self.url = ULDK_BASE_URL
 
         self.teryt = kwargs.get('teryt', None)
-        self.objectType = objectType
+        self.object_type = object_type
+
+        # Utworzenie loop PRZED wywołaniem request
+        self.loop = QEventLoop()
+        self.reply = None
 
         self.getRequest()
-        self.loop = QEventLoop()
-        self.loop.exec_()
+        self.loop.exec()
 
     def getRequest(self):
-        """Wysłanie zapytania z odpowiednimi parametrami"""
-        finalUrl = f"{self.url}?{urlencode(self.params)}"
-        req = QNetworkRequest(QUrl(finalUrl))
-        reply = self.manager.get(req)
-        reply.finished.connect(lambda: self.handleRequest(reply))
+        try:
+            final_url = f"{self.url}?{urlencode(self.params)}"
+        except Exception as e:
+            MessageUtils.pushLogWarning(
+                f"Nie udało się zbudować adresu zapytania: {e}"
+            )
+            self._data = None
+            return
 
-    def handleRequest(self, reply):
-        """Obsłużenie odpowiedzi"""
-        if reply.error() == QNetworkReply.NoError:
-            returnedData = reply.readAll().data().decode('utf-8')
+        try:
+            self.reply = self.session.get(final_url)
+        except Exception as e:
+            MessageUtils.pushLogWarning(
+                f"Błąd podczas wysyłania zapytania do ULDK: {e}"
+            )
+            self._data = None
+            return
 
-            for line in returnedData.split('\n'):
-                if len(line) < 3 or line == "-1 brak wyników" or line.find("XML")>-1 or line.find("błęd")>-1:
+        if not self.reply:
+            MessageUtils.pushLogWarning(
+                "Serwer ULDK nie zwrócił odpowiedzi.",
+            )
+            self._data = None
+            return
+
+        # Czekamy na zakończenie odpowiedzi
+        self.reply.finished.connect(self.handleReply)
+
+    def handleReply(self):
+        """Obsłużenie odpowiedzi (Qt5/Qt6 kompatybilnie + logika constants)"""
+        reply = self.reply
+        try:
+            # Sprawdzenie błędu w sposób zgodny z Qt5 i Qt6
+            error_val = reply.error()
+            if hasattr(QNetworkReply, 'NetworkError'):
+                no_err = QNetworkReply.NetworkError.NoError  # Qt6
+                is_no_error = (error_val == no_err)
+            else:
+                no_err = QNetworkReply.NoError  # Qt5
+                is_no_error = (int(error_val) == int(no_err))
+
+            if not is_no_error:
+                MessageUtils.pushLogWarning(
+                    "Błąd sieci podczas pobierania danych z ULDK: "
+                    f"{reply.errorString()}"
+                )
+                self._data = None
+                return
+
+            # Odczyt danych (działa i w Qt5, i w Qt6)
+            read_data = reply.readAll()
+            if hasattr(read_data, 'data'):
+                returned_data = read_data.data().decode(ENCODING_SYSTEM)
+            else:
+                returned_data = bytes(read_data).decode(ENCODING_SYSTEM)
+
+            if not returned_data or len(returned_data.strip()) == 0:
+                MessageUtils.pushLogWarning(
+                    "Serwer ULDK zwrócił pustą odpowiedź."
+                )
+                self._data = None
+                return
+
+            teryt = None
+
+            for line in returned_data.split('\n'):
+                if (
+                    len(line) < ULDK_MIN_LINE_LEN
+                    or line == ULDK_NO_RESULTS
+                    or line.find(ULDK_XML_MARKER) > ULDK_NOT_FOUND
+                    or any(line.find(marker) > ULDK_NOT_FOUND for marker in ULDK_ERROR_MARKERS)
+                ):
                     continue
+
                 if ";" in line:
                     polygon = line.split(';')[1]
-                    if not self.teryt:
-                        self._data = polygon
-                        pass
+                else:
+                    polygon = line
                     
-                    if self.objectType in [1, 6]:
-                        teryt = polygon.split('|')[1].split('.')[0]
-                        break
-                    elif self.objectType ==2:
-                        if polygon.split('|')[1].find(".") >-1:
-                            teryt = polygon.split('|')[1].split('.')[0]
-                            break
-                        else:
-                            pass
-                    else:
-                        teryt = polygon.split('|')[1]
-                        break
+                if not self.teryt:
+                    self._data = polygon
+                    break
 
-                    if teryt[:-4] == self.teryt[:-4]:
-                        # jeżeli wybór przezXY lub teryt z formularza == teryt otrzymany z odpowiedzi
-                        self._data = polygon
-                        break
+                if self.object_type in [1, 6]:
+                    try:
+                        teryt = polygon.split('|')[1].split('.')[0]
+                    except IndexError:
+                        continue
+
+                elif self.object_type == ULDK_OBJ_REGION:
+                    try:
+                        field = polygon.split("|")[1]
+                    except IndexError:
+                        continue
+
+                    if field.find(".") > ULDK_NOT_FOUND:
+                        teryt = field.split(".")[0]
+                    else:
+                        continue
 
                 else:
-                    if not self.teryt:
-                        self._data = line
-                        pass
+                    try:
+                        teryt = polygon.split('|')[1]
+                    except IndexError:
+                        continue
+                        
+                if (
+                    teryt
+                    and self.teryt
+                    and teryt[:-ULDK_TERYT_SUFFIX_LEN] == self.teryt[:-ULDK_TERYT_SUFFIX_LEN]
+                ):
+                    self._data = polygon
+                    break
 
-                    if self.objectType in [1, 6]:
-                        try:
-                            teryt = line.split('|')[1].split('.')[0]
-                        except IndexError:
-                            pass
-                        break
+            if self._data is None:
+                MessageUtils.pushLogWarning(
+                    "Brak wyników dla podanego zapytania do ULDK."
+                )
 
-                    elif self.objectType ==2:
-                        if line.split('|')[1].find(".") >-1:
-                            teryt = line.split('|')[1].split('.')[0]
-                            break
-                        else:
-                            pass
-                    else:
-                        teryt = line.split('|')[1].split('.')[0]
-                    if teryt[:-4] == self.teryt[:-4]:
-                        self._data = line
-                        break
-
-        else:  # brak zgodności - nie ma takiego nr działki
+        except Exception as e:
+            MessageUtils.pushLogWarning(
+                "Nieoczekiwany błąd podczas przetwarzania odpowiedzi ULDK: "
+                f"{e}"
+            )
             self._data = None
-
-        self.loop.quit()
+        finally:
+            if self.loop.isRunning():
+                self.loop.quit()
+            reply.deleteLater()
 
     @property
     def data(self):

@@ -89,7 +89,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Wprowadź identyfikator obiektu (np. 141301_1.0010.713/2.5_BUD)</string>
+      <string>Wprowadź identyfikator obiektu (np. 142608_2.0022.108_BUD)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="edit_id">
@@ -898,7 +898,7 @@
            </font>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;© 2025 EnviroSolutions Sp. z o.o.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;© 2026 EnviroSolutions Sp. z o.o.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>

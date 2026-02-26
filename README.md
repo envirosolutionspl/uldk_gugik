@@ -38,10 +38,12 @@
    Jeżeli chcemy pobrać warstwę województwa, w którym przykładowo znajduje się nasza działka należy zaznaczyć w bocznym panelu "Województwo". 
    Mając wpisany identyfikator działki wtyczka automatycznie pobierze przypisane do niej województwo lub inny wybrany obszar.
    Jeśli numer działki występuje więcej niż jeden raz w danym obrębie, w górnej części QGIS’a pojawi się komunikat i zostanie pobrana pierwsza z działek zwrócona przez usługę ULDK.
+   
+![uldk_gif](https://github.com/user-attachments/assets/415b51a4-8ef5-4492-abea-bae393b68edc)
 
 ### Uwaga
 
-Warunkiem koniecznym do prawidłowego działania wtyczki jest posiadanie wersji QGIS 3.22 lub wyższej.
+Warunkiem koniecznym do prawidłowego działania wtyczki jest posiadanie wersji QGIS 3.28 lub wyższej.
 
 
 
@@ -81,5 +83,7 @@ The plugin offers 3 methods for searching and downloading boundaries.
 
 In the side panel, there are options to select the area of interest (parcel, registration area, municipality, county, voivodeship). If you want to download the voivodeship layer where your parcel is located, select "Województwo" in the side panel. Once you enter the parcel identifier, the plugin will automatically download the associated voivodeship or another selected area. If the parcel number appears more than once in the same registration area, a message will appear at the top of QGIS, and the plugin will download the first parcel returned by the ULDK service.
 
+![uldk_gif](https://github.com/user-attachments/assets/415b51a4-8ef5-4492-abea-bae393b68edc)
+
 ### Note
-A necessary condition for the plugin to work correctly is having QGIS version 3.22 or higher."
+A necessary condition for the plugin to work correctly is having QGIS version 3.28 or higher."
