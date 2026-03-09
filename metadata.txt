@@ -26,12 +26,14 @@ repository=https://github.com/envirosolutionspl/uldk_gugik
 
 # Uncomment the following line and add your changelog:
 changelog=
-  Wersja 1.5.0
-    * Pełna kompatybilność z QGIS 3.40+ (Qt6) oraz starszymi wersjami (Qt5)
-    * Usprawnienie pobierania obiektów administracyjnych: województwa, powiaty, gminy i obręby
-    * Usunięcie zależności od zewnętrznej biblioteki Python (requests) i zastąpienie jej natywnym rozwiązaniem dla QGIS - naprawia błąd uniemożliwiający załadowanie wtyczki
-    * Lepsza obsługa błędów - czytelne komunikaty w pasku QGIS
-    * Poprawa interfejsu - ukrywanie zbędnych pól formularza w zależności od wybranego typu obiektu
+  Wersja 1.5.1
+    * dodanie parametru qgisMaximumVersion dla QGIS4
+#  Wersja 1.5.0
+#    * Pełna kompatybilność z QGIS 3.40+ (Qt6) oraz starszymi wersjami (Qt5)
+#    * Usprawnienie pobierania obiektów administracyjnych: województwa, powiaty, gminy i obręby
+#    * Usunięcie zależności od zewnętrznej biblioteki Python (requests) i zastąpienie jej natywnym rozwiązaniem dla QGIS - naprawia błąd uniemożliwiający załadowanie wtyczki
+#    * Lepsza obsługa błędów - czytelne komunikaty w pasku QGIS
+#    * Poprawa interfejsu - ukrywanie zbędnych pól formularza w zależności od wybranego typu obiektu
 #  Wersja 1.4.2
 #    * Aktualizacja stopki wtyczki
 #  Wersja 1.4.1
