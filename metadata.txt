@@ -26,8 +26,10 @@ repository=https://github.com/envirosolutionspl/uldk_gugik
 
 # Uncomment the following line and add your changelog:
 changelog=
-  Wersja 1.5.1
-    * dodanie parametru qgisMaximumVersion dla QGIS4
+  Wersja 1.5.2
+    * zamiana przekierowania homepage, zmiana adresu email na aktualny 
+#  Wersja 1.5.1
+#  * dodanie parametru qgisMaximumVersion dla QGIS4
 #  Wersja 1.5.0
 #    * Pełna kompatybilność z QGIS 3.40+ (Qt6) oraz starszymi wersjami (Qt5)
 #    * Usprawnienie pobierania obiektów administracyjnych: województwa, powiaty, gminy i obręby
