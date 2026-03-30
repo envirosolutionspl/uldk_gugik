@@ -781,6 +781,30 @@ class UldkGugik:
                 MessageUtils.pushLogCritical(msg)
                 MessageUtils.pushCritical(self.iface, msg)
                 return
+                
+            #sprawdzenie czy dane z API są poprawne, zapobiega to wpisaniu losowych kombinacji danych do formularza
+            expected = (
+                self.dlg.wojcomboBox.currentText().strip(),
+                self.dlg.powcomboBox.currentText().strip(),
+                self.dlg.gmicomboBox.currentText().strip(),
+                self.dlg.obrcomboBox.currentText().strip(),
+                parcel.strip(),
+            )
+            api_check = (
+                res[6].strip(),
+                res[5].strip(),
+                res[4].strip(),
+                res[3].strip(),
+                res[2].strip(),
+            )
+            if api_check != expected:
+                msg = (
+                    "Nie udało się pobrać obiektu: "
+                    "Wprowadzono błędne dane."
+                )
+                MessageUtils.pushLogCritical(msg)
+                MessageUtils.pushCritical(self.iface, msg)
+                return
 
             wkt = res[0]
             teryt = res[1]
