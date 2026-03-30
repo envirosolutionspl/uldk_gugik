@@ -781,7 +781,8 @@ class UldkGugik:
                 MessageUtils.pushLogCritical(msg)
                 MessageUtils.pushCritical(self.iface, msg)
                 return
-
+                
+            #sprawdzenie czy dane z API są poprawne, zapobiega to wpisaniu losowych kombinacji danych do formularza
             expected = (
                 self.dlg.wojcomboBox.currentText().strip(),
                 self.dlg.powcomboBox.currentText().strip(),
