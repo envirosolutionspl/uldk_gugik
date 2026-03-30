@@ -45,6 +45,9 @@
 
 Warunkiem koniecznym do prawidłowego działania wtyczki jest posiadanie wersji QGIS 3.28 lub wyższej.
 
+## Kontakt
+
+Wtyczka została stworzona przez ****EnviroSolutions**. W razie pytań lub potrzeby wsparcia skontaktuj się z nami przez e-mail:** **[gis@envirosolutions.pl](mailto:gis@envirosolutions.pl)**.
 
 
 # ULDK
@@ -87,3 +90,7 @@ In the side panel, there are options to select the area of interest (parcel, reg
 
 ### Note
 A necessary condition for the plugin to work correctly is having QGIS version 3.28 or higher."
+
+## Contact
+
+The plugin was developed by ****EnviroSolutions**. For questions or support, contact us at:** **[gis@envirosolutions.pl](mailto:gis@envirosolutions.pl)**.
