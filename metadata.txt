@@ -8,12 +8,12 @@
 
 [general]
 name=Usługa Lokalizacji Działek Katastralnych
+description=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. ENG: The plugin made for dowloading parcells geometry from The Central Office of Geodesy and Cartography of Poland "ULDK API".
+version=1.5.2
 qgisMinimumVersion=3.28
 qgisMaximumVersion=4.99
-description=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. ENG: The plugin made for dowloading parcells geometry from The Central Office of Geodesy and Cartography of Poland "ULDK API".
-version=1.5.1
 author=EnviroSolutions Sp. z o.o.
-email=office@envirosolutions.pl
+email=gis@envirosolutions.pl
 supportsQt6=true
 
 about=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw za pomocą numeru TERYT lub współrzędnych w dowolnym układzie. Pobieranie danych jest realizowane przez usługę ULDK udostępnianą przez Główny Urząd Geodezji i Kartografii. ENG: The plugin allows user to download geometry of parcells, communies, regions using the TERYT number or coordinates in any system. Plugin uses ULDK API of The Central Office of Geodesy and Cartography of Poland.
@@ -85,7 +85,7 @@ changelog=
 # Tags are comma separated with spaces allowed
 tags=python, uldk, działki, dzialki, ewidencja, gugik, kataster
 
-homepage=https://github.com/envirosolutionspl/uldk_gugik
+homepage=https://envirosolutions.pl/wtyczki-qgis/usluga-lokalizacji-dzialek-katastralnych-uldk/
 category=Plugins
 icon=images/uldk.svg
 # experimental flag
