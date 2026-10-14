@@ -151,6 +151,9 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     # ------------------------------- Logika ----------------------------------- 
 
+        # Ustawienie formularza pod warstwę zaznaczoną w .ui (Działka).
+        self.setupTabWidget(True)
+
     def _setupSignals(self):
         self.btn_help.clicked.connect(self._openHelp)
         # Pogrubienie wybranej warstwy (reguła [checked="true"] w QSS .ui)
