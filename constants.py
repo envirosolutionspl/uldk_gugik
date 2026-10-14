@@ -167,3 +167,12 @@ OBJECT_TYPES = {
         "success_label": "budynek"
     }
 }
+
+HOME_LINK = 'https://envirosolutions.pl/wtyczki-qgis/usluga-lokalizacji-dzialek-katastralnych-uldk/'
+
+# ----------- Kolory dla footerów w zależności od theme -----------
+
+FOOTER_LINK_COLORS = {'light': '#4a5250', 'dark': '#b8c0bc'}
+
+# Logo w stopce zależne od motywu (pliki w images/).
+FOOTER_LOGOS = {'light': 'es_logo_h.png', 'dark': 'es_logo_white.png'}
