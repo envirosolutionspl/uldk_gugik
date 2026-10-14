@@ -45,7 +45,7 @@ QTabBar::tab:selected { margin-top: 0px; padding-bottom: 7px; margin-bottom: -1p
 
 QLabel[role="section"] { font-size: 13px; font-weight: 700; }
 QLabel[role="field-title"] { font-weight: 700; }
-QLabel[role="code"] { font-family: Consolas, "DejaVu Sans Mono", monospace; padding: 8px 10px; border-radius: 4px; }
+QLabel[role="code"] { padding: 8px 10px; border-radius: 4px; }
 QLabel[role="divider"] { font-size: 10px; padding: 0px 8px; }
 QFrame#line_or_left, QFrame#line_or_right { border: none; min-height: 1px; max-height: 1px; }
 
