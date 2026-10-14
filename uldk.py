@@ -26,7 +26,7 @@ class RegionFetch:
             MessageUtils.pushLogInfo(f"Pobieranie danych z: {url}")
             raw = self.manager.getSync(url)
             if raw is None:
-                MessageUtils.pushLogWarningFetch(
+                MessageUtils.pushLogWarning(
                     f"Błąd sieci przy pobieraniu: {url}"
                 )
                 return unit_dict
@@ -34,7 +34,7 @@ class RegionFetch:
             for item in data:
                 unit_dict[item['teryt']] = item['name']
         except Exception as e:
-            MessageUtils.pushLogWarningFetch(
+            MessageUtils.pushLogWarning(
                 f"Wyjątek przy pobieraniu {url}: {str(e)}"
             )
         return unit_dict
