@@ -59,6 +59,9 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self._setupDialog()
         self._setupSignals()
 
+        # Ustawienie formularza pod warstwę zaznaczoną w .ui (Działka).
+        self.setupTabWidget(True)
+
     def _setupSignals(self):
         for base_combo, combo_items in ADMINISTRATIVE_UNITS_OBJECTS.items():
             fetch_func, dependent_combo = combo_items
