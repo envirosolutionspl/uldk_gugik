@@ -23,29 +23,35 @@
 """
 
 import os
+import re
+import configparser
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtWidgets import QWidget
-from qgis.core import Qgis
+from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl, Qt
+from qgis.PyQt.QtGui import QDesktopServices, QPalette, QPixmap
+from qgis.core import QgsApplication
 
 from .uldk import RegionFetch
 from .constants import (
     DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS,
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING,
-    COMBOBOX_STYLES
+    FOOTER_LINK_COLORS, FOOTER_LOGOS, HOME_LINK
 )
 from .utils import MessageUtils
 
-# Nazwa do logów (jeśli istnieje w __init__.py)
 try:
     from . import PLUGIN_NAME as plugin_name
 except Exception:
     plugin_name = "ULDK"
 
+PLUGIN_DIR = os.path.dirname(__file__)
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'uldk_gugik_dialog_base.ui'
-))
+# Prefiks „uldkimg:” używany w url(...) arkusza stylów w pliku .ui.
+# Musi być zarejestrowany PRZED setupUi, inaczej QSS nie znajdzie ikon.
+QDir.addSearchPath('uldkimg', os.path.join(PLUGIN_DIR, 'images'))
+
+
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(PLUGIN_DIR, 'ui', 'uldk_gugik_dialog_base.ui'))
 
 
 class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -56,10 +62,85 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         """Constructor."""
         super(UldkGugikDialog, self).__init__(parent)
         self.setupUi(self)
+        self._theme = None
+        self._applyTheme()
         self._setupDialog()
         self._setupSignals()
 
+    # ------------------------------- Motyw ----------------------------------- 
+    @staticmethod
+    def _isDarkTheme():
+        """Ciemny motyw QGIS (np. Night Mapping) albo ciemna paleta systemu."""
+        name = ''  # domyślnie – gdy QGIS nie poda nazwy motywu albo wystąpi wyjątek
+        try:
+            theme_name = (QgsApplication.themeName() or '').lower()
+            if theme_name:
+                name = theme_name.lower()
+        except AttributeError as e:
+            MessageUtils.pushLogCritical(f"Atrybut motywu jest niedostępny (AttributeError): {e}")
+        except RuntimeError as e:
+            MessageUtils.pushLogCritical(f"Aplikacja QGIS nie jest w pełni zainicjalizowana (RuntimeError): {e}")
+        except TypeError as e:
+            MessageUtils.pushLogCritical(f"Nieoczekiwany typ danych przy pobieraniu motywu (TypeError): {e}")
+        except Exception as e:
+            MessageUtils.pushLogCritical(f"Nieoczekiwany błąd: {e}")
+
+        if 'night' in name or 'dark' in name:
+            return True
+        return QgsApplication.palette().color(QPalette.ColorRole.Window).lightness() < 128
+
+    def _applyTheme(self, force=False):
+        """Ustawia właściwość „theme” – kolory zdefiniowane w arkuszu stylów w pliku .ui."""
+        theme = 'dark' if self._isDarkTheme() else 'light'
+        if theme == self._theme and not force:
+            return
+        self._theme = theme
+        self.setProperty('theme', theme)
+        # Pełne przeliczenie stylu: widgety mogły zostać ostylowane, zanim okno
+        # dostało właściwość „theme” (setStyleSheet sam tego nie robi przed show()).
+        for widget in [self] + self.findChildren(QtWidgets.QWidget):
+            widget.style().unpolish(widget)
+            widget.style().polish(widget)
+            widget.update()
+        # Linki w stopce: tekst i adres są w .ui, tu zmienia się tylko kolor
+        color = FOOTER_LINK_COLORS[theme]
+        for lbl in (self.lbl_email, self.lbl_szkolenia):
+            lbl.setText(re.sub(r'style="[^"]*"', 'style="text-decoration:underline; color:%s;"' % color, lbl.text()))
+        # Logo w stopce: zielone na jasnym tle, białe na ciemnym.
+        self._setFooterLogo(FOOTER_LOGOS[theme])
+
+    def _setFooterLogo(self, filename, height=34):
+        pix = QPixmap(os.path.join(PLUGIN_DIR, 'images', filename))
+        if pix.isNull():
+            return
+        dpr = self.devicePixelRatioF()
+        pix = pix.scaledToHeight(int(height * dpr), Qt.TransformationMode.SmoothTransformation)
+        pix.setDevicePixelRatio(dpr)
+        self.label_6.setScaledContents(False)
+        self.label_6.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label_6.setPixmap(pix)
+
+    def showEvent(self, event):
+        self._applyTheme()
+        super().showEvent(event)
+        self._setFooterLogo(FOOTER_LOGOS[self._theme])
+
+    def changeEvent(self, event):
+        # changeEvent przychodzi już w trakcie setupUi – wtedy _theme jeszcze nie istnieje
+        if (event.type() in (QEvent.Type.PaletteChange, QEvent.Type.StyleChange)
+                and getattr(self, '_theme', None) is not None):
+            self._applyTheme()
+        super().changeEvent(event)
+
+    def _openHelp(self):
+        url = self._readHomepage() or HOME_LINK
+        QDesktopServices.openUrl(QUrl(url))
+
+    # ------------------------------- Logika ----------------------------------- 
+
     def _setupSignals(self):
+        self.btn_help.clicked.connect(self._openHelp)
+
         for base_combo, combo_items in ADMINISTRATIVE_UNITS_OBJECTS.items():
             fetch_func, dependent_combo = combo_items
             combo_obj = getattr(self, base_combo)
@@ -82,7 +163,6 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 )
 
     def _setupDialog(self):
-        self.img_main.setMargin(9)
         self.tabWidget.setTabVisible(2, False)
 
         try:
@@ -116,8 +196,8 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())
         rdbt_attrs = DIALOG_MAPPING.get(rdbt_name)
         tab_title = rdbt_attrs.get('tab_title')
-        self.tabWidget.setTabText(2, tab_title)
-        self.tab3.findChild(QWidget).setText(tab_title)
+        # Zakładka ma stałą, krótką nazwę („Wybór z listy”); zmienia się tylko nagłówek sekcji.
+        self.lbl_desc_tab3.setText(tab_title)
         self.id_label.setText(f"""Wprowadź identyfikator obiektu (np. {rdbt_attrs.get('sample_id')})""")
         self.description_label.setText(rdbt_attrs.get('description_label'))
         self.parcel_lineedit.clear()
@@ -131,21 +211,27 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.btn_search_tab3.setVisible(is_parcel_mode)
         self.tabWidget.setTabVisible(2, rdbt_name != 'rdb_bu')
 
+    def _setComboMuted(self, combo_obj, muted):
+        """Combobox poniżej wybranego poziomu: wyłączony, tekst ukryty (reguła [muted] w QSS .ui)."""
+        combo_obj.setProperty('muted', bool(muted))
+        combo_obj.setEnabled(not muted)
+        for widget in (combo_obj, combo_obj.lineEdit()):
+            if widget is not None:
+                widget.style().unpolish(widget)
+                widget.style().polish(widget)
+                widget.update()
+
     def hideComboboxes(self):
         comboboxes_to_hide = []
         for rdbt, cmb in RADIOBUTTON_COMBOBOX_MAPPING.items():
-            combo_obj = getattr(self, cmb)
-            combo_obj.setStyleSheet(COMBOBOX_STYLES["visible"])
-            getattr(self, cmb).setEnabled(True)
+            self._setComboMuted(getattr(self, cmb), False)
             if getattr(self, rdbt).isChecked():
                 combo_idx = list(RADIOBUTTON_COMBOBOX_MAPPING).index(rdbt) + 1
                 comboboxes_to_hide = list(list(RADIOBUTTON_COMBOBOX_MAPPING.values())[combo_idx:])
                 break
 
         for combo in comboboxes_to_hide:
-            combo_obj = getattr(self, combo)
-            combo_obj.setStyleSheet(COMBOBOX_STYLES["hidden"])
-            combo_obj.setEnabled(False)
+            self._setComboMuted(getattr(self, combo), True)
 
     def setupAdministrativeUnitObj(self, func, dependent_combo):
         combo_obj = getattr(self, dependent_combo)
@@ -159,6 +245,15 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 combo_obj.setItemData(idx, val)
         combo_obj.setCurrentIndex(-1)
         combo_obj.blockSignals(False)
+
+    @staticmethod
+    def _readHomepage():
+        parser = configparser.ConfigParser(interpolation=None)
+        try:
+            parser.read(os.path.join(PLUGIN_DIR, 'metadata.txt'), encoding='utf-8')
+            return parser.get('general', 'homepage', fallback='')
+        except Exception:
+            return ''
 
     def closeEvent(self, event):
         self.closing_plugin.emit()
