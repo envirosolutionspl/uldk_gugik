@@ -40,7 +40,6 @@ if not hasattr(QEventLoop, 'exec'):
 from .resources import *
 # Import the code for the dialog
 from .uldk_gugik_dialog import UldkGugikDialog
-from .uldk_gugik_dialog_parcel import UldkGugikDialogParcel
 from .uldk import RegionFetch
 from .qgis_feed import QgisFeedDialog
 import os.path
