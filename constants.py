@@ -101,11 +101,6 @@ RES_COMMUNE_BY_ID = ["geom_wkt", "teryt", "commune", "county", "voivodeship"]
 RES_COUNTY_BY_ID = ["geom_wkt", "teryt", "county", "voivodeship"]
 RES_VOIVODESHIP_BY_ID = ["geom_wkt", "teryt", "voivodeship"]
 
-COMBOBOX_STYLES = {
-    "visible": "",
-    "hidden": "QComboBox { color: transparent }"
-}
-
 PARCEL_BY_ID_OR_NR = {
     "request": "GetParcelByIdOrNr",
     "result": ["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"]
