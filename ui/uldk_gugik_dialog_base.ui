@@ -18,16 +18,7 @@
     <normaloff>../images/uldk.svg</normaloff>../images/uldk.svg</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">/* =====================================================================
-   ULDK GUGiK – styl EnviroSolutions (konwencja „GIS Assistant AI”).
-   Kolory zależą od dynamicznej właściwości okna „theme” (light / dark).
-   W Designerze zmień ją ręcznie, żeby podejrzeć drugi motyw (Ctrl+R).
-   W QGIS ustawia ją uldk_gugik_dialog.py na podstawie motywu programu.
-   Ikony w url(...) korzystają z prefiksu „uldkimg:” = katalog images/.
-   ===================================================================== */
-
-/* ---------- Struktura (wspólna dla obu motywów) ---------- */
-QLabel#lbl_title { font-size: 16px; font-weight: 700; }
+   <string notr="true">QLabel#lbl_title { font-size: 16px; font-weight: 700; }
 QLabel#lbl_subtitle, QLabel#lbl_pluginVersion { font-size: 11px; }
 QToolButton#btn_help { border: none; border-radius: 6px; padding: 3px; }
 QLabel#lbl_email, QLabel#lbl_szkolenia { font-size: 10px; }
@@ -37,7 +28,7 @@ QFrame#groupBox { border-radius: 6px; margin: 0px; padding: 0px; }
 QLabel#lbl_layers_title { font-weight: 700; padding: 6px 10px; border-top-left-radius: 5px; border-top-right-radius: 5px; }
 QFrame#groupBox QRadioButton { spacing: 0px; padding: 6px 10px; border-radius: 4px; }
 QFrame#groupBox QRadioButton::indicator { width: 0px; height: 0px; border: none; image: none; }
-QFrame#groupBox QRadioButton:checked { font-weight: 700; }
+QFrame#groupBox QRadioButton[checked="true"] { font-weight: 700; }
 
 QTabWidget::pane { border-radius: 6px; border-top-left-radius: 0px; top: -1px; }
 QTabBar::tab { padding: 6px 14px; margin-right: 3px; margin-top: 3px; border-top-left-radius: 6px; border-top-right-radius: 6px; font-weight: 700; }
@@ -60,7 +51,9 @@ QgsProjectionSelectionWidget QToolButton { border-radius: 4px; padding: 3px 6px;
 QPushButton { border-radius: 4px; padding: 5px 12px; min-height: 18px; }
 QPushButton[role="primary"] { font-weight: 700; padding: 5px 16px; border: none; }
 
-/* ---------- Motyw jasny ---------- */
+QRadioButton:focus, QPushButton:focus, QToolButton:focus, QCheckBox:focus, QGroupBox:focus, QTabBar:focus, QTabWidget:focus { outline: none; }
+QToolButton#btn_help:focus { border: none; }
+
 QDialog[theme="light"] { background: #ffffff; }
 QDialog[theme="light"] QLabel, QDialog[theme="light"] QRadioButton { color: #23282a; }
 QDialog[theme="light"] QFrame#header_frame { background: #ffffff; border: none; border-bottom: 2px solid #4c6e4f; }
@@ -89,7 +82,7 @@ QDialog[theme="light"] QFrame#line_or_left, QDialog[theme="light"] QFrame#line_o
 QDialog[theme="light"] QGroupBox#groupBox_2 { background: #ffffff; border: 1px solid #b9c7b9; color: #3b5a3e; }
 
 QDialog[theme="light"] QLineEdit, QDialog[theme="light"] QComboBox, QDialog[theme="light"] QAbstractSpinBox { background: #ffffff; color: #23282a; border: 1px solid #b9c7ba; selection-background-color: #4c6e4f; selection-color: #ffffff; }
-QDialog[theme="light"] QLineEdit:focus, QDialog[theme="light"] QComboBox:focus, QDialog[theme="light"] QAbstractSpinBox:focus { border-color: #4c6e4f; }
+QDialog[theme="light"] QLineEdit:focus, QDialog[theme="light"] QComboBox:focus, QDialog[theme="light"] QAbstractSpinBox:focus { border: 1px solid #4c6e4f; }
 QDialog[theme="light"] QLineEdit:disabled, QDialog[theme="light"] QComboBox:disabled, QDialog[theme="light"] QAbstractSpinBox:disabled { background: #f3f5f3; color: #9aa39e; border-color: #d6ded6; }
 QDialog[theme="light"] QComboBox QLineEdit, QDialog[theme="light"] QAbstractSpinBox QLineEdit { border: none; padding: 0px; min-height: 0px; background: transparent; }
 QDialog[theme="light"] QComboBox QAbstractItemView { background: #ffffff; color: #23282a; border: 1px solid #b9c7ba; selection-background-color: #4c6e4f; selection-color: #ffffff; }
@@ -104,7 +97,6 @@ QDialog[theme="light"] QPushButton[role="primary"]:hover { background: #5b8260; 
 QDialog[theme="light"] QPushButton[role="primary"]:pressed { background: #3d5a40; }
 QDialog[theme="light"] QPushButton[role="primary"]:disabled { background: #c9d3ca; color: #f4f6f4; }
 
-/* ---------- Motyw ciemny ---------- */
 QDialog[theme="dark"] { background: #2b2d2e; }
 QDialog[theme="dark"] QLabel, QDialog[theme="dark"] QRadioButton { color: #e6e9e7; }
 QDialog[theme="dark"] QFrame#header_frame { background: #2b2d2e; border: none; border-bottom: 2px solid #5b8260; }
@@ -133,7 +125,7 @@ QDialog[theme="dark"] QFrame#line_or_left, QDialog[theme="dark"] QFrame#line_or_
 QDialog[theme="dark"] QGroupBox#groupBox_2 { background: #262829; border: 1px solid #4c6e4f; color: #a9cfac; }
 
 QDialog[theme="dark"] QLineEdit, QDialog[theme="dark"] QComboBox, QDialog[theme="dark"] QAbstractSpinBox { background: #1f2122; color: #e6e9e7; border: 1px solid #5a6162; selection-background-color: #5b8260; selection-color: #ffffff; }
-QDialog[theme="dark"] QLineEdit:focus, QDialog[theme="dark"] QComboBox:focus, QDialog[theme="dark"] QAbstractSpinBox:focus { border-color: #6f9c73; }
+QDialog[theme="dark"] QLineEdit:focus, QDialog[theme="dark"] QComboBox:focus, QDialog[theme="dark"] QAbstractSpinBox:focus { border: 1px solid #6f9c73; }
 QDialog[theme="dark"] QLineEdit:disabled, QDialog[theme="dark"] QComboBox:disabled, QDialog[theme="dark"] QAbstractSpinBox:disabled { background: #2b2d2e; color: #6f7773; border-color: #44494a; }
 QDialog[theme="dark"] QComboBox QLineEdit, QDialog[theme="dark"] QAbstractSpinBox QLineEdit { border: none; padding: 0px; min-height: 0px; background: transparent; }
 QDialog[theme="dark"] QComboBox QAbstractItemView { background: #1f2122; color: #e6e9e7; border: 1px solid #5a6162; selection-background-color: #5b8260; selection-color: #ffffff; }
@@ -148,7 +140,6 @@ QDialog[theme="dark"] QPushButton[role="primary"]:hover { background: #6f9c73; c
 QDialog[theme="dark"] QPushButton[role="primary"]:pressed { background: #4c6e4f; }
 QDialog[theme="dark"] QPushButton[role="primary"]:disabled { background: #3e4442; color: #8a918e; }
 
-/* ---------- Comboboxy poniżej wybranego poziomu (ustawia muted w Pythonie) ---------- */
 QDialog QComboBox[muted="true"], QDialog QComboBox[muted="true"]:disabled,
 QDialog QComboBox[muted="true"] QLineEdit, QDialog QComboBox[muted="true"]:disabled QLineEdit { color: transparent; }
 </string>

@@ -136,10 +136,22 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         url = self._readHomepage() or HOME_LINK
         QDesktopServices.openUrl(QUrl(url))
 
+    def _repolishLayerButtons(self, *_):
+        """Qt nie zmienia czcionki w stanie :checked – przeliczamy styl, żeby zadziałała
+        reguła QRadioButton[checked="true"] (pogrubienie wybranej warstwy)."""
+        for rdbt in DIALOG_MAPPING:
+            btn = getattr(self, rdbt)
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
+            btn.update()
+
     # ------------------------------- Logika ----------------------------------- 
 
     def _setupSignals(self):
         self.btn_help.clicked.connect(self._openHelp)
+        # Pogrubienie wybranej warstwy (reguła [checked="true"] w QSS .ui)
+        for rdbt in DIALOG_MAPPING:
+            getattr(self, rdbt).toggled.connect(self._repolishLayerButtons)
 
         for base_combo, combo_items in ADMINISTRATIVE_UNITS_OBJECTS.items():
             fetch_func, dependent_combo = combo_items
