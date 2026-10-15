@@ -249,7 +249,7 @@ class UldkGugik:
         self.dlg.setMinimumSize(self.dlg.minimumSizeHint())
 
         # informacje o wersji
-        self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
+        self.dlg.setWindowTitle(' ')
         self.dlg.lbl_pluginVersion.setText('v%s' % plugin_version)
 
         self.dlg.btn_download_tab1.clicked.connect(self.btnDownloadTab1Clicked)
