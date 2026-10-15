@@ -101,11 +101,6 @@ RES_COMMUNE_BY_ID = ["geom_wkt", "teryt", "commune", "county", "voivodeship"]
 RES_COUNTY_BY_ID = ["geom_wkt", "teryt", "county", "voivodeship"]
 RES_VOIVODESHIP_BY_ID = ["geom_wkt", "teryt", "voivodeship"]
 
-COMBOBOX_STYLES = {
-    "visible": "",
-    "hidden": "QComboBox { color: transparent }"
-}
-
 PARCEL_BY_ID_OR_NR = {
     "request": "GetParcelByIdOrNr",
     "result": ["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"]
@@ -167,3 +162,12 @@ OBJECT_TYPES = {
         "success_label": "budynek"
     }
 }
+
+HOME_LINK = 'https://envirosolutions.pl/wtyczki-qgis/usluga-lokalizacji-dzialek-katastralnych-uldk/'
+
+# ----------- Kolory dla footerów w zależności od theme -----------
+
+FOOTER_LINK_COLORS = {'light': '#4a5250', 'dark': '#b8c0bc'}
+
+# Logo w stopce zależne od motywu (pliki w images/).
+FOOTER_LOGOS = {'light': 'es_logo_h.png', 'dark': 'es_logo_white.png'}

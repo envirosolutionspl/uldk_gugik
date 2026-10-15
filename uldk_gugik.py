@@ -40,7 +40,6 @@ if not hasattr(QEventLoop, 'exec'):
 from .resources import *
 # Import the code for the dialog
 from .uldk_gugik_dialog import UldkGugikDialog
-from .uldk_gugik_dialog_parcel import UldkGugikDialogParcel
 from .uldk import RegionFetch
 from .qgis_feed import QgisFeedDialog
 import os.path
@@ -243,15 +242,14 @@ class UldkGugik:
         #self.iface.addDockWidget(Qt.RigthDockWidgetArea, self.dock)
 
 
-        # Inicjacja grafik
-        self.dlg.img_tab2.setPixmap(QPixmap(os.path.join(self.plugin_dir, 'images', 'coords.png')))
+        # Grafiki (w tym osie współrzędnych na zakładce 2) są ustawione w pliku .ui
 
-        # rozmiar okna
-        self.dlg.setFixedSize(self.dlg.size())
+        # rozmiar okna – minimalny wynika z layoutów w .ui, okno można powiększać
+        self.dlg.setMinimumSize(self.dlg.minimumSizeHint())
 
         # informacje o wersji
-        self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
-        self.dlg.lbl_pluginVersion.setText('%s %s' % (plugin_name, plugin_version))
+        self.dlg.setWindowTitle(' ')
+        self.dlg.lbl_pluginVersion.setText('v%s' % plugin_version)
 
         self.dlg.btn_download_tab1.clicked.connect(self.btnDownloadTab1Clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btnDownloadTab2Clicked)
