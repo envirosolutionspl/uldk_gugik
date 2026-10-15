@@ -66,6 +66,10 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self._applyTheme()
         self._setupDialog()
         self._setupSignals()
+        
+        # Ustawienie formularza pod warstwę zaznaczoną w .ui (Działka).
+        self.setupTabWidget(True)
+
 
     # ------------------------------- Motyw ----------------------------------- 
     @staticmethod
