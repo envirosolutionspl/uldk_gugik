@@ -14,19 +14,23 @@ REST_ENDPOINT_PRECINCT = "/getPrecinct"
 FEED_URL = 'https://qgisfeed.envirosolutions.pl/'
 
 INDUSTRIES = {
-    "999": "Nie wybrano",
-    "e": "Energetyka/OZE",
-    "u": "Urząd",
-    "td": "Transport/Drogi",
-    "pg": "Planowanie/Geodezja",
-    "wk": "WodKan",
-    "s": "Środowisko",
-    "rl": "Rolnictwo/Leśnictwo",
-    "tk": "Telkom",
+    "999": "nie wybrano",
+    "pub": "Administracja publiczna",
     "edu": "Edukacja",
-    "i": "Inne",
+    "enr": "Energetyka",
+    "gdz": "Geodezja",
     "it": "IT",
-    "n": "Nieruchomości"
+    "les": "Leśnictwo",
+    "nrs": "Nieruchomości",
+    "oze": "OZE",
+    "pla": "Planowanie przestrzenne",
+    "rol": "Rolnictwo",
+    "srd": "Środowisko",
+    "tkm": "Telekomunikacja",
+    "trn": "Transport",
+    "ubz": "Ubezpieczenia",
+    "wkn": "WodKan",
+    "inn": "inne"
 }
 
 ULDK_BASE_URL = "https://uldk.gugik.gov.pl/"
