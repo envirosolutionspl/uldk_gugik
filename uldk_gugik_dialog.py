@@ -26,9 +26,8 @@ import os
 import re
 import configparser
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl, Qt
-from qgis.PyQt.QtGui import QDesktopServices, QPalette, QPixmap
-from qgis.core import QgsApplication
+from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl
+from qgis.PyQt.QtGui import QDesktopServices
 
 from .uldk import RegionFetch
 from .constants import (
@@ -36,7 +35,7 @@ from .constants import (
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING,
     FOOTER_LINK_COLORS, FOOTER_LOGOS, HOME_LINK
 )
-from .utils import MessageUtils
+from .utils import MessageUtils, ThemeUtils
 
 try:
     from . import PLUGIN_NAME as plugin_name
@@ -72,40 +71,14 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
     # ------------------------------- Motyw ----------------------------------- 
-    @staticmethod
-    def _isDarkTheme():
-        """Ciemny motyw QGIS (np. Night Mapping) albo ciemna paleta systemu."""
-        name = ''  # domyślnie – gdy QGIS nie poda nazwy motywu albo wystąpi wyjątek
-        try:
-            theme_name = (QgsApplication.themeName() or '').lower()
-            if theme_name:
-                name = theme_name.lower()
-        except AttributeError as e:
-            MessageUtils.pushLogCritical(f"Atrybut motywu jest niedostępny (AttributeError): {e}")
-        except RuntimeError as e:
-            MessageUtils.pushLogCritical(f"Aplikacja QGIS nie jest w pełni zainicjalizowana (RuntimeError): {e}")
-        except TypeError as e:
-            MessageUtils.pushLogCritical(f"Nieoczekiwany typ danych przy pobieraniu motywu (TypeError): {e}")
-        except Exception as e:
-            MessageUtils.pushLogCritical(f"Nieoczekiwany błąd: {e}")
-
-        if 'night' in name or 'dark' in name:
-            return True
-        return QgsApplication.palette().color(QPalette.ColorRole.Window).lightness() < 128
-
     def _applyTheme(self, force=False):
         """Ustawia właściwość „theme” – kolory zdefiniowane w arkuszu stylów w pliku .ui."""
-        theme = 'dark' if self._isDarkTheme() else 'light'
+        theme = 'dark' if ThemeUtils.isDarkTheme() else 'light'
         if theme == self._theme and not force:
             return
         self._theme = theme
         self.setProperty('theme', theme)
-        # Pełne przeliczenie stylu: widgety mogły zostać ostylowane, zanim okno
-        # dostało właściwość „theme” (setStyleSheet sam tego nie robi przed show()).
-        for widget in [self] + self.findChildren(QtWidgets.QWidget):
-            widget.style().unpolish(widget)
-            widget.style().polish(widget)
-            widget.update()
+        ThemeUtils.repolishAll(self)
         # Linki w stopce: tekst i adres są w .ui, tu zmienia się tylko kolor
         color = FOOTER_LINK_COLORS[theme]
         for lbl in (self.lbl_email, self.lbl_szkolenia):
@@ -114,15 +87,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self._setFooterLogo(FOOTER_LOGOS[theme])
 
     def _setFooterLogo(self, filename, height=34):
-        pix = QPixmap(os.path.join(PLUGIN_DIR, 'images', filename))
-        if pix.isNull():
-            return
-        dpr = self.devicePixelRatioF()
-        pix = pix.scaledToHeight(int(height * dpr), Qt.TransformationMode.SmoothTransformation)
-        pix.setDevicePixelRatio(dpr)
-        self.label_6.setScaledContents(False)
-        self.label_6.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label_6.setPixmap(pix)
+        ThemeUtils.setLogo(self.label_6, filename, height)
 
     def showEvent(self, event):
         self._applyTheme()

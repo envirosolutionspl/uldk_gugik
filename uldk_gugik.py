@@ -46,7 +46,7 @@ import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 from .constants import (
     DEFAULT_SRID, ENV_MENU_NAME, SWAP_XY_SRIDS, TOOLTIP_FROM_MAP,
-    OBJECT_TYPES, ULDK_MIN_LINE_LEN,
+    OBJECT_TYPES, ULDK_MIN_LINE_LEN, INDUSTRIES,
 )
 from .utils import VersionUtils
 
@@ -75,6 +75,11 @@ class UldkGugik:
             #qgis feed
             self.selected_industry = self.settings.value("selected_industry", None)
             show_dialog = self.settings.value("showDialog", True, type=bool)
+
+            # wczytywanie branży jeżeli nie jest zgodna z aktualnym słownikiem
+            if self.selected_industry not in INDUSTRIES.values():
+                self.selected_industry = None
+                show_dialog = True 
             
             if self.selected_industry is None and show_dialog:
                 self.showBranchSelectionDialog()
