@@ -1112,7 +1112,7 @@ QDialog QComboBox[muted="true"] QLineEdit, QDialog QComboBox[muted="true"]:disab
       <item>
        <widget class="QLabel" name="lbl_email">
         <property name="text">
-         <string>&lt;a href=&quot;https://envirosolutions.pl/systemy-opensource-gis/?utm_source=stopka&amp;utm_medium=wtyczka&amp;utm_campaign=organic&amp;utm_term=uldk_gugik&quot; style=&quot;text-decoration:underline;&quot;&gt;SYSTEMY I WSPARCIE GIS&lt;/a&gt;</string>
+         <string>&lt;a href=&quot;https://envirosolutions.pl/?utm_source=plugins&amp;utm_medium=referral&amp;utm_campaign=uldk&amp;utm_content=systemy_wsparcie#uslugi&quot; style=&quot;text-decoration:underline;&quot;&gt;SYSTEMY I WSPARCIE GIS&lt;/a&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -1179,7 +1179,7 @@ QDialog QComboBox[muted="true"] QLineEdit, QDialog QComboBox[muted="true"]:disab
       <item>
        <widget class="QLabel" name="lbl_szkolenia">
         <property name="text">
-         <string>&lt;a href=&quot;https://envirosolutions.pl/oferta-szkoleniowa/?utm_source=stopka&amp;utm_medium=wtyczka&amp;utm_campaign=organic&amp;utm_term=uldk_gugik&quot; style=&quot;text-decoration:underline;&quot;&gt;SZKOLENIA GIS&lt;/a&gt;</string>
+         <string>&lt;a href=&quot;https://envirosolutions.pl/oferta-szkoleniowa/?utm_source=plugins&amp;utm_medium=referral&amp;utm_campaign=uldk&amp;utm_content=szkolenia_gis&quot; style=&quot;text-decoration:underline;&quot;&gt;SZKOLENIA GIS&lt;/a&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
