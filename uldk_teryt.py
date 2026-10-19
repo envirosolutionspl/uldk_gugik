@@ -14,7 +14,6 @@ if not hasattr(QEventLoop, 'exec'):
 def getRequestTeryt(xy, request):
     def handleReply(reply):
         nonlocal result
-        nonlocal loop
         try:
             error_val = reply.error()
             if hasattr(QNetworkReply, 'NetworkError'):

@@ -7,7 +7,7 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=Usługa Lokalizacji Działek Katastralnych
+name=Usługa Lokalizacji Działek Katastralnych ml_141
 description=Wtyczka pozwala na pobieranie geometrii granic działek katastralnych, obrębów, gmin, powiatów i województw. ENG: The plugin made for dowloading parcells geometry from The Central Office of Geodesy and Cartography of Poland "ULDK API".
 version=1.5.2
 qgisMinimumVersion=3.28
