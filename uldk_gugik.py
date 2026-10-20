@@ -37,17 +37,16 @@ if not hasattr(QEventLoop, 'exec'):
     QEventLoop.exec = QEventLoop.exec_
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from .resources import *  # noqa: F403
 # Import the code for the dialog
 from .uldk_gugik_dialog import UldkGugikDialog
-from .uldk_gugik_dialog_parcel import UldkGugikDialogParcel
 from .uldk import RegionFetch
 from .qgis_feed import QgisFeedDialog
 import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 from .constants import (
     DEFAULT_SRID, ENV_MENU_NAME, SWAP_XY_SRIDS, TOOLTIP_FROM_MAP,
-    OBJECT_TYPES, ULDK_MIN_LINE_LEN,
+    OBJECT_TYPES, ULDK_MIN_LINE_LEN, INDUSTRIES,
 )
 from .utils import VersionUtils
 
@@ -73,9 +72,14 @@ class UldkGugik:
         if Qgis.QGIS_VERSION_INT >= 31000:
             from .qgis_feed import QgisFeed
 
-            #qgis feed
+            # qgis feed
             self.selected_industry = self.settings.value("selected_industry", None)
             show_dialog = self.settings.value("showDialog", True, type=bool)
+
+            # wczytywanie branży jeżeli nie jest zgodna z aktualnym słownikiem
+            if self.selected_industry not in INDUSTRIES.values():
+                self.selected_industry = None
+                show_dialog = True 
             
             if self.selected_industry is None and show_dialog:
                 self.showBranchSelectionDialog()
@@ -85,7 +89,7 @@ class UldkGugik:
             self.feed = QgisFeed(selected_industry=select_indust_session, plugin_name=plugin_name)
             self.feed.initFeed()
 
-        #DialogOnTop
+        # DialogOnTop
 
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
@@ -107,7 +111,7 @@ class UldkGugik:
         self.actions = []
         self.menu = self.tr(f"&{ENV_MENU_NAME}")
 
-        #toolbar
+        # toolbar
         toolbar_name = ENV_MENU_NAME
         self.toolbar = self.iface.mainWindow().findChild(QToolBar, toolbar_name)
         if not self.toolbar:
@@ -161,7 +165,8 @@ class UldkGugik:
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-        parent=None):
+        parent=None
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -214,7 +219,7 @@ class UldkGugik:
 
         if add_to_toolbar:
             # Adds plugin icon to Plugins toolbar
-            #self.iface.addToolBarIcon(action)
+            # self.iface.addToolBarIcon(action)
             self.toolbar.addAction(action)
 
         if add_to_menu:
@@ -239,19 +244,18 @@ class UldkGugik:
 
         # will be set False in run()
         self.first_start = True
-        #self.dock = UldkGugikDialog()
-        #self.iface.addDockWidget(Qt.RigthDockWidgetArea, self.dock)
+        # self.dock = UldkGugikDialog()
+        # self.iface.addDockWidget(Qt.RigthDockWidgetArea, self.dock)
 
 
-        # Inicjacja grafik
-        self.dlg.img_tab2.setPixmap(QPixmap(os.path.join(self.plugin_dir, 'images', 'coords.png')))
+        # Grafiki (w tym osie współrzędnych na zakładce 2) są ustawione w pliku .ui
 
-        # rozmiar okna
-        self.dlg.setFixedSize(self.dlg.size())
+        # rozmiar okna – minimalny wynika z layoutów w .ui, okno można powiększać
+        self.dlg.setMinimumSize(self.dlg.minimumSizeHint())
 
         # informacje o wersji
-        self.dlg.setWindowTitle('%s %s' % (plugin_name, plugin_version))
-        self.dlg.lbl_pluginVersion.setText('%s %s' % (plugin_name, plugin_version))
+        self.dlg.setWindowTitle(' ')
+        self.dlg.lbl_pluginVersion.setText('v%s' % plugin_version)
 
         self.dlg.btn_download_tab1.clicked.connect(self.btnDownloadTab1Clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btnDownloadTab2Clicked)
@@ -281,7 +285,7 @@ class UldkGugik:
                 "W celu dalszej pracy zdefiniuj układ współrzędnych dla projektu"
             )
             return 1
-        if self.first_start == True:
+        if self.first_start is True:
             self.first_start = False
             # skrot klawiszowy
             self.shortcut = QShortcut(self.iface.mainWindow())
@@ -290,7 +294,7 @@ class UldkGugik:
             if VersionUtils.isQt6():
                 self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
             else:
-                self.shortcut.setContext(Qt.ApplicationShortcut)
+                self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
             self.shortcut.activated.connect(self.shortcutActivated)
         
         try:
@@ -299,7 +303,7 @@ class UldkGugik:
             if hasattr(QNetworkRequest, 'KnownHeaders'):
                 ua_header = QNetworkRequest.KnownHeaders.UserAgentHeader
             else:
-                ua_header = QNetworkRequest.UserAgentHeader
+                ua_header = QNetworkRequest.KnownHeaders.UserAgentHeader
             request.setHeader(ua_header, f"QGIS-Plugin-{plugin_name}")
 
             manager = QgsNetworkAccessManager.instance()
@@ -315,14 +319,14 @@ class UldkGugik:
                 no_err = QNetworkReply.NetworkError.NoError  # Qt6
                 is_no_error = (error_val == no_err)
             else:
-                no_err = QNetworkReply.NoError  # Qt5
+                no_err = QNetworkReply.NetworkError.NoError  # Qt5
                 is_no_error = (int(error_val) == int(no_err))
 
             if is_no_error:
                 if hasattr(QNetworkRequest, 'Attribute'):
                     status_code = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)  # Qt6
                 else:
-                    status_code = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)  # Qt5
+                    status_code = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)  # Qt5
 
                 if status_code and int(status_code) == 200:
                     self.setupDialog()
@@ -340,7 +344,7 @@ class UldkGugik:
 
         except Exception as e:
             MessageUtils.pushLogWarning(
-                "Ostrzeżenie: Brak połączenia z internetem"
+                f"Ostrzeżenie: Brak połączenia z internetem: {e}"
             )
 
         self.dlg.projectionWidget.setCrs(
@@ -372,12 +376,12 @@ class UldkGugik:
         elif utils.isInternetConnected():
             try:
                 self.performRequestTeryt(teryt=teryt)
-            except:
+            except Exception as e:
                 msg = (
                     "Nie udało się pobrać obiektu: API nie zwróciło "
                     "odpowiedzi dla żądanego zapytania"
                 )
-                MessageUtils.pushLogCritical(msg)
+                MessageUtils.pushLogCritical(f"{msg}: {e}")
                 MessageUtils.pushCritical(self.iface, msg)
 
 
@@ -407,7 +411,7 @@ class UldkGugik:
         self.dlg.parcel_lineedit.setReadOnly(True)
         current_idx = self.dlg.gmicomboBox.currentIndex()
         teryt = self.dlg.gmicomboBox.itemData(current_idx)
-        obj_parcel = self.dlg.parcel_lineedit.text().strip() # nr działki
+        obj_parcel = self.dlg.parcel_lineedit.text().strip()  # nr działki
 
         if not obj_region:
             msg = "Błąd formularza: Musisz wpisać obręb"
@@ -428,28 +432,28 @@ class UldkGugik:
             result_obreb = uldk_parcel.getRegionById(id=teryt)
             result_obreb = list(result_obreb)
 
-            #sprawdzanie obrebow po usunieciu niepotrzebnych numerow
+            # sprawdzanie obrebow po usunieciu niepotrzebnych numerow
             for obreb in result_obreb:
                 if len(obreb) < ULDK_MIN_LINE_LEN:
                     result_obreb.remove(obreb)
                 else:
                     pass
 
-            #sprawdzanie czy obręb leży w tym województwie, w którym powinien
+            # sprawdzanie czy obręb leży w tym województwie, w którym powinien
             for obreb in result_obreb:
                 if obreb.split("|")[-1].rstrip() == self.dlg.wojcomboBox.currentText():
                     pass
                 else:
                     result_obreb.remove(obreb)
 
-            #sprawdzanie czy obręb leży w tym powiecie, w którym powinien
+            # sprawdzanie czy obręb leży w tym powiecie, w którym powinien
             for obreb in result_obreb:
                 if obreb.split("|")[-2] == self.dlg.powcomboBox.currentText():
                     pass
                 else:
                     result_obreb.remove(obreb)
 
-            #sprawdzanie czy obręb leży w tej gminie, w której powinien
+            # sprawdzanie czy obręb leży w tej gminie, w której powinien
             for obreb in result_obreb:
                 if obreb.split("|")[-3] == self.dlg.gmicomboBox.currentText():
                     pass
@@ -469,7 +473,7 @@ class UldkGugik:
                     else:
                         response = True
 
-                if response == True:
+                if response is True:
                     for i in range(len(result)):
                         if len(result[i]) < ULDK_MIN_LINE_LEN:
                             pass
@@ -488,7 +492,7 @@ class UldkGugik:
                     if len(arkusze_numery) >= 1:
                         for arkusz in arkusze_numery:
                             arkusze_numery_posortowane.add(arkusz.split("AR_")[-1])
-                        for sort_ark in sorted(arkusze_numery_posortowane,key=int):
+                        for sort_ark in sorted(arkusze_numery_posortowane, key=int):
                             self.dlg.arkcomboBox.addItem(f"AR_{sort_ark}")
                     else:
                         pass
@@ -526,14 +530,15 @@ class UldkGugik:
         if object_type == 1:
             current_idx = self.dlg.gmicomboBox.currentIndex()
             teryt = self.dlg.gmicomboBox.itemData(current_idx)
-            obj_parcel = self.dlg.parcel_lineedit.text().strip() # nr działki
+            obj_parcel = self.dlg.parcel_lineedit.text().strip()  # nr działki
             if not obj_region:
                 msg = "Błąd formularza: Musisz wpisać obręb"
                 MessageUtils.pushLogWarning(msg)
                 MessageUtils.pushWarning(self.iface, msg)
 
             if not obj_parcel:
-                MessageUtils.pushLogWarning(self.iface,
+                MessageUtils.pushLogWarning(
+                    self.iface,
                     "Błąd formularza: Musisz wpisać numer działki"
                 )
 
@@ -646,7 +651,7 @@ class UldkGugik:
             county = res[2]
             voivodeship = res[3]
 
-        elif object_type == 5: # województwo
+        elif object_type == 5:  # województwo
             current_idx = self.dlg.wojcomboBox.currentIndex()
             teryt = self.dlg.wojcomboBox.itemData(current_idx)
             resp = uldk_api.getVoivodeshipById(teryt, object_type=5)
@@ -693,7 +698,8 @@ class UldkGugik:
         success_message = f"Pobrano {label}" % teryt if "%s" in label else f"Pobrano {label}"
 
         MessageUtils.pushLogSuccess(success_message)
-        MessageUtils.pushSuccess(self.iface,
+        MessageUtils.pushSuccess(
+            self.iface,
             success_message
         )
 
@@ -782,7 +788,7 @@ class UldkGugik:
                 MessageUtils.pushCritical(self.iface, msg)
                 return
                 
-            #sprawdzenie czy dane z API są poprawne, zapobiega to wpisaniu losowych kombinacji danych do formularza
+            # sprawdzenie czy dane z API są poprawne, zapobiega to wpisaniu losowych kombinacji danych do formularza
             expected = (
                 self.dlg.wojcomboBox.currentText().strip(),
                 self.dlg.powcomboBox.currentText().strip(),
@@ -916,7 +922,8 @@ class UldkGugik:
                 return
 
             if teryt != res[1] and "AR" in res[1]:
-                MessageUtils.pushLogInfo(self.iface,
+                MessageUtils.pushLogInfo(
+                    self.iface,
                     "W wybranym obrębie znaleziono więcej działek o "
                     f"identyfikatorze TERYT: {teryt}. Dodaj numer "
                     "arkusza w celu odnalezienia właściwej działki"
@@ -973,7 +980,7 @@ class UldkGugik:
 
             res = resp.split("|")
             if res[0] == '':
-                msg (
+                msg(
                     "Nie udało się pobrać obiektu: "
                     f"API nie zwróciło geometrii dla id {teryt}"
                 )
@@ -1098,7 +1105,7 @@ class UldkGugik:
 
         object_type = self.checkedFeatureType()
 
-        #Sprawdzenie, czy współrzędne są z przecinkiem czy kropką
+        # Sprawdzenie, czy współrzędne są z przecinkiem czy kropką
         if "," in x or "," in y:
             x = float(x.replace(",", "."))
             y = float(y.replace(",", "."))
@@ -1115,7 +1122,7 @@ class UldkGugik:
             requestPoint.transform(tr)
         pid = f"{str(requestPoint.x())},{str(requestPoint.y())}"
 
-        if object_type == 1:# działka
+        if object_type == 1:  # działka
             resp = uldk_xy.getParcelByXY(xy=pid, object_type=1)
 
             if not resp:
@@ -1279,15 +1286,15 @@ class UldkGugik:
             voivField = QgsField('województwo', QVariant.String, len=30)
             provider.addAttributes([voivField])
 
-            if object_type==6 or object_type == 4 or object_type == 3 or object_type == 2 or object_type == 1:
+            if object_type == 6 or object_type == 4 or object_type == 3 or object_type == 2 or object_type == 1:
                 conField = QgsField('powiat', QVariant.String, len=30)
                 provider.addAttributes([conField])
 
-            if object_type==6 or object_type == 3 or object_type == 2 or object_type == 1:
+            if object_type == 6 or object_type == 3 or object_type == 2 or object_type == 1:
                 comField = QgsField('gmina', QVariant.String, len=30)
                 provider.addAttributes([comField])
 
-            if object_type==6 or object_type == 2 or object_type == 1:
+            if object_type == 6 or object_type == 2 or object_type == 1:
                 regField = QgsField('obręb', QVariant.String, len=30)
                 provider.addAttributes([regField])
 
@@ -1311,7 +1318,7 @@ class UldkGugik:
             'powiat': county,
         }
 
-        if voivodeship != None:
+        if voivodeship is not None:
             feat.setAttribute('województwo', voivodeship)
 
         for field_name, attr in fields_mapping.items():

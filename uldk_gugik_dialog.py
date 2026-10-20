@@ -23,29 +23,34 @@
 """
 
 import os
+import re
+import configparser
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.QtWidgets import QWidget
-from qgis.core import Qgis
+from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl
+from qgis.PyQt.QtGui import QDesktopServices
 
 from .uldk import RegionFetch
 from .constants import (
     DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS,
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING,
-    COMBOBOX_STYLES
+    FOOTER_LINK_COLORS, FOOTER_LOGOS, HOME_LINK
 )
-from .utils import MessageUtils
+from .utils import MessageUtils, ThemeUtils
 
-# Nazwa do logów (jeśli istnieje w __init__.py)
 try:
     from . import PLUGIN_NAME as plugin_name
 except Exception:
     plugin_name = "ULDK"
 
+PLUGIN_DIR = os.path.dirname(__file__)
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui', 'uldk_gugik_dialog_base.ui'
-))
+# Prefiks „uldkimg:” używany w url(...) arkusza stylów w pliku .ui.
+# Musi być zarejestrowany PRZED setupUi, inaczej QSS nie znajdzie ikon.
+QDir.addSearchPath('uldkimg', os.path.join(PLUGIN_DIR, 'images'))
+
+
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(PLUGIN_DIR, 'ui', 'uldk_gugik_dialog_base.ui'))
 
 
 class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -56,10 +61,66 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         """Constructor."""
         super(UldkGugikDialog, self).__init__(parent)
         self.setupUi(self)
+        self._theme = None
+        self._applyTheme()
         self._setupDialog()
         self._setupSignals()
+        
+        # Ustawienie formularza pod warstwę zaznaczoną w .ui (Działka).
+        self.setupTabWidget(True)
+
+    # ------------------------------- Motyw ----------------------------------- 
+    def _applyTheme(self, force=False):
+        """Ustawia właściwość „theme” – kolory zdefiniowane w arkuszu stylów w pliku .ui."""
+        theme = 'dark' if ThemeUtils.isDarkTheme() else 'light'
+        if theme == self._theme and not force:
+            return
+        self._theme = theme
+        self.setProperty('theme', theme)
+        ThemeUtils.repolishAll(self)
+        # Linki w stopce: tekst i adres są w .ui, tu zmienia się tylko kolor
+        color = FOOTER_LINK_COLORS[theme]
+        for lbl in (self.lbl_email, self.lbl_szkolenia):
+            lbl.setText(re.sub(r'style="[^"]*"', 'style="text-decoration:underline; color:%s;"' % color, lbl.text()))
+        # Logo w stopce: zielone na jasnym tle, białe na ciemnym.
+        self._setFooterLogo(FOOTER_LOGOS[theme])
+
+    def _setFooterLogo(self, filename, height=34):
+        ThemeUtils.setLogo(self.label_6, filename, height)
+
+    def showEvent(self, event):
+        self._applyTheme()
+        super().showEvent(event)
+        self._setFooterLogo(FOOTER_LOGOS[self._theme])
+
+    def changeEvent(self, event):
+        # changeEvent przychodzi już w trakcie setupUi – wtedy _theme jeszcze nie istnieje
+        if (event.type() in (QEvent.Type.PaletteChange, QEvent.Type.StyleChange)
+                and getattr(self, '_theme', None) is not None):
+            self._applyTheme()
+        super().changeEvent(event)
+
+    def _openHelp(self):
+        url = self._readHomepage() or HOME_LINK
+        QDesktopServices.openUrl(QUrl(url))
+
+    def _repolishLayerButtons(self, *_):
+        """Qt nie zmienia czcionki w stanie :checked – przeliczamy styl, żeby zadziałała
+        reguła QRadioButton[checked="true"] (pogrubienie wybranej warstwy)."""
+        for rdbt in DIALOG_MAPPING:
+            btn = getattr(self, rdbt)
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
+            btn.update()
+
+    # ------------------------------- Logika ----------------------------------- 
 
     def _setupSignals(self):
+        self.btn_help.clicked.connect(self._openHelp)
+        # Pogrubienie wybranej warstwy (reguła [checked="true"] w QSS .ui)
+        for rdbt in DIALOG_MAPPING:
+            getattr(self, rdbt).toggled.connect(self._repolishLayerButtons)
+
         for base_combo, combo_items in ADMINISTRATIVE_UNITS_OBJECTS.items():
             fetch_func, dependent_combo = combo_items
             combo_obj = getattr(self, base_combo)
@@ -82,7 +143,6 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
                 )
 
     def _setupDialog(self):
-        self.img_main.setMargin(9)
         self.tabWidget.setTabVisible(2, False)
 
         try:
@@ -116,8 +176,8 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         rdbt_name = next(rdbt for rdbt in DIALOG_MAPPING if getattr(self, rdbt).isChecked())
         rdbt_attrs = DIALOG_MAPPING.get(rdbt_name)
         tab_title = rdbt_attrs.get('tab_title')
-        self.tabWidget.setTabText(2, tab_title)
-        self.tab3.findChild(QWidget).setText(tab_title)
+        # Zakładka ma stałą, krótką nazwę („Wybór z listy”); zmienia się tylko nagłówek sekcji.
+        self.lbl_desc_tab3.setText(tab_title)
         self.id_label.setText(f"""Wprowadź identyfikator obiektu (np. {rdbt_attrs.get('sample_id')})""")
         self.description_label.setText(rdbt_attrs.get('description_label'))
         self.parcel_lineedit.clear()
@@ -131,34 +191,53 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.btn_search_tab3.setVisible(is_parcel_mode)
         self.tabWidget.setTabVisible(2, rdbt_name != 'rdb_bu')
 
+    def _setComboMuted(self, combo_obj, muted):
+        """Combobox poniżej wybranego poziomu: wyłączony, tekst ukryty (reguła [muted] w QSS .ui)."""
+        combo_obj.setProperty('muted', bool(muted))
+        combo_obj.setEnabled(not muted)
+        for widget in (combo_obj, combo_obj.lineEdit()):
+            if widget is not None:
+                widget.style().unpolish(widget)
+                widget.style().polish(widget)
+                widget.update()
+
     def hideComboboxes(self):
         comboboxes_to_hide = []
         for rdbt, cmb in RADIOBUTTON_COMBOBOX_MAPPING.items():
-            combo_obj = getattr(self, cmb)
-            combo_obj.setStyleSheet(COMBOBOX_STYLES["visible"])
-            getattr(self, cmb).setEnabled(True)
+            self._setComboMuted(getattr(self, cmb), False)
             if getattr(self, rdbt).isChecked():
                 combo_idx = list(RADIOBUTTON_COMBOBOX_MAPPING).index(rdbt) + 1
                 comboboxes_to_hide = list(list(RADIOBUTTON_COMBOBOX_MAPPING.values())[combo_idx:])
                 break
 
         for combo in comboboxes_to_hide:
-            combo_obj = getattr(self, combo)
-            combo_obj.setStyleSheet(COMBOBOX_STYLES["hidden"])
-            combo_obj.setEnabled(False)
+            self._setComboMuted(getattr(self, combo), True)
 
     def setupAdministrativeUnitObj(self, func, dependent_combo):
+        sender = self.sender()
         combo_obj = getattr(self, dependent_combo)
-        unit_data = self.sender().currentData()
+        unit_data = sender.currentData()
         combo_obj.clear()
-        combo_obj.blockSignals(True)
+        unit_dict = {}
         if unit_data and self.RegionFetch:
             unit_dict = getattr(self.RegionFetch, func)(unit_data)
-            combo_obj.addItems(unit_dict.values())
-            for idx, val in enumerate(unit_dict.keys()):
-                combo_obj.setItemData(idx, val)
+            if sender.currentData() != unit_data:
+                return
+        combo_obj.blockSignals(True)
+        combo_obj.clear()
+        for teryt, name in unit_dict.items():
+            combo_obj.addItem(name, teryt)
         combo_obj.setCurrentIndex(-1)
         combo_obj.blockSignals(False)
+
+    @staticmethod
+    def _readHomepage():
+        parser = configparser.ConfigParser(interpolation=None)
+        try:
+            parser.read(os.path.join(PLUGIN_DIR, 'metadata.txt'), encoding='utf-8')
+            return parser.get('general', 'homepage', fallback='')
+        except Exception:
+            return ''
 
     def closeEvent(self, event):
         self.closing_plugin.emit()
