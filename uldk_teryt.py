@@ -20,7 +20,7 @@ def getRequestTeryt(xy, request):
                 no_err = QNetworkReply.NetworkError.NoError  # Qt6
                 is_no_error = (error_val == no_err)
             else:
-                no_err = QNetworkReply.NoError  # Qt5
+                no_err = QNetworkReply.NetworkError.NoError  # Qt5
                 is_no_error = (int(error_val) == int(no_err))
 
             if not is_no_error:
