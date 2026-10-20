@@ -69,7 +69,6 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         # Ustawienie formularza pod warstwę zaznaczoną w .ui (Działka).
         self.setupTabWidget(True)
 
-
     # ------------------------------- Motyw ----------------------------------- 
     def _applyTheme(self, force=False):
         """Ustawia właściwość „theme” – kolory zdefiniowane w arkuszu stylów w pliku .ui."""
