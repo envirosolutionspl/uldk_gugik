@@ -14,23 +14,19 @@ REST_ENDPOINT_PRECINCT = "/getPrecinct"
 FEED_URL = 'https://qgisfeed.envirosolutions.pl/'
 
 INDUSTRIES = {
-    "999": "nie wybrano",
-    "pub": "Administracja publiczna",
+    "999": "Nie wybrano",
+    "e": "Energetyka/OZE",
+    "u": "Urząd",
+    "td": "Transport/Drogi",
+    "pg": "Planowanie/Geodezja",
+    "wk": "WodKan",
+    "s": "Środowisko",
+    "rl": "Rolnictwo/Leśnictwo",
+    "tk": "Telkom",
     "edu": "Edukacja",
-    "enr": "Energetyka",
-    "gdz": "Geodezja",
+    "i": "Inne",
     "it": "IT",
-    "les": "Leśnictwo",
-    "nrs": "Nieruchomości",
-    "oze": "OZE",
-    "pla": "Planowanie przestrzenne",
-    "rol": "Rolnictwo",
-    "srd": "Środowisko",
-    "tkm": "Telekomunikacja",
-    "trn": "Transport",
-    "ubz": "Ubezpieczenia",
-    "wkn": "WodKan",
-    "inn": "inne"
+    "n": "Nieruchomości"
 }
 
 ULDK_BASE_URL = "https://uldk.gugik.gov.pl/"
@@ -105,6 +101,11 @@ RES_COMMUNE_BY_ID = ["geom_wkt", "teryt", "commune", "county", "voivodeship"]
 RES_COUNTY_BY_ID = ["geom_wkt", "teryt", "county", "voivodeship"]
 RES_VOIVODESHIP_BY_ID = ["geom_wkt", "teryt", "voivodeship"]
 
+COMBOBOX_STYLES = {
+    "visible": "",
+    "hidden": "QComboBox { color: transparent }"
+}
+
 PARCEL_BY_ID_OR_NR = {
     "request": "GetParcelByIdOrNr",
     "result": ["geom_wkt", "teryt", "parcel", "region", "commune", "county", "voivodeship"]
@@ -166,12 +167,3 @@ OBJECT_TYPES = {
         "success_label": "budynek"
     }
 }
-
-HOME_LINK = 'https://envirosolutions.pl/wtyczki-qgis/usluga-lokalizacji-dzialek-katastralnych-uldk/'
-
-# ----------- Kolory dla footerów w zależności od theme -----------
-
-FOOTER_LINK_COLORS = {'light': '#4a5250', 'dark': '#b8c0bc'}
-
-# Logo w stopce zależne od motywu (pliki w images/).
-FOOTER_LOGOS = {'light': 'es_logo_h.png', 'dark': 'es_logo_white.png'}

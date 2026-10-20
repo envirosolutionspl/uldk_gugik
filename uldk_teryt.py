@@ -14,13 +14,14 @@ if not hasattr(QEventLoop, 'exec'):
 def getRequestTeryt(xy, request):
     def handleReply(reply):
         nonlocal result
+        nonlocal loop
         try:
             error_val = reply.error()
             if hasattr(QNetworkReply, 'NetworkError'):
                 no_err = QNetworkReply.NetworkError.NoError  # Qt6
                 is_no_error = (error_val == no_err)
             else:
-                no_err = QNetworkReply.NetworkError.NoError  # Qt5
+                no_err = QNetworkReply.NoError  # Qt5
                 is_no_error = (int(error_val) == int(no_err))
 
             if not is_no_error:
