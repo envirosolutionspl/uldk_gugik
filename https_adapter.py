@@ -23,7 +23,7 @@ class CustomHttpAdapter:
         if hasattr(QSslSocket, 'PeerVerifyMode'):
             verify_mode = QSslSocket.PeerVerifyMode.VerifyNone  # Qt6
         else:
-            verify_mode = QSslSocket.PeerVerifyMode.VerifyNone  # Qt5
+            verify_mode = QSslSocket.VerifyNone  # Qt5
         ssl_conf.setPeerVerifyMode(verify_mode)
         ssl_conf.setPeerVerifyDepth(0)
         request.setSslConfiguration(ssl_conf)
@@ -63,7 +63,7 @@ class NetworkManager:
             if hasattr(QNetworkReply, 'NetworkError'):
                 no_err = QNetworkReply.NetworkError.NoError
             else:
-                no_err = QNetworkReply.NetworkError.NoError
+                no_err = QNetworkReply.NoError
 
             if error_val != no_err:
                 return None
@@ -72,7 +72,7 @@ class NetworkManager:
             if hasattr(QNetworkRequest, 'Attribute'):
                 status_attr = QNetworkRequest.Attribute.HttpStatusCodeAttribute
             else:
-                status_attr = QNetworkRequest.Attribute.HttpStatusCodeAttribute
+                status_attr = QNetworkRequest.HttpStatusCodeAttribute
 
             status_code = reply.attribute(status_attr)
             if status_code != 200:

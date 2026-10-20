@@ -14,8 +14,8 @@ if TEST_DIR not in sys.path:
     sys.path.insert(0, TEST_DIR)
 
 for name in ['constants', 'https_adapter', 'request', 'request_search',
-             'request_region', 'uldk', 'uldk_teryt', 'uldk_gugik_dialog',
-             'uldk_xy', 'uldk_api', 'uldk_parcel']:
+              'request_region', 'uldk', 'uldk_teryt', 'uldk_gugik_dialog',
+              'uldk_xy', 'uldk_api', 'uldk_parcel']:
     try:
         sys.modules[name] = importlib.import_module(f"{PLUGIN_NAME}.{name}")
     except Exception as e:
