@@ -294,7 +294,7 @@ class UldkGugik:
             if VersionUtils.isQt6():
                 self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
             else:
-                self.shortcut.setContext(Qt.ApplicationShortcut)
+                self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
             self.shortcut.activated.connect(self.shortcutActivated)
         
         try:
@@ -303,7 +303,7 @@ class UldkGugik:
             if hasattr(QNetworkRequest, 'KnownHeaders'):
                 ua_header = QNetworkRequest.KnownHeaders.UserAgentHeader
             else:
-                ua_header = QNetworkRequest.UserAgentHeader
+                ua_header = QNetworkRequest.KnownHeaders.UserAgentHeader
             request.setHeader(ua_header, f"QGIS-Plugin-{plugin_name}")
 
             manager = QgsNetworkAccessManager.instance()
@@ -319,14 +319,14 @@ class UldkGugik:
                 no_err = QNetworkReply.NetworkError.NoError  # Qt6
                 is_no_error = (error_val == no_err)
             else:
-                no_err = QNetworkReply.NoError  # Qt5
+                no_err = QNetworkReply.NetworkError.NoError  # Qt5
                 is_no_error = (int(error_val) == int(no_err))
 
             if is_no_error:
                 if hasattr(QNetworkRequest, 'Attribute'):
                     status_code = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)  # Qt6
                 else:
-                    status_code = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)  # Qt5
+                    status_code = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)  # Qt5
 
                 if status_code and int(status_code) == 200:
                     self.setupDialog()

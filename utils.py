@@ -26,7 +26,7 @@ class MessageUtils:
         iface.messageBar().pushMessage(
             "Sukces:",
             message,
-            level=Qgis.Success,
+            level=Qgis.MessageLevel.Success,
             duration=10
         )
 
@@ -35,7 +35,7 @@ class MessageUtils:
         iface.messageBar().pushMessage(
             'Informacja',
             message,
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
             duration=10
         )
 
@@ -44,7 +44,7 @@ class MessageUtils:
         iface.messageBar().pushMessage(
             "Ostrzeżenie",
             message,
-            level=Qgis.Warning,
+            level=Qgis.MessageLevel.Warning,
             duration=10
         )
     
@@ -52,7 +52,7 @@ class MessageUtils:
     def pushCritical(iface, message: str) -> None:
         iface.messageBar().pushMessage(
             message,
-            level=Qgis.Critical,
+            level=Qgis.MessageLevel.Critical,
             duration=10
         )
 
@@ -61,7 +61,7 @@ class MessageUtils:
         QgsMessageLog.logMessage(
             message,
             tag=PLUGIN_NAME,
-            level=Qgis.Success
+            level=Qgis.MessageLevel.Success
         )
 
     @staticmethod
@@ -69,7 +69,7 @@ class MessageUtils:
         QgsMessageLog.logMessage(
             message,
             tag=PLUGIN_NAME,
-            level=Qgis.Info
+            level=Qgis.MessageLevel.Info
         )
     
     @staticmethod
@@ -77,7 +77,7 @@ class MessageUtils:
         QgsMessageLog.logMessage(
             message,
             tag=PLUGIN_NAME,
-            level=Qgis.Warning
+            level=Qgis.MessageLevel.Warning
         )
     
     @staticmethod
@@ -85,7 +85,7 @@ class MessageUtils:
         QgsMessageLog.logMessage(
             message,
             tag=PLUGIN_NAME,
-            level=Qgis.Critical
+            level=Qgis.MessageLevel.Critical
         )
 
 class ThemeUtils:
@@ -147,7 +147,7 @@ def isInternetConnected():
         iface.messageBar().pushMessage(
             "Ostrzeżenie:",
             f"Brak połączenia z internetem: {ex}",
-            level=Qgis.Warning,
+            level=Qgis.MessageLevel.Warning,
             duration=10,
         )
         return False
