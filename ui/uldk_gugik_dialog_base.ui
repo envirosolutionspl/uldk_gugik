@@ -646,7 +646,7 @@ QDialog QComboBox[muted="true"] QLineEdit, QDialog QComboBox[muted="true"]:disab
         <attribute name="title">
          <string>Współrzędne</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_tab2">
+        <layout class="QVBoxLayout" name="verticalLayout_tab2" stretch="0,0,0,0,0,1">
          <property name="spacing">
           <number>8</number>
          </property>
