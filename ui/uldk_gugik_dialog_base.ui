@@ -20,7 +20,7 @@
   <property name="styleSheet">
    <string notr="true">QLabel#lbl_title { font-size: 16px; font-weight: 700; }
 QLabel#lbl_subtitle, QLabel#lbl_pluginVersion { font-size: 11px; }
-QToolButton#btn_help { border: none; border-radius: 6px; padding: 3px; }
+QToolButton#btn_help, QToolButton#btn_close { border: none; border-radius: 6px; padding: 3px; }
 QLabel#lbl_email, QLabel#lbl_szkolenia { font-size: 10px; }
 QLabel#label_6 { padding: 2px 6px; border-radius: 4px; }
 
@@ -47,19 +47,21 @@ QLineEdit, QComboBox, QAbstractSpinBox { border-radius: 4px; padding: 3px 6px; m
 QComboBox::drop-down { subcontrol-origin: padding; subcontrol-position: center right; width: 22px; border: none; }
 QComboBox::down-arrow { image: url(uldkimg:chevron_down.svg); width: 12px; height: 12px; }
 QgsProjectionSelectionWidget QToolButton { border-radius: 4px; padding: 3px 6px; }
+QgsProjectionSelectionWidget { max-height: 28px; }
+QgsProjectionSelectionWidget QComboBox { max-height: 20px; }
 
 QPushButton { border-radius: 4px; padding: 5px 12px; min-height: 18px; }
 QPushButton[role="primary"] { font-weight: 700; padding: 5px 16px; border: none; }
 
 QRadioButton:focus, QPushButton:focus, QToolButton:focus, QCheckBox:focus, QGroupBox:focus, QTabBar:focus, QTabWidget:focus { outline: none; }
-QToolButton#btn_help:focus { border: none; }
+QToolButton#btn_help:focus, QToolButton#btn_close:focus { border: none; }
 
 QDialog[theme="light"] { background: #ffffff; }
 QDialog[theme="light"] QLabel, QDialog[theme="light"] QRadioButton { color: #23282a; }
 QDialog[theme="light"] QFrame#header_frame { background: #ffffff; border: none; border-bottom: 2px solid #4c6e4f; }
 QDialog[theme="light"] QLabel#lbl_title { color: #3b5a3e; }
 QDialog[theme="light"] QLabel#lbl_subtitle, QDialog[theme="light"] QLabel#lbl_pluginVersion { color: #6b7572; }
-QDialog[theme="light"] QToolButton#btn_help:hover { background: #e8efe8; }
+QDialog[theme="light"] QToolButton#btn_help:hover, QDialog[theme="light"] QToolButton#btn_close:hover { background: #e8efe8; }
 QDialog[theme="light"] QFrame#footer_frame { background: #f6f8f6; border: none; border-top: 1px solid #d6ded6; }
 QDialog[theme="light"] QLabel#label_6 { background: transparent; }
 
@@ -102,7 +104,7 @@ QDialog[theme="dark"] QLabel, QDialog[theme="dark"] QRadioButton { color: #e6e9e
 QDialog[theme="dark"] QFrame#header_frame { background: #2b2d2e; border: none; border-bottom: 2px solid #5b8260; }
 QDialog[theme="dark"] QLabel#lbl_title { color: #a9cfac; }
 QDialog[theme="dark"] QLabel#lbl_subtitle, QDialog[theme="dark"] QLabel#lbl_pluginVersion { color: #9aa4a0; }
-QDialog[theme="dark"] QToolButton#btn_help:hover { background: #2c3a2d; }
+QDialog[theme="dark"] QToolButton#btn_help:hover, QDialog[theme="dark"] QToolButton#btn_close:hover { background: #2c3a2d; }
 QDialog[theme="dark"] QFrame#footer_frame { background: #303334; border: none; border-top: 1px solid #44494a; }
 QDialog[theme="dark"] QLabel#label_6 { background: transparent; }
 
@@ -268,6 +270,29 @@ QDialog QComboBox[muted="true"] QLineEdit, QDialog QComboBox[muted="true"]:disab
         <property name="icon">
          <iconset>
           <normaloff>../images/help.svg</normaloff>../images/help.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btn_close">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="toolTip">
+         <string>Zamknij wtyczkę</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../images/close.svg</normaloff>../images/close.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -621,7 +646,7 @@ QDialog QComboBox[muted="true"] QLineEdit, QDialog QComboBox[muted="true"]:disab
         <attribute name="title">
          <string>Współrzędne</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_tab2">
+        <layout class="QVBoxLayout" name="verticalLayout_tab2" stretch="0,0,0,0,0,1">
          <property name="spacing">
           <number>8</number>
          </property>

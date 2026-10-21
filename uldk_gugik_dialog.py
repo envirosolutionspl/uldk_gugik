@@ -26,8 +26,8 @@ import os
 import re
 import configparser
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl
-from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl, Qt
+from qgis.PyQt.QtGui import QDesktopServices, QIcon
 
 from .uldk import RegionFetch
 from .constants import (
@@ -53,6 +53,12 @@ QDir.addSearchPath('uldkimg', os.path.join(PLUGIN_DIR, 'images'))
 FORM_CLASS, _ = uic.loadUiType(os.path.join(PLUGIN_DIR, 'ui', 'uldk_gugik_dialog_base.ui'))
 
 
+class DockHeader(QtWidgets.QDialog):
+    """Kontener nagłówka wtyczki, używany jako pasek tytułu panelu dokowanego."""
+
+    def __init__(self):
+        super().__init__(None, Qt.WindowType.Widget)
+
 class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     closing_plugin = pyqtSignal()
@@ -61,6 +67,8 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         """Constructor."""
         super(UldkGugikDialog, self).__init__(parent)
         self.setupUi(self)
+        self._setVectorIcons()
+        self.header_container = None
         self._theme = None
         self._applyTheme()
         self._setupDialog()
@@ -70,6 +78,27 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupTabWidget(True)
 
     # ------------------------------- Motyw ----------------------------------- 
+    def _setVectorIcons(self):
+        """Ikony przycisków w nagłówku jako wektorowe QIcon.
+        QIcon(ścieżka) rysuje SVG w docelowym rozmiarze."""
+        images = os.path.join(PLUGIN_DIR, 'images')
+        self.btn_help.setIcon(QIcon(os.path.join(images, 'help.svg')))
+        self.btn_close.setIcon(QIcon(os.path.join(images, 'close.svg')))
+
+    def takeHeader(self):
+        """Wyjmuje nagłówek z formularza do osobnego kontenera."""
+        self.verticalLayout_root.removeWidget(self.header_frame)
+        container = DockHeader()
+        container.setStyleSheet(self.styleSheet())
+        container.setProperty('theme', self._theme)
+        layout = QtWidgets.QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.header_frame)
+        ThemeUtils.repolishAll(container)
+        self.header_container = container
+        return container
+
     def _applyTheme(self, force=False):
         """Ustawia właściwość „theme” – kolory zdefiniowane w arkuszu stylów w pliku .ui."""
         theme = 'dark' if ThemeUtils.isDarkTheme() else 'light'
@@ -78,6 +107,10 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self._theme = theme
         self.setProperty('theme', theme)
         ThemeUtils.repolishAll(self)
+        # Nagłówek siedzi w pasku tytułu panelu, poza formularzem – motyw osobno
+        if self.header_container is not None:
+            self.header_container.setProperty('theme', theme)
+            ThemeUtils.repolishAll(self.header_container)
         # Linki w stopce: tekst i adres są w .ui, tu zmienia się tylko kolor
         color = FOOTER_LINK_COLORS[theme]
         for lbl in (self.lbl_email, self.lbl_szkolenia):

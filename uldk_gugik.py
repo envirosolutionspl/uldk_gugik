@@ -24,7 +24,7 @@
 from qgis.PyQt.QtCore import (QSettings, QTranslator, qVersion, 
                               QCoreApplication, QVariant, Qt)
 from qgis.PyQt.QtGui import QIcon, QPixmap, QKeySequence
-from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel, QDialog
+from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel, QDialog, QScrollArea, QFrame
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import (Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField,
                        QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform,
@@ -130,6 +130,7 @@ class UldkGugik:
         self.click_tool.canvasClicked.connect(self.canvasClicked)
 
         self.dlg = UldkGugikDialog()
+        self.dock = None
         self.region_name = None
         self.project = QgsProject.instance()
         
@@ -244,9 +245,6 @@ class UldkGugik:
 
         # will be set False in run()
         self.first_start = True
-        # self.dock = UldkGugikDialog()
-        # self.iface.addDockWidget(Qt.RigthDockWidgetArea, self.dock)
-
 
         # Grafiki (w tym osie współrzędnych na zakładce 2) są ustawione w pliku .ui
 
@@ -257,6 +255,8 @@ class UldkGugik:
         self.dlg.setWindowTitle(' ')
         self.dlg.lbl_pluginVersion.setText('v%s' % plugin_version)
 
+        self.setupDock()
+
         self.dlg.btn_download_tab1.clicked.connect(self.btnDownloadTab1Clicked)
         self.dlg.btn_download_tab2.clicked.connect(self.btnDownloadTab2Clicked)
         self.dlg.btn_download_tab3.clicked.connect(self.btnDownloadTab3Clicked)
@@ -265,6 +265,51 @@ class UldkGugik:
         self.dlg.btn_frommap.clicked.connect(self.btnFrommapClicked)
         self.dlg.btn_frommap.setToolTip(TOOLTIP_FROM_MAP)
 
+    def setupDock(self):
+        """Umieszcza okno wtyczki w panelu dokowanym QGIS (domyślnie po prawej, można przeciągać)."""
+        self.dlg.setWindowFlags(Qt.WindowType.Widget)
+
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll.setWidget(self.dlg)
+
+        self.dock = QgsDockWidget(self.tr(u'ULDK GUGiK'), self.iface.mainWindow())
+        self.dock.setObjectName('UldkGugikDock')
+        self.dock.setTitleBarWidget(self.dlg.takeHeader())
+        self.dock.setWidget(self.scroll)
+
+        self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
+        self.dock.hide()
+
+        self.dlg.btn_close.clicked.connect(self.dock.hide)
+
+    def showDock(self):
+        """Pokazuje panel tam gdzie zostawił go użytkownik, i rozszerza go do rozmiaru formularza."""
+        main_window = self.iface.mainWindow()
+
+        self.dock.show()
+        self.dock.raise_()
+
+        if self.dock.isFloating():
+            return
+
+        form = self.dlg.sizeHint().expandedTo(self.dlg.minimumSizeHint())
+        header = self.dock.titleBarWidget().sizeHint().height()
+        screen = main_window.screen().availableGeometry()
+        scrollbar = self.scroll.verticalScrollBar().sizeHint().width()
+        width = min(form.width() + scrollbar, screen.width() // 2)
+
+        area = main_window.dockWidgetArea(self.dock)
+        if area in (Qt.DockWidgetArea.TopDockWidgetArea, Qt.DockWidgetArea.BottomDockWidgetArea):
+            # Góra / dół – panel zabiera wysokość mapy, więc najwyżej połowa ekranu
+            height = min(form.height() + header, screen.height() // 2)
+            main_window.resizeDocks([self.dock], [height], Qt.Orientation.Vertical)
+            main_window.resizeDocks([self.dock], [width], Qt.Orientation.Horizontal)
+        else:
+            height = min(form.height() + header, int(screen.height() * 0.8))
+            main_window.resizeDocks([self.dock], [width], Qt.Orientation.Horizontal)
+            main_window.resizeDocks([self.dock], [height], Qt.Orientation.Vertical)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -275,8 +320,17 @@ class UldkGugik:
             # self.iface.removeToolBarIcon(action)
             self.toolbar.removeAction(action)
 
+        if self.dock is not None:
+            self.iface.removeDockWidget(self.dock)
+            self.dock.deleteLater()
+            self.dock = None
+
     def run(self):
         """Otwarcie okna wtyczki"""
+        # Panel nie ma paska z krzyżykiem – ikona wtyczki przełącza go (otwórz / schowaj)
+        if self.dock is not None and self.dock.isVisible():
+            self.dock.hide()
+            return
         try:
             srid = self.project.crs().postgisSrid()
         except IndexError:
@@ -363,6 +417,7 @@ class UldkGugik:
                     f"Nie udało się zainicjować listy województw: {e}"
                 )
         self.dlg.show()
+        self.showDock()
 
     def btnDownloadTab1Clicked(self):
         """kliknięcie klawisza pobierania po numerze TERYT w oknie wtyczki"""
@@ -749,8 +804,8 @@ class UldkGugik:
 
     def btnFrommapClicked(self):
         """zdarzenie wciśnięcia w oknie wtyczki klawisza wskazania działki na mapie"""
+        # panel dokowany nie zasłania mapy, więc formularz zostaje widoczny
         self.canvas.setMapTool(self.click_tool)
-        self.dlg.hide()
 
     def canvasClicked(self, point):
         """kliknięcie na mapie"""
