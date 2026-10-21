@@ -47,6 +47,8 @@ QLineEdit, QComboBox, QAbstractSpinBox { border-radius: 4px; padding: 3px 6px; m
 QComboBox::drop-down { subcontrol-origin: padding; subcontrol-position: center right; width: 22px; border: none; }
 QComboBox::down-arrow { image: url(uldkimg:chevron_down.svg); width: 12px; height: 12px; }
 QgsProjectionSelectionWidget QToolButton { border-radius: 4px; padding: 3px 6px; }
+QgsProjectionSelectionWidget { max-height: 28px; }
+QgsProjectionSelectionWidget QComboBox { max-height: 20px; }
 
 QPushButton { border-radius: 4px; padding: 5px 12px; min-height: 18px; }
 QPushButton[role="primary"] { font-weight: 700; padding: 5px 16px; border: none; }
