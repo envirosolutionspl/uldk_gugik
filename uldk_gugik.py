@@ -266,7 +266,7 @@ class UldkGugik:
         self.dlg.btn_frommap.setToolTip(TOOLTIP_FROM_MAP)
 
     def setupDock(self):
-        """Umieszcza okno wtyczki w prawym panelu dokowanym QGIS."""
+        """Umieszcza okno wtyczki w panelu dokowanym QGIS (domyślnie po prawej, można przeciągać)."""
         self.dlg.setWindowFlags(Qt.WindowType.Widget)
 
         self.scroll = QScrollArea()
@@ -276,9 +276,8 @@ class UldkGugik:
 
         self.dock = QgsDockWidget(self.tr(u'ULDK GUGiK'), self.iface.mainWindow())
         self.dock.setObjectName('UldkGugikDock')
-        self.dock.setTitleBarWidget(QWidget())
+        self.dock.setTitleBarWidget(self.dlg.takeHeader())
         self.dock.setWidget(self.scroll)
-        self.dock.setAllowedAreas(Qt.DockWidgetArea.RightDockWidgetArea)
 
         self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
         self.dock.hide()
@@ -286,26 +285,31 @@ class UldkGugik:
         self.dlg.btn_close.clicked.connect(self.dock.hide)
 
     def showDock(self):
-        """Pokazuje panel po prawej stronie i rozszerza go do rozmiaru formularza."""
+        """Pokazuje panel tam gdzie zostawił go użytkownik, i rozszerza go do rozmiaru formularza."""
         main_window = self.iface.mainWindow()
-
-        right = Qt.DockWidgetArea.RightDockWidgetArea
-        if main_window.dockWidgetArea(self.dock) != right:
-            main_window.addDockWidget(right, self.dock)
 
         self.dock.show()
         self.dock.raise_()
 
-        # Szerokość formularza + pasek przewijania
+        if self.dock.isFloating():
+            return
+
         form = self.dlg.sizeHint().expandedTo(self.dlg.minimumSizeHint())
+        header = self.dock.titleBarWidget().sizeHint().height()
         screen = main_window.screen().availableGeometry()
         scrollbar = self.scroll.verticalScrollBar().sizeHint().width()
         width = min(form.width() + scrollbar, screen.width() // 2)
-        height = min(form.height(), int(screen.height() * 0.8))
 
-        main_window.resizeDocks([self.dock], [width], Qt.Orientation.Horizontal)
-        # Gdy panel dzieli prawą kolumnę z innymi panelami – wysokość formularza
-        main_window.resizeDocks([self.dock], [height], Qt.Orientation.Vertical)
+        area = main_window.dockWidgetArea(self.dock)
+        if area in (Qt.DockWidgetArea.TopDockWidgetArea, Qt.DockWidgetArea.BottomDockWidgetArea):
+            # Góra / dół – panel zabiera wysokość mapy, więc najwyżej połowa ekranu
+            height = min(form.height() + header, screen.height() // 2)
+            main_window.resizeDocks([self.dock], [height], Qt.Orientation.Vertical)
+            main_window.resizeDocks([self.dock], [width], Qt.Orientation.Horizontal)
+        else:
+            height = min(form.height() + header, int(screen.height() * 0.8))
+            main_window.resizeDocks([self.dock], [width], Qt.Orientation.Horizontal)
+            main_window.resizeDocks([self.dock], [height], Qt.Orientation.Vertical)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
