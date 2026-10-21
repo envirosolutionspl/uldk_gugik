@@ -26,8 +26,8 @@ import os
 import re
 import configparser
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl
-from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl, Qt
+from qgis.PyQt.QtGui import QDesktopServices, QIcon
 
 from .uldk import RegionFetch
 from .constants import (
@@ -61,6 +61,7 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         """Constructor."""
         super(UldkGugikDialog, self).__init__(parent)
         self.setupUi(self)
+        self._setVectorIcons()
         self._theme = None
         self._applyTheme()
         self._setupDialog()
@@ -70,6 +71,13 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupTabWidget(True)
 
     # ------------------------------- Motyw ----------------------------------- 
+    def _setVectorIcons(self):
+        """Ikony przycisków w nagłówku jako wektorowe QIcon.
+        QIcon(ścieżka) rysuje SVG w docelowym rozmiarze."""
+        images = os.path.join(PLUGIN_DIR, 'images')
+        self.btn_help.setIcon(QIcon(os.path.join(images, 'help.svg')))
+        self.btn_close.setIcon(QIcon(os.path.join(images, 'close.svg')))
+
     def _applyTheme(self, force=False):
         """Ustawia właściwość „theme” – kolory zdefiniowane w arkuszu stylów w pliku .ui."""
         theme = 'dark' if ThemeUtils.isDarkTheme() else 'light'
