@@ -28,6 +28,7 @@ repository=https://github.com/envirosolutionspl/uldk_gugik
 changelog=
   Wersja 2.1.0
     * Dockowanie wtyczki do prawej strony
+    * Poprawa działania skrótu alt + f
 #  Wersja 2.0.0
 #    * Poprawa widoczności zakładek podczas uruchamiania wtyczki
 #    * Poprawa błędu pobierania innych obrębów administracyjnych
