@@ -246,6 +246,10 @@ class UldkGugik:
         # will be set False in run()
         self.first_start = True
 
+        self.shortcut = QShortcut(QKeySequence("Alt+F"), self.iface.mainWindow())
+        self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
+        self.shortcut.activated.connect(self.shortcutActivated)
+
         # Grafiki (w tym osie współrzędnych na zakładce 2) są ustawione w pliku .ui
 
         # rozmiar okna – minimalny wynika z layoutów w .ui, okno można powiększać
@@ -320,6 +324,13 @@ class UldkGugik:
             # self.iface.removeToolBarIcon(action)
             self.toolbar.removeAction(action)
 
+        # usuniecie skrotu klawiszowego
+        if self.shortcut is not None:
+            self.shortcut.setEnabled(False)
+            self.shortcut.setParent(None)
+            self.shortcut.deleteLater()
+            self.shortcut = None
+
         if self.dock is not None:
             self.iface.removeDockWidget(self.dock)
             self.dock.deleteLater()
@@ -341,15 +352,6 @@ class UldkGugik:
             return 1
         if self.first_start is True:
             self.first_start = False
-            # skrot klawiszowy
-            self.shortcut = QShortcut(self.iface.mainWindow())
-            # Qt6 compatibility: use "Alt+F" string format instead of Qt.ALT + Qt.Key_F
-            self.shortcut.setKey(QKeySequence("Alt+F"))
-            if VersionUtils.isQt6():
-                self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
-            else:
-                self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
-            self.shortcut.activated.connect(self.shortcutActivated)
         
         try:
             url = QUrl('https://uldk.gugik.gov.pl')
