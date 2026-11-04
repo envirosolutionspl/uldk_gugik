@@ -6,6 +6,8 @@ from .https_adapter import LegacySession
 from .uldk_gugik_dialog import UldkGugikDialog
 from .constants import ULDK_BASE_URL, ULDK_NO_RESULTS, ULDK_MIN_LINE_LEN
 
+from .utils import MessageUtils
+
 # Qt5/Qt6 compat: QEventLoop.exec_ -> exec
 if not hasattr(QEventLoop, 'exec'):
     QEventLoop.exec = QEventLoop.exec_
@@ -66,8 +68,10 @@ class Request:
 
                 self._data.add(line)
 
-        except Exception:
-            pass
+        except Exception as e:
+            MessageUtils.pushLogWarning(
+                f"Nie udało się wykonać zapytania: {e}"
+            )
         finally:
             # Zawsze zakończ loop, nawet w przypadku błędu
             if self.loop.isRunning():
