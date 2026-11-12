@@ -29,7 +29,6 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal, QDir, QEvent, QUrl, Qt
 from qgis.PyQt.QtGui import QDesktopServices, QIcon
 
-from .uldk import RegionFetch
 from .constants import (
     DIALOG_MAPPING, ADMINISTRATIVE_UNITS_OBJECTS,
     RADIOBUTTON_COMBOBOX_MAPPING, COMBOBOX_RADIOBUTTON_MAPPING,
@@ -180,16 +179,8 @@ class UldkGugikDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def _setupDialog(self):
         self.tabWidget.setTabVisible(2, False)
-
-        try:
-            self.RegionFetch = RegionFetch(teryt='')
-        except Exception:
-            MessageUtils.pushLogWarning(
-                "Brak połączenia z Internetem. Spróbuj ponownie później"
-            )
-            self.RegionFetch = None
-
-        self.fillVoivodeships()
+        # województwa pobierają się dopiero po otwarciu wtyczki
+        self.RegionFetch = None
 
     def fillVoivodeships(self):
         if self.RegionFetch:
