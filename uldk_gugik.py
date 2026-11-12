@@ -29,8 +29,9 @@ from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
 from qgis.core import (Qgis, QgsVectorLayer, QgsGeometry, QgsFeature, QgsProject, QgsField,
                        QgsCoordinateReferenceSystem, QgsPoint, QgsCoordinateTransform,
                        QgsSettings, QgsNetworkAccessManager)
-from qgis.PyQt.QtCore import QUrl, QEventLoop
+from qgis.PyQt.QtCore import QUrl, QEventLoop, QTimer
 from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
+from qgis.PyQt import sip
 
 # Kompatybilność Qt5/Qt6 - w Qt5 metoda to exec_(), w Qt6 to exec()
 if not hasattr(QEventLoop, 'exec'):
@@ -119,9 +120,6 @@ class UldkGugik:
             self.toolbar.setObjectName(toolbar_name)
 
         self.shortcut = None
-        # Check if plugin was started the first time in current QGIS session
-        # Must be set in initGui() to survive plugin reloads
-        self.first_start = None
 
         self.canvas = self.iface.mapCanvas()
         
@@ -129,8 +127,10 @@ class UldkGugik:
         self.click_tool = QgsMapToolEmitPoint(self.canvas)
         self.click_tool.canvasClicked.connect(self.canvasClicked)
 
-        self.dlg = UldkGugikDialog()
+        # Okno i panel tworzone są dopiero w initGui()
+        self.dlg = None
         self.dock = None
+        self.scroll = None
         self.region_name = None
         self.project = QgsProject.instance()
         
@@ -234,7 +234,13 @@ class UldkGugik:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        if self.dock is not None:
+            MessageUtils.pushLogWarning(
+                "GUI wtyczki już zainicjowane, pomijam."
+            )
+            return
 
+        self.dlg = UldkGugikDialog()
 
         icon_path = os.path.join(self.plugin_dir, 'images', 'uldk.svg')
         self.addAction(
@@ -242,9 +248,6 @@ class UldkGugik:
             text=self.tr(u'Usługa Lokalizacji Działek Katastralnych (ULDK)'),
             callback=self.run,
             parent=self.iface.mainWindow())
-
-        # will be set False in run()
-        self.first_start = True
 
         self.shortcut = QShortcut(QKeySequence("Alt+F"), self.iface.mainWindow())
         self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
@@ -287,6 +290,21 @@ class UldkGugik:
         self.dock.hide()
 
         self.dlg.btn_close.clicked.connect(self.dock.hide)
+        self.dock.visibilityChanged.connect(self.onDockVisibilityChanged)
+
+    def onDockVisibilityChanged(self, visible):
+        """Dopasowanie rozmiaru wtyczki i pobranie województw, jeżeli GUI już zainicjowane."""
+        if not visible:
+            return
+        QTimer.singleShot(0, self.prepareShownDock)
+
+    def prepareShownDock(self):
+        """Przygotowuje formularz w panelu, jeśli jeszcze nie był przygotowany."""
+        if self.dock is None or not self.dock.isVisible():
+            return
+        if self.areRegionsLoaded():
+            return
+        self.setupDialog()
 
     def showDock(self):
         """Pokazuje panel tam gdzie zostawił go użytkownik, i rozszerza go do rozmiaru formularza."""
@@ -318,11 +336,15 @@ class UldkGugik:
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginMenu(
-                self.tr(ENV_MENU_NAME),
-                action)
-            # self.iface.removeToolBarIcon(action)
+            self.iface.removePluginMenu(self.menu, action)
             self.toolbar.removeAction(action)
+            action.deleteLater()
+        self.actions = []
+
+        # odłączenie pobierania przez przycisk (jeżeli jest akurat włączone)
+        if self.canvas.mapTool() is self.click_tool:
+            self.canvas.unsetMapTool(self.click_tool)
+        self.click_tool.canvasClicked.disconnect(self.canvasClicked)
 
         # usuniecie skrotu klawiszowego
         if self.shortcut is not None:
@@ -333,8 +355,11 @@ class UldkGugik:
 
         if self.dock is not None:
             self.iface.removeDockWidget(self.dock)
-            self.dock.deleteLater()
+            # Usunięcie od razu, a nie przez deleteLater():
+            sip.delete(self.dock)
             self.dock = None
+            self.scroll = None
+        self.dlg = None
 
     def run(self):
         """Otwarcie okna wtyczki"""
@@ -350,8 +375,6 @@ class UldkGugik:
                 "W celu dalszej pracy zdefiniuj układ współrzędnych dla projektu"
             )
             return 1
-        if self.first_start is True:
-            self.first_start = False
         
         try:
             url = QUrl('https://uldk.gugik.gov.pl')
@@ -403,21 +426,33 @@ class UldkGugik:
                 f"Ostrzeżenie: Brak połączenia z internetem: {e}"
             )
 
+        # w trakcie czekania na serwer wtyczka mogła zostać wyłączona lub przeładowana
+        if self.dlg is None:
+            return
+
         self.dlg.projectionWidget.setCrs(
             QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
         )
 
+    def areRegionsLoaded(self):
+        """Czy lista województw jest pobrana i niepusta."""
+        return (
+            self.dlg.RegionFetch is not None
+            and bool(self.dlg.RegionFetch.wojewodztwo_dict)
+        )
 
     def setupDialog(self):
-        if self.dlg.RegionFetch is None:
-            try:
-                self.dlg.RegionFetch = RegionFetch(teryt='')
-                self.dlg.fillVoivodeships()
-            except Exception as e:
-                MessageUtils.pushLogWarning(
-                    "Ostrzeżenie: "
-                    f"Nie udało się zainicjować listy województw: {e}"
-                )
+        # wtyczka mogła zostać wyłączona, zanim doszło do tej funkcji (unload ustawia dlg = None)
+        if self.dlg is None:
+            return
+        if not self.areRegionsLoaded():
+            # Pobieranie czeka na serwer, a w tym czasie QGIS dalej obsługuje zdarzenia –
+            # wtyczka mogła zostać w trakcie wyłączona lub przeładowana.
+            region_fetch = RegionFetch(teryt='')
+            if self.dlg is None:
+                return
+            self.dlg.RegionFetch = region_fetch
+            self.dlg.fillVoivodeships()
         self.dlg.show()
         self.showDock()
 
