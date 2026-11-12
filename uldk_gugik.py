@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 from qgis.PyQt.QtCore import (QSettings, QTranslator, qVersion, 
-                              QCoreApplication, QVariant, Qt)
+                              QCoreApplication, Qt)
 from qgis.PyQt.QtGui import QIcon, QPixmap, QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QToolBar, QShortcut, QWidget, QLabel, QDialog, QScrollArea, QFrame
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsDockWidget
@@ -47,6 +47,7 @@ from . import utils, uldk_api, uldk_xy, uldk_parcel
 from .constants import (
     DEFAULT_SRID, ENV_MENU_NAME, SWAP_XY_SRIDS, TOOLTIP_FROM_MAP,
     OBJECT_TYPES, ULDK_MIN_LINE_LEN, INDUSTRIES,
+    RESULT_FIELD_LENGTHS, RESULT_FIELDS_BY_OBJECT_TYPE,
 )
 from .utils import VersionUtils
 
@@ -884,34 +885,11 @@ class UldkGugik:
                 # jezeli istnieje to dodaj obiekt do warstwy
                 layer = layers[0]
             else:
-                # jezeli nie istnieje to stworz warstwe
-                epsg = f"Polygon?crs=EPSG:{DEFAULT_SRID}"
-                layer = QgsVectorLayer(epsg, nazwa, "memory")
-                self.project.addMapLayer(layer)
+                # jezeli nie istnieje to stworz warstwe - wyszukiwanie dzialki zwraca komplet atrybutow dzialki
+                layer = self.createResultLayer(nazwa, RESULT_FIELDS_BY_OBJECT_TYPE[1])
             
             provider = layer.dataProvider()
             layer.updateExtents()
-
-            if not layers:
-                voivField = QgsField('województwo', QVariant.String, len=30)
-                provider.addAttributes([voivField])
-
-                conField = QgsField('powiat', QVariant.String, len=30)
-                provider.addAttributes([conField])
-
-                comField = QgsField('gmina', QVariant.String, len=30)
-                provider.addAttributes([comField])
-
-                regField = QgsField('obręb', QVariant.String, len=30)
-                provider.addAttributes([regField])
-
-                parField = QgsField('numer', QVariant.String, len=30)
-                provider.addAttributes([parField])
-                
-                idField = QgsField('teryt', QVariant.String, len=40)
-                provider.addAttributes([idField])
-
-                layer.updateFields()
 
             feat = QgsFeature(provider.fields())
             feat.setGeometry(QgsGeometry().fromWkt(wkt))
@@ -1314,6 +1292,21 @@ class UldkGugik:
         MessageUtils.pushLogSuccess(success_message)
         MessageUtils.pushSuccess(self.iface, success_message)
 
+    def createResultLayer(self, nazwa, field_names):
+        """tworzy warstwe tymczasowa (memory) na wyniki, dodaje ja do projektu i zaklada pola tekstowe o podanych nazwach"""
+        layer = QgsVectorLayer(f"Polygon?crs=EPSG:{DEFAULT_SRID}", nazwa, "memory")
+        self.project.addMapLayer(layer)
+
+        provider = layer.dataProvider()
+        string_type = VersionUtils.stringFieldType()
+        provider.addAttributes([
+            QgsField(field_name, string_type, len=RESULT_FIELD_LENGTHS[field_name])
+            for field_name in field_names
+        ])
+        layer.updateFields()
+
+        return layer
+
     def addResultsToLayer(self, object_type, wkt, teryt, parcel, region, commune, county, voivodeship, zoomToFeature):
         """dodaje wyniki (odpowiedź z serwera) do mapy jako warstwę z atrybutami i geometrią"""
 
@@ -1331,38 +1324,11 @@ class UldkGugik:
         if layers:
             # jezeli istnieje to dodaj obiekt do warstwy
             layer = layers[0]
-            provider = layer.dataProvider()
-
         else:
-            # jezeli nie istnieje to stworz warstwe
-            layer = QgsVectorLayer(f"Polygon?crs=EPSG:{DEFAULT_SRID}", nazwa, "memory")
-            self.project.addMapLayer(layer)
+            # jezeli nie istnieje to stworz warstwe z polami wlasciwymi dla typu obiektu
+            layer = self.createResultLayer(nazwa, RESULT_FIELDS_BY_OBJECT_TYPE[object_type])
 
-            provider = layer.dataProvider()
-
-            voivField = QgsField('województwo', QVariant.String, len=30)
-            provider.addAttributes([voivField])
-
-            if object_type == 6 or object_type == 4 or object_type == 3 or object_type == 2 or object_type == 1:
-                conField = QgsField('powiat', QVariant.String, len=30)
-                provider.addAttributes([conField])
-
-            if object_type == 6 or object_type == 3 or object_type == 2 or object_type == 1:
-                comField = QgsField('gmina', QVariant.String, len=30)
-                provider.addAttributes([comField])
-
-            if object_type == 6 or object_type == 2 or object_type == 1:
-                regField = QgsField('obręb', QVariant.String, len=30)
-                provider.addAttributes([regField])
-
-            if object_type == 1:
-                parField = QgsField('numer', QVariant.String, len=30)
-                provider.addAttributes([parField])
-
-            idField = QgsField('teryt', QVariant.String, len=40)
-            provider.addAttributes([idField])
-
-            layer.updateFields()
+        provider = layer.dataProvider()
 
         feat = QgsFeature(provider.fields())
         feat.setGeometry(QgsGeometry().fromWkt(wkt))

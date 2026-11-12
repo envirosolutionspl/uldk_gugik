@@ -163,6 +163,29 @@ OBJECT_TYPES = {
     }
 }
 
+# Od QGIS 3.38 QgsField przyjmuje QMetaType.Type; wersja z QVariant.Type jest przestarzała (DeprecationWarning)
+QGIS_QMETATYPE_FIELD_MIN_VERSION = 33800
+
+# Długości pól tekstowych w warstwach wynikowych
+RESULT_FIELD_LENGTHS = {
+    'województwo': 30,
+    'powiat': 30,
+    'gmina': 30,
+    'obręb': 30,
+    'numer': 30,
+    'teryt': 40,
+}
+
+# Pola warstwy wynikowej dla każdego typu obiektu (klucze jak w OBJECT_TYPES)
+RESULT_FIELDS_BY_OBJECT_TYPE = {
+    1: ['województwo', 'powiat', 'gmina', 'obręb', 'numer', 'teryt'],
+    2: ['województwo', 'powiat', 'gmina', 'obręb', 'teryt'],
+    3: ['województwo', 'powiat', 'gmina', 'teryt'],
+    4: ['województwo', 'powiat', 'teryt'],
+    5: ['województwo', 'teryt'],
+    6: ['województwo', 'powiat', 'gmina', 'obręb', 'teryt'],
+}
+
 HOME_LINK = 'https://envirosolutions.pl/wtyczki-qgis/usluga-lokalizacji-dzialek-katastralnych-uldk/'
 
 # ----------- Kolory dla footerów w zależności od theme -----------
