@@ -72,7 +72,7 @@ QDialog[theme="light"] QFrame#groupBox QRadioButton:hover { border-color: #4c6e4
 QDialog[theme="light"] QFrame#groupBox QRadioButton:checked { background: #4c6e4f; border-color: #4c6e4f; color: #ffffff; }
 
 QDialog[theme="light"] QTabWidget::pane { background: #ffffff; border: 1px solid #b9c7b9; }
-QDialog[theme="light"] QWidget#tab1, QDialog[theme="light"] QWidget#tab2, QDialog[theme="light"] QWidget#tab3 { background: #ffffff; }
+QDialog[theme="light"] QWidget#tab1, QDialog[theme="light"] QWidget#tab2, QDialog[theme="light"] QWidget#tab3 { background: transparent; }
 QDialog[theme="light"] QTabBar::tab { background: #e3ebe3; color: #5a6460; border: 1px solid #c9d5c9; border-bottom: 1px solid #b9c7b9; }
 QDialog[theme="light"] QTabBar::tab:hover { background: #eef3ee; color: #3b5a3e; }
 QDialog[theme="light"] QTabBar::tab:selected { background: #ffffff; color: #3b5a3e; border-color: #b9c7b9; border-bottom: 1px solid #ffffff; }
@@ -115,7 +115,7 @@ QDialog[theme="dark"] QFrame#groupBox QRadioButton:hover { border-color: #6f9c73
 QDialog[theme="dark"] QFrame#groupBox QRadioButton:checked { background: #5b8260; border-color: #5b8260; color: #ffffff; }
 
 QDialog[theme="dark"] QTabWidget::pane { background: #262829; border: 1px solid #4c6e4f; }
-QDialog[theme="dark"] QWidget#tab1, QDialog[theme="dark"] QWidget#tab2, QDialog[theme="dark"] QWidget#tab3 { background: #262829; }
+QDialog[theme="dark"] QWidget#tab1, QDialog[theme="dark"] QWidget#tab2, QDialog[theme="dark"] QWidget#tab3 { background: transparent; }
 QDialog[theme="dark"] QTabBar::tab { background: #1f2122; color: #9aa4a0; border: 1px solid #3a3f40; border-bottom: 1px solid #4c6e4f; }
 QDialog[theme="dark"] QTabBar::tab:hover { background: #2c3a2d; color: #e6e9e7; }
 QDialog[theme="dark"] QTabBar::tab:selected { background: #262829; color: #a9cfac; border-color: #4c6e4f; border-bottom: 1px solid #262829; }
