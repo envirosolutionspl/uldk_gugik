@@ -302,7 +302,7 @@ class UldkGugik:
         """Przygotowuje formularz w panelu, jeśli jeszcze nie był przygotowany."""
         if self.dock is None or not self.dock.isVisible():
             return
-        if self.dlg.RegionFetch is not None:
+        if self.areRegionsLoaded():
             return
         self.setupDialog()
 
@@ -434,12 +434,18 @@ class UldkGugik:
             QgsCoordinateReferenceSystem.fromEpsgId(int(srid))
         )
 
+    def areRegionsLoaded(self):
+        """Czy lista województw jest pobrana i niepusta."""
+        return (
+            self.dlg.RegionFetch is not None
+            and bool(self.dlg.RegionFetch.wojewodztwo_dict)
+        )
 
     def setupDialog(self):
         # wtyczka mogła zostać wyłączona, zanim doszło do tej funkcji (unload ustawia dlg = None)
         if self.dlg is None:
             return
-        if self.dlg.RegionFetch is None:
+        if not self.areRegionsLoaded():
             # Pobieranie czeka na serwer, a w tym czasie QGIS dalej obsługuje zdarzenia –
             # wtyczka mogła zostać w trakcie wyłączona lub przeładowana.
             region_fetch = RegionFetch(teryt='')
