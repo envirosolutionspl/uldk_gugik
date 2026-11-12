@@ -2,10 +2,10 @@ import os
 import socket
 from qgis.utils import iface
 from qgis.core import Qgis, QgsMessageLog, QgsApplication
-from qgis.PyQt.QtCore import QT_VERSION_STR, Qt
+from qgis.PyQt.QtCore import QT_VERSION_STR, Qt, QVariant, QMetaType
 from qgis.PyQt.QtGui import QPalette, QPixmap
 from qgis.PyQt.QtWidgets import QWidget
-from .constants import CHECK_INTERNET_CLIENT
+from .constants import CHECK_INTERNET_CLIENT, QGIS_QMETATYPE_FIELD_MIN_VERSION
 from . import PLUGIN_NAME
 
 PLUGIN_DIR = os.path.dirname(__file__)
@@ -18,6 +18,13 @@ class VersionUtils:
             return True
         else:
             return False
+
+    @staticmethod
+    def stringFieldType():
+        """Typ pola tekstowego dla QgsField: QMetaType w QGIS >= 3.38, QVariant w starszych (min. 3.28)."""
+        if Qgis.QGIS_VERSION_INT >= QGIS_QMETATYPE_FIELD_MIN_VERSION:
+            return QMetaType.Type.QString
+        return QVariant.String
 
 class MessageUtils:
     
