@@ -12,22 +12,13 @@ REST_ENDPOINT_COMMUNE = "/getCommune"
 REST_ENDPOINT_PRECINCT = "/getPrecinct"
 
 FEED_URL = 'https://qgisfeed.envirosolutions.pl/'
+INDUSTRIES_URL = 'https://qgisfeed.enviro-dev.pl/industries/'
+INDUSTRIES_TIMEOUT_MS = 3000
 
-INDUSTRIES = {
-    "999": "Nie wybrano",
-    "e": "Energetyka/OZE",
-    "u": "Urząd",
-    "td": "Transport/Drogi",
-    "pg": "Planowanie/Geodezja",
-    "wk": "WodKan",
-    "s": "Środowisko",
-    "rl": "Rolnictwo/Leśnictwo",
-    "tk": "Telkom",
-    "edu": "Edukacja",
-    "i": "Inne",
-    "it": "IT",
-    "n": "Nieruchomości"
-}
+# Klucze QgsSettings wspólne dla wszystkich wtyczek EnviroSolutions w profilu QGIS
+FEED_KEY_USER_ID = 'anonymous_user_id'
+FEED_KEY_INDUSTRY = 'selected_industry'
+FEED_APP_PROPERTY_DIALOG_HANDLED = 'envirosolutions_industry_dialog_handled'
 
 ULDK_BASE_URL = "https://uldk.gugik.gov.pl/"
 ULDK_NO_RESULTS = "-1 brak wyników"
