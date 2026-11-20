@@ -42,12 +42,13 @@ from .resources import *  # noqa: F403
 # Import the code for the dialog
 from .uldk_gugik_dialog import UldkGugikDialog
 from .uldk import RegionFetch
-from .qgis_feed import QgisFeedDialog
+from .qgis_feed import EnviroFeedManager
+from .qgis_feed_dialog import QgisFeedDialog
 import os.path
 from . import utils, uldk_api, uldk_xy, uldk_parcel
 from .constants import (
     DEFAULT_SRID, ENV_MENU_NAME, SWAP_XY_SRIDS, TOOLTIP_FROM_MAP,
-    OBJECT_TYPES, ULDK_MIN_LINE_LEN, INDUSTRIES,
+    OBJECT_TYPES, ULDK_MIN_LINE_LEN,
     RESULT_FIELD_LENGTHS, RESULT_FIELDS_BY_OBJECT_TYPE,
 )
 from .utils import VersionUtils
@@ -71,25 +72,10 @@ class UldkGugik:
         self.settings = QgsSettings()
         self.iface = iface
 
+        self.feed_manager = None
         if Qgis.QGIS_VERSION_INT >= 31000:
-            from .qgis_feed import QgisFeed
-
-            # qgis feed
-            self.selected_industry = self.settings.value("selected_industry", None)
-            show_dialog = self.settings.value("showDialog", True, type=bool)
-
-            # wczytywanie branży jeżeli nie jest zgodna z aktualnym słownikiem
-            if self.selected_industry not in INDUSTRIES.values():
-                self.selected_industry = None
-                show_dialog = True 
-            
-            if self.selected_industry is None and show_dialog:
-                self.showBranchSelectionDialog()
-        
-            select_indust_session = self.settings.value('selected_industry')
-            
-            self.feed = QgisFeed(selected_industry=select_indust_session, plugin_name=plugin_name)
-            self.feed.initFeed()
+            self.feed_manager = EnviroFeedManager(iface, plugin_name, QgisFeedDialog)
+            self.feed_manager.start()
 
         # DialogOnTop
 
@@ -134,13 +120,6 @@ class UldkGugik:
         self.scroll = None
         self.region_name = None
         self.project = QgsProject.instance()
-        
-
-    def showBranchSelectionDialog(self):
-        """Wyświetla dialog wyboru branży dla QGIS Feed."""
-        dialog = QgisFeedDialog(self.iface.mainWindow())
-        dialog.exec()
-        self.selected_industry = self.settings.value("selected_industry", None)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -336,6 +315,10 @@ class UldkGugik:
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
+        if self.feed_manager is not None:
+            self.feed_manager.unload()
+            self.feed_manager = None
+
         for action in self.actions:
             self.iface.removePluginMenu(self.menu, action)
             self.toolbar.removeAction(action)
