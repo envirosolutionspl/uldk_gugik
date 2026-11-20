@@ -35,10 +35,6 @@ class FeedSettings:
     def setIndustryCode(code: str):
         QgsSettings().setValue(FEED_KEY_INDUSTRY, code)
 
-    @staticmethod
-    def getLanguage() -> str:
-        return QgsApplication.locale()
-
 
 class IndustriesFetch:
 
@@ -122,9 +118,9 @@ class IndustriesFetch:
 
 
 class QgisFeed:
-    def __init__(self, plugin_name, industry_code, user_id, language):
+    def __init__(self, plugin_name, industry_code, user_id):
         self.s = QgsSettings()
-        self.es_url = self.buildFeedUrl(plugin_name, industry_code, user_id, language)
+        self.es_url = self.buildFeedUrl(plugin_name, industry_code, user_id)
         self.parser = QgsNewsFeedParser(
             feedUrl=QUrl(self.es_url)
         )
@@ -135,12 +131,11 @@ class QgisFeed:
         self.parser.fetched.connect(self.registerFeed)
 
     @staticmethod
-    def buildFeedUrl(plugin_name, industry_code, user_id, language) -> str:
+    def buildFeedUrl(plugin_name, industry_code, user_id) -> str:
         params = (
             ('industry', industry_code),
-            ('plugin', QgisFeed.create_slug(plugin_name or '')),
+            ('plugin', QgisFeed.createSlug(plugin_name or '')),
             ('uid', user_id),
-            ('lang', language),
         )
         query = QUrlQuery()
         for key, value in params:
@@ -161,7 +156,7 @@ class QgisFeed:
         return re.sub(r'://|\.|:|/\?|=|&|-', '', url)
 
     @staticmethod
-    def create_slug(text):
+    def createSlug(text):
         """
         This function makes slug from a random text
         """
@@ -258,7 +253,7 @@ class EnviroFeedManager:
         self._fetch.start(self._onIndustriesFetched)
 
     def _startFeed(self, code):
-        self.feed = QgisFeed(self.plugin_name, code, self._user_id, FeedSettings.getLanguage())
+        self.feed = QgisFeed(self.plugin_name, code, self._user_id)
         self.feed.initFeed()
 
     def _onIndustriesFetched(self, industries):

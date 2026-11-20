@@ -120,7 +120,6 @@ class UldkGugik:
         self.scroll = None
         self.region_name = None
         self.project = QgsProject.instance()
-        
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
