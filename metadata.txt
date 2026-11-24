@@ -27,6 +27,7 @@ repository=https://github.com/envirosolutionspl/uldk_gugik
 # Uncomment the following line and add your changelog:
 changelog=
   Wersja 2.2.0
+    * Zautomatyzowanie procesu publikacji wtyczek w repozytorium QGIS
     * Zmiana działania qgisfeeda
 #  Wersja 2.1.1
 #    * Poprawa security issues
